@@ -1,6 +1,7 @@
 # itootuf
 
 itoofut (I'm Tired Of Other Frameworks for Unit Testing), a simple and flexible testing framework. Probably not as user friendly as others, but more flexible and still simple
+(Maybe rename into I'm Tired of Unit Testing Frameworks or I'm Tired Of Cpp Unit Testing Frameworks or I'm Tired Of Cpp Frameworks for Unit Testing)
 
 Note : May need to change namespace itoofut to itft or something like this ?
 
