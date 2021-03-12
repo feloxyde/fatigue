@@ -1,3 +1,3 @@
-# itootf
+# itootuf
 
-Itootf (I'm Tired Of Other Testing Frameworks), a simple and flexible testing framework. Probably not as user friendly as others, but more flexible and still simple
+itoofut (I'm Tired Of Other Frameworks for Unit Testing), a simple and flexible testing framework. Probably not as user friendly as others, but more flexible and still simple
