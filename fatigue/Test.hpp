@@ -51,6 +51,9 @@ template<typename T, typename U> concept Subbable = requires (T const& left, U c
 
 class Test {
 public:
+  Test(TestId name);
+
+public:
   virtual void run() = 0;
   virtual TestId name() = 0;
   virtual void load();
