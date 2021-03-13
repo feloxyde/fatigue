@@ -101,9 +101,9 @@ Most frameworks able to handle some of previously regarded features are :
 
 # Solution : Three class Framework
 
-In order to use the itoofut framework, only three classes, fairly fast, are to be known. It's use are somehow inspired from Pytest framework, where tests are implemented by deriving a test class. 
+In order to use the fatigue framework, only two classes and two methods are to be known. It's use is somehow inspired from Pytest framework, where tests are implemented by deriving a test class. 
 
-Especially, this framework is oriented toward ensuring debug is as simple as possible.
+Especially, this framework is oriented toward ensuring debug of the code is as simple as possible.
 
 ## ```Test```
 
@@ -118,7 +118,7 @@ In order to run it, you only need to override four methods, each taking no argum
 ```cpp 
 //should Test should be instanciated with final class, in order to auto name ?
 //Test has an additional
-struct MyTest : public itoofut::Test {
+struct MyTest : public ftg::Test {
     virtual void load();
     virtual void run();
     virtual void unload();
@@ -201,7 +201,7 @@ To create your own suite, simply derive from ```TestSuite``` struct, and overrid
 Please note that ```TestSuite``` constructor takes a ```std::string``` name as mandatory parameter.
 
 ```cpp 
-struct MySuite : public itoofut::TestSuite {
+struct MySuite : public ftg::TestSuite {
     /* some ctor */
     virtual void testList tests() const;
 }
@@ -224,14 +224,14 @@ Usually, the bottom of the *main* file of your tests will look like that :
 
 ```cpp
 void register_tests(){
-    ::itoofut::add(std::make_unique<MySuite>("MySuite"));
-    ::itoofut::add(std::make_unique<AnotherSuite>("AnotherSuite"));
+    ::ftg::add(std::make_unique<MySuite>("MySuite"));
+    ::ftg::add(std::make_unique<AnotherSuite>("AnotherSuite"));
     /* ... */
 }
 
 int main(int argc, char** argv){
     register_tests();
-    ::itoofut::run(argc, argv);
+    ::ftg::run(argc, argv);
 }
 ```
 
