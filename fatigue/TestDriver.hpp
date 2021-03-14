@@ -12,8 +12,10 @@
 
 namespace ftg {
 
-//#FIXME add a decoupled "output" class for message to allow user to
+//#FIXME add a decoupled "output" (ReportDisplay ?) class for message to allow
+// user to
 // customize its output !
+struct ReportDisplay;
 
 enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_FATAL, MESSAGE_INFO };
 
@@ -33,14 +35,14 @@ private:
 // exception.
 typedef std::string TestId;
 
-class TestLogger {
+class TestDriver {
 public:
-  TestLogger();
+  TestDriver();
 
 public:
   class CheckReporter {
   public:
-    CheckReporter(TestLogger &test, std::string const &description, bool res);
+    CheckReporter(TestDriver &test, std::string const &description, bool res);
     ~CheckReporter();
 
     // used to tell what to do with result
@@ -70,7 +72,7 @@ public:
     bool m_res;
     bool m_expected;
     bool m_important;
-    TestLogger &m_test;
+    TestDriver &m_test;
     bool m_reported;
   };
 
@@ -100,16 +102,16 @@ private:
 
 /** OTHER METHODS IMPLEMENTATION */
 
-inline TestLogger::CheckReporter::CheckReporter(TestLogger &test,
+inline TestDriver::CheckReporter::CheckReporter(TestDriver &test,
                                                 std::string const &description,
                                                 bool res)
     : m_test(test), m_description(description), m_res(res),
       m_mode(MESSAGE_CHECK), m_expected(true), m_important(false),
       m_reported(false) {}
 
-inline TestLogger::CheckReporter::~CheckReporter() { report(); }
+inline TestDriver::CheckReporter::~CheckReporter() { report(); }
 
-inline void TestLogger::CheckReporter::report() {
+inline void TestDriver::CheckReporter::report() {
   if (m_reported == false) {
     m_reported = true;
     m_test.m_checkCount++;
@@ -137,27 +139,27 @@ inline void TestLogger::CheckReporter::report() {
   }
 }
 
-inline void TestLogger::CheckReporter::warn() { m_mode = MESSAGE_WARN; }
+inline void TestDriver::CheckReporter::warn() { m_mode = MESSAGE_WARN; }
 
-inline void TestLogger::CheckReporter::fatal() {
+inline void TestDriver::CheckReporter::fatal() {
   m_mode = MESSAGE_FATAL;
   report();
   throw FatalAssertionExit();
 }
 
-inline void TestLogger::CheckReporter::assert() { fatal(); }
+inline void TestDriver::CheckReporter::assert() { fatal(); }
 
-inline TestLogger::CheckReporter &TestLogger::CheckReporter::important() {
+inline TestDriver::CheckReporter &TestDriver::CheckReporter::important() {
   m_important = true;
   return *this;
 }
 
-inline TestLogger::CheckReporter &TestLogger::CheckReporter::fails() {
+inline TestDriver::CheckReporter &TestDriver::CheckReporter::fails() {
   m_expected = false;
   return *this;
 }
 
-inline TestLogger::CheckReporter &TestLogger::CheckReporter::succeeds() {
+inline TestDriver::CheckReporter &TestDriver::CheckReporter::succeeds() {
   m_expected = true;
   return *this;
 }

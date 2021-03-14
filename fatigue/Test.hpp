@@ -1,7 +1,7 @@
 #ifndef FATIGUE_TEST_HPP
 #define FATIQUE_TEST_HPP
 
-#include "TestLogger.hpp"
+#include "TestDriver.hpp"
 #include "utils.hpp"
 #include <concepts>
 #include <exception>
@@ -62,7 +62,7 @@ template<typename T, typename U> concept Subbable = requires (T const& left, U c
 };
 // clang-format on
 
-class Test : public TestLogger {
+class Test : public TestDriver {
 public:
 public:
   virtual void run() = 0;
