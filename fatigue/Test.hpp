@@ -4,6 +4,8 @@
 #include <ostream>
 #include <string>
 #include <type_traits>
+#include "utils.hpp"
+#include <sstring>
 
 namespace ftg {
 struct LogMessage {};
@@ -161,13 +163,34 @@ protected:
   CheckReporter check_greater_equal(T const& left, U const& right, std::string const& message);
 //clang-format on
 
+private: 
+  
+  template<OutStreamable T, OutStreamable U>
+  std::string reportCheck(std::string check, T const& left, U const& right);
+  bool m_show_types;
 };
 
+//#FIXME SHALL ADAPT TO DIFFERENT POSSIBILITIES, as << and ftg::value_to_string<T>(T), the later should be priorized, so one can choose
+//to simply display what they want. Displayble = OutStreamable || ValueToString
+template<OutStreamable T, OutStreamable U>
+std::string Test::reportBinaryCheck(std::string check, T const& left, U const& right){
+  std::stringstream ss;
+  ss << "expected " << check << " between ";
+  ss << left;
+  if(m_show_types)
+    ss << "(" + type_to_string<T>() + ")";
+  ss << " and ";
+  ss << right;
+  if(m_show_types)
+    ss << "(" + type_to_string<U>() + ")";
+    return ss.str();
+}
 
+  
 /* CHECK IMPLEMENTATIONS */
 Test::CheckReporter Test::check_true(bool b)
 {
-  return check_true(b, "check_true failed : found false");
+  return check_true(b, "expected check_true");
 }
 
 Test::CheckReporter Test::check_true(bool b, std::string const& message)
@@ -177,7 +200,7 @@ Test::CheckReporter Test::check_true(bool b, std::string const& message)
 
 Test::CheckReporter Test::check_false(bool b)
 {
-  return check_true(b, "check_false failed : found true");
+  return check_false(b, "expected check_false");
 }
   
 Test::CheckReporter Test::check_false(bool b, std::string const& message)
@@ -185,11 +208,21 @@ Test::CheckReporter Test::check_false(bool b, std::string const& message)
   return Test::CheckReporter(*this, message, !b);
 }
 
+
 template <OutStreamable T, OutStreamable U>
 requires EQComparable<T, U>
 Test::CheckReporter Test::check_equal(T const& left, U const& right)
 {
-  return check_equal(left, right, "implement check_equal auto message");
+  std::stringstream ss;
+  ss << "expected ";
+  ss << left;
+  if(m_show_types)
+    ss << "(" + type_to_string<T>() + ")";
+  ss << " == ";
+  ss << right;
+  if(m_show_types)
+    ss << "(" + type_to_string<U>() + ")";
+  return check_equal(left, right, ss.str());
 }
 
 template <typename T, typename U>
