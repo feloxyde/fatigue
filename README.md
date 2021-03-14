@@ -29,7 +29,7 @@ private:
 };
 ```
 
-Construction and cast to ```JSON``` is meant to be directional, so all three following lines are strictly equivalents in term of object they produce :
+Construction and cast to ```JSON``` is meant to be directional, so all three following lines are strictly equivalents in terms of object they produce :
 
 ```cpp
 Mystruct a(...), b(...);
