@@ -1,11 +1,11 @@
 #ifndef TEST_SUITE_HPP
 #define TEST_SUITE_HPP
+#include "utils.hpp"
 #include <concepts>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <type_traits>
-#include "utils.hpp"
-#include <sstring>
 
 namespace ftg {
 struct LogMessage {};
@@ -17,6 +17,14 @@ typedef std::string TestId;
 template <typename T> concept OutStreamable = requires(std::ostream &a, T const& b) {
   { a << b } ->std::same_as<std::ostream &>;
 };
+
+template <typename T> std::string to_string(T const &a);
+
+template <typename T> concept ToStringable = requires(T const& a){
+  { ftg::to_string(a) } -> std::same_as<std::string>;
+};
+
+template <typename T> concept Displayable = OutStreamable<T> && ToStringable<T>;
 
 template <typename T, typename U> concept EQComparable = requires(T const& left, U const& right){
   { left == right } ->std::same_as<bool>; 
@@ -106,7 +114,7 @@ protected:
 
   CheckReporter check_false(bool b, std::string const& message);
 
-  template <OutStreamable T, OutStreamable U>
+  template <Displayable T, Displayable U>
   requires EQComparable<T, U>
   CheckReporter check_equal(T const& left, U const& right);
 
@@ -114,7 +122,7 @@ protected:
   requires EQComparable<T, U>
   CheckReporter check_equal(T const& left, U const& right, std::string const& message);
   
-  template <OutStreamable T, OutStreamable U, OutStreamable V>
+  template <Displayable T, Displayable U, Displayable V>
   requires LEComparable<T, U> && GEComparable<T, U> && Addable<U, V> && Subbable<U, V>
   CheckReporter check_near_equal(T const& left, U const& right, V const& tolerance);
 
@@ -122,7 +130,7 @@ protected:
   requires LEComparable<T, U> && GEComparable<T, U> && Addable<U, V> && Subbable<U, V>
   CheckReporter check_near_equal(T const& left, U const& right, V const& tolerance, std::string const& message);
 
-  template <OutStreamable T, OutStreamable U>
+  template <Displayable T, Displayable U>
   requires NEComparable<T, U>
   CheckReporter check_not_equal(T const& left, U const& right);
 
@@ -130,7 +138,7 @@ protected:
   requires NEComparable<T, U>
   CheckReporter check_not_equal(T const& left, U const& right, std::string const& message);
 
-  template <OutStreamable T, OutStreamable U>
+  template <Displayable T, Displayable U>
   requires LTComparable<T, U>
   CheckReporter check_less_than(T const& left, U const& right);
 
@@ -138,7 +146,7 @@ protected:
   requires LTComparable<T, U>
   CheckReporter check_less_than(T const& left, U const& right, std::string const& message);
 
-  template <OutStreamable T, OutStreamable U>
+  template <Displayable T, Displayable U>
   requires LEComparable<T, U>
   CheckReporter check_less_equal(T const& left, U const& right);
 
@@ -146,7 +154,7 @@ protected:
   requires LEComparable<T, U>
   CheckReporter check_less_equal(T const& left, U const& right, std::string const& message);
 
-  template <OutStreamable T, OutStreamable U>
+  template <Displayable T, Displayable U>
   requires GTComparable<T, U>
   CheckReporter check_greater_than(T const& left, U const& right);
 
@@ -154,7 +162,7 @@ protected:
   requires GTComparable<T, U>
   CheckReporter check_greater_than(T const& left, U const& right, std::string const& message);
 
-  template <OutStreamable T, OutStreamable U>
+  template <Displayable T, Displayable U>
   requires GEComparable<T, U>
   CheckReporter check_greater_equal(T const& left, U const& right);
 
@@ -165,64 +173,83 @@ protected:
 
 private: 
   
-  template<OutStreamable T, OutStreamable U>
-  std::string reportCheck(std::string check, T const& left, U const& right);
+  template<Displayable T, Displayable U>
+  std::string formatBinaryCheck(std::string check, T const& left, U const& right);
+
+  template<Displayable T, Displayable U, Displayable V>
+  std::string formatTolerantCheck(std::string check, T const& left, U const& right, V const& tolerance);
+
   bool m_show_types;
 };
 
 //#FIXME SHALL ADAPT TO DIFFERENT POSSIBILITIES, as << and ftg::value_to_string<T>(T), the later should be priorized, so one can choose
-//to simply display what they want. Displayble = OutStreamable || ValueToString
-template<OutStreamable T, OutStreamable U>
-std::string Test::reportBinaryCheck(std::string check, T const& left, U const& right){
+//to simply display what they want. Displayble = Displayable || ValueToString
+template<Displayable T, Displayable U>
+std::string Test::formatBinaryCheck(std::string check, T const& left, U const& right){
   std::stringstream ss;
-  ss << "expected " << check << " between ";
-  ss << left;
-  if(m_show_types)
-    ss << "(" + type_to_string<T>() + ")";
+  ss << "expected " << check << " with ";
+  if constexpr (ToStringable<T>){
+    ss << ftg::to_string(left);
+  } else {
+    ss << left;
+  }
+  if(m_show_types){
+    ss << " (" + type_to_string<T>() + ")";
+  }
   ss << " and ";
-  ss << right;
-  if(m_show_types)
-    ss << "(" + type_to_string<U>() + ")";
-    return ss.str();
+  if constexpr (ToStringable<U>){
+    ss << ftg::to_string(right);
+  } else {
+    ss << right;
+  }
+  if(m_show_types){
+    ss << " (" + type_to_string<U>() + ")";
+  }
+  return ss.str();
 }
 
-  
+template<Displayable T, Displayable U, Displayable V>
+std::string Test::formatTolerantCheck(std::string check, T const& left, U const& right, V const& tolerance)
+{
+  std::stringstream ss;
+  ss << formatBinaryCheck(check, left, right);
+  ss << " tolerance ";
+  if constexpr (ToStringable<V>){
+    ss << ftg::to_string(tolerance);
+  } else {
+    ss << tolerance;
+  }
+  if(m_show_types){
+    ss << "(" + type_to_string<V>() + ")";
+  }
+}
+
 /* CHECK IMPLEMENTATIONS */
-Test::CheckReporter Test::check_true(bool b)
+inline Test::CheckReporter Test::check_true(bool b)
 {
   return check_true(b, "expected check_true");
 }
 
-Test::CheckReporter Test::check_true(bool b, std::string const& message)
+inline Test::CheckReporter Test::check_true(bool b, std::string const& message)
 {
   return Test::CheckReporter(*this, message, b);
 }
 
-Test::CheckReporter Test::check_false(bool b)
+inline Test::CheckReporter Test::check_false(bool b)
 {
   return check_false(b, "expected check_false");
 }
   
-Test::CheckReporter Test::check_false(bool b, std::string const& message)
+inline Test::CheckReporter Test::check_false(bool b, std::string const& message)
 {
   return Test::CheckReporter(*this, message, !b);
 }
 
-
-template <OutStreamable T, OutStreamable U>
+template <Displayable T, Displayable U>
 requires EQComparable<T, U>
 Test::CheckReporter Test::check_equal(T const& left, U const& right)
 {
-  std::stringstream ss;
-  ss << "expected ";
-  ss << left;
-  if(m_show_types)
-    ss << "(" + type_to_string<T>() + ")";
-  ss << " == ";
-  ss << right;
-  if(m_show_types)
-    ss << "(" + type_to_string<U>() + ")";
-  return check_equal(left, right, ss.str());
+  return check_equal(left, right, formatBinaryCheck("check_equal", left, right));
 }
 
 template <typename T, typename U>
@@ -232,7 +259,7 @@ Test::CheckReporter Test::check_equal(T const& left, U const& right, std::string
   return Test::CheckReporter(*this, message, left == right);
 }
   
-template <OutStreamable T, OutStreamable U, OutStreamable V>
+template <Displayable T, Displayable U, Displayable V>
 requires LEComparable<T, U> && GEComparable<T, U>  && Addable<U, V> && Subbable<U, V>
 Test::CheckReporter Test::check_near_equal(T const& left, U const& right, V const& tolerance)
 {
@@ -246,7 +273,7 @@ Test::CheckReporter Test::check_near_equal(T const& left, U const& right, V cons
   return Test::CheckReporter(*this, message, left <= right + tolerance && left >= right - tolerance);
 }
 
-template <OutStreamable T, OutStreamable U>
+template <Displayable T, Displayable U>
 requires NEComparable<T, U>
 Test::CheckReporter Test::check_not_equal(T const& left, U const& right)
 {
@@ -260,7 +287,7 @@ Test::CheckReporter Test::check_not_equal(T const& left, U const& right, std::st
   return Test::CheckReporter(*this, message, left != right);
 }
 
-template <OutStreamable T, OutStreamable U>
+template <Displayable T, Displayable U>
 requires LTComparable<T, U>
 Test::CheckReporter Test::check_less_than(T const& left, U const& right)
 {
@@ -274,7 +301,7 @@ Test::CheckReporter Test::check_less_than(T const& left, U const& right, std::st
   return Test::CheckReporter(*this, message, left < right);
 }
 
-template <OutStreamable T, OutStreamable U>
+template <Displayable T, Displayable U>
 requires LEComparable<T, U>
 Test::CheckReporter Test::check_less_equal(T const& left, U const& right)
 {
@@ -288,7 +315,7 @@ Test::CheckReporter Test::check_less_equal(T const& left, U const& right, std::s
   return Test::CheckReporter(*this, message, left <= right);
 }
 
-template <OutStreamable T, OutStreamable U>
+template <Displayable T, Displayable U>
 requires GTComparable<T, U>
 Test::CheckReporter Test::check_greater_than(T const& left, U const& right)
 {
@@ -302,7 +329,7 @@ Test::CheckReporter Test::check_greater_than(T const& left, U const& right, std:
   return Test::CheckReporter(*this, message, left > right);
 }
 
-template <OutStreamable T, OutStreamable U>
+template <Displayable T, Displayable U>
 requires GEComparable<T, U>
 Test::CheckReporter Test::check_greater_equal(T const& left, U const& right)
 {
