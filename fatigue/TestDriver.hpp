@@ -47,8 +47,6 @@ struct LogMessage {
   return m_tindex;
 }
 
-
-
 private:
   std::string m_description;
   MessageMode m_mode;
