@@ -4,6 +4,7 @@
 #include <concepts>
 #include <cstddef>
 #include <exception>
+#include <functional>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -15,57 +16,66 @@ namespace ftg {
 //#FIXME add a decoupled "output" (ReportDisplay ?) class for message to allow
 // user to
 // customize its output !
-struct ReportDisplay;
 
 enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_FATAL, MESSAGE_INFO };
 
 struct LogMessage {
-  LogMessage(MessageMode mode, std::string const &description, bool important);
-  bool isImportant() const;
-  std::string const &description() const;
-  MessageMode mode();
-  friend std::ostream &operator<<(std::ostream &out, LogMessage);
+  LogMessage(size_t sindex, size_t tindex, MessageMode mode,
+                              std::string const &description, bool important) :
+  m_description(description), m_mode(mode), m_important(important), m_sindex(sindex), m_tindex(tindex)
+  {}
+
+  bool isImportant() const {
+    return m_important;
+  }
+
+  std::string const &description() const
+  {
+    return m_description;
+  }
+  MessageMode mode() const
+  {
+    return m_mode;
+  }
+
+  size_t sindex() const
+  {
+    return m_sindex;
+  }
+  
+  size_t tindex() const{
+  return m_tindex;
+}
+
+
 
 private:
   std::string m_description;
   MessageMode m_mode;
   bool m_important;
+  size_t m_sindex;
+  size_t m_tindex;
 };
+
+struct ReportDisplay {
+  virtual void operator<<(LogMessage const &message) = 0;
+};
+
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
 typedef std::string TestId;
 
-class TestDriver {
-public:
-  TestDriver();
+struct FatalAssertionExit {
+    FatalAssertionExit(){};
+    virtual const char *what() {
+      return "Fatal assertion exit : test execution stopped because a fatal "
+             "check was not met";
+    }
+};
 
-public:
-  class CheckReporter {
-  public:
-    CheckReporter(TestDriver &test, std::string const &description, bool res);
-    ~CheckReporter();
+class TestDriver;
 
-    // used to tell what to do with result
-    // void check();  // reports and marks test as failed (default)
-    void warn();   // reports and does not marks test as failed
-    void fatal();  // reports and exit tests
-    void assert(); // same as fatal
-
-    //#FIXME should add an EMPHASE option or something like that to mark answer
-    // as important ?
-    CheckReporter &important(); // marks assertion fail as important
-    // CheckReporter & notImportant(); // marks assertion as not especially
-    // important (default)
-
-    // used to tell that result should be inverted
-    CheckReporter &
-    fails(); // means that check should be considered as OK if res = false
-    CheckReporter &succeeds(); // means that check shoube be considered as OK
-    // if res = true (default)
-
-  private:
-    void report();
-
+class CheckReporter {
   private:
     std::string m_description;
     MessageMode m_mode;
@@ -74,19 +84,52 @@ public:
     bool m_important;
     TestDriver &m_test;
     bool m_reported;
-  };
 
-  struct FatalAssertionExit : public std::exception {
-    FatalAssertionExit(){};
-    virtual const char *what() {
-      return "Fatal assertion exit : test execution stopped because a fatal "
-             "check was not met";
+  public:
+     CheckReporter(TestDriver &test, std::string const &description, bool res): 
+      m_test(test), m_description(description), m_res(res),
+      m_mode(MESSAGE_CHECK), m_expected(true), m_important(false),
+      m_reported(false) {}
+    
+    ~CheckReporter() { report(); }
+
+    void warn() { m_mode = MESSAGE_WARN; }
+
+    void fatal() {
+      m_mode = MESSAGE_FATAL;
+      report();
+      throw FatalAssertionExit();
     }
+
+    void assert() { fatal(); }
+
+    CheckReporter &important() {
+      m_important = true;
+      return *this;
+    }
+
+    CheckReporter &fails() {
+      m_expected = false;
+      return *this;
+    }
+
+    CheckReporter &succeeds() {
+      m_expected = true;
+      return *this;
+    }
+
+  private:
+    void report();
   };
 
+class TestDriver {
 public:
-  std::vector<LogMessage> const &log();
-  bool passed();
+  TestDriver(){}
+ 
+public:
+  std::vector<LogMessage> const &log(){return m_log;}
+  bool passed(){return m_passed;}
+  void setReportDisplay(ReportDisplay * rd){m_display = rd;}
 
 protected:
   bool showTypes();
@@ -96,22 +139,16 @@ private:
   bool m_directReport;
   std::vector<LogMessage> m_log;
   bool m_passed;
-  TestId m_name;
   size_t m_checkCount;
+  ReportDisplay* m_display;
+
+private:
+  friend CheckReporter;
 };
 
-/** OTHER METHODS IMPLEMENTATION */
+/* ### IMPLEMENTATION ### */
 
-inline TestDriver::CheckReporter::CheckReporter(TestDriver &test,
-                                                std::string const &description,
-                                                bool res)
-    : m_test(test), m_description(description), m_res(res),
-      m_mode(MESSAGE_CHECK), m_expected(true), m_important(false),
-      m_reported(false) {}
-
-inline TestDriver::CheckReporter::~CheckReporter() { report(); }
-
-inline void TestDriver::CheckReporter::report() {
+inline void CheckReporter::report() {
   if (m_reported == false) {
     m_reported = true;
     m_test.m_checkCount++;
@@ -124,11 +161,12 @@ inline void TestDriver::CheckReporter::report() {
         msg += " to fail, but succeeded.";
       }
 
-      LogMessage lm(m_mode, m_description, m_important);
+      LogMessage lm(m_test.m_checkCount, m_test.m_checkCount, m_mode,
+                    m_description, m_important);
       m_test.m_log.push_back(lm);
 
       if (m_test.m_directReport) {
-        std::cout << lm << std::endl;
+        *(m_test.m_display) << lm;
       }
 
       if (m_mode == MESSAGE_CHECK || m_mode == MESSAGE_FATAL) {
@@ -137,31 +175,6 @@ inline void TestDriver::CheckReporter::report() {
       // unveil STACK of INFO (tbi latter)
     }
   }
-}
-
-inline void TestDriver::CheckReporter::warn() { m_mode = MESSAGE_WARN; }
-
-inline void TestDriver::CheckReporter::fatal() {
-  m_mode = MESSAGE_FATAL;
-  report();
-  throw FatalAssertionExit();
-}
-
-inline void TestDriver::CheckReporter::assert() { fatal(); }
-
-inline TestDriver::CheckReporter &TestDriver::CheckReporter::important() {
-  m_important = true;
-  return *this;
-}
-
-inline TestDriver::CheckReporter &TestDriver::CheckReporter::fails() {
-  m_expected = false;
-  return *this;
-}
-
-inline TestDriver::CheckReporter &TestDriver::CheckReporter::succeeds() {
-  m_expected = true;
-  return *this;
 }
 
 } // namespace ftg
