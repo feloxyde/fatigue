@@ -1,5 +1,6 @@
 #ifndef FATIGUE_TESTDRIVER_HPP
 #define FATIGUE_TESTDRIVER_HPP
+#include "Logger.hpp"
 #include "utils.hpp"
 #include <concepts>
 #include <cstddef>
@@ -17,49 +18,6 @@ namespace ftg {
 // user to
 // customize its output !
 
-enum MessageMode
-{
-  MESSAGE_CHECK,
-  MESSAGE_WARN,
-  MESSAGE_FATAL,
-  MESSAGE_INFO
-};
-
-struct LogMessage final
-{
-  LogMessage(size_t sindex,
-             size_t tindex,
-             MessageMode mode,
-             std::string const& description,
-             bool important)
-    : m_description(description)
-    , m_mode(mode)
-    , m_important(important)
-    , m_sindex(sindex)
-    , m_tindex(tindex)
-  {}
-
-  bool isImportant() const { return m_important; }
-
-  std::string const& description() const { return m_description; }
-  MessageMode mode() const { return m_mode; }
-
-  size_t sindex() const { return m_sindex; }
-
-  size_t tindex() const { return m_tindex; }
-
-private:
-  std::string m_description;
-  MessageMode m_mode;
-  bool m_important;
-  size_t m_sindex;
-  size_t m_tindex;
-};
-
-struct ReportDisplay
-{
-  virtual void operator<<(LogMessage const& message) = 0;
-};
 
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
@@ -136,19 +94,15 @@ public:
     : m_showTypes(false)
     , m_directReport(false)
     , m_log()
-    , m_passed(true)
     , m_checkCount(0)
-    , m_display(nullptr)
+    , m_logger(nullptr)
     , m_name(name)
   {}
 
 public:
-  std::vector<LogMessage> const& log() { return m_log; }
-  bool passed() const { return m_passed; }
-  void setReportDisplay(ReportDisplay* rd) { m_display = rd; }
+  std::vector<TestMessage> const& log() { return m_log; }
+  void setLogger(TestLogger* r) { m_logger = r; }
   void setShowTypes(bool show) { m_showTypes = show; }
-  void setDirectReport(bool direct) { m_directReport = direct; }
-  void markAsFailed() { m_passed = false; }
   TestId const& name() const { return m_name; }
 
 protected:
@@ -157,10 +111,9 @@ protected:
 private:
   bool m_showTypes;
   bool m_directReport;
-  std::vector<LogMessage> m_log;
-  bool m_passed;
+  std::vector<TestMessage> m_log;
   size_t m_checkCount;
-  ReportDisplay* m_display;
+  TestLogger* m_logger;
   TestId m_name;
 
 private:
@@ -183,18 +136,13 @@ CheckReporter::report()
       } else {
         msg += " to fail, but succeeded.";
       }
-      LogMessage lm(
+      TestMessage lm(
         m_test.m_checkCount, m_test.m_checkCount, m_mode, msg, m_important);
-      m_test.m_log.push_back(lm);
-
-      if (m_test.m_directReport) {
-        *(m_test.m_display) << lm;
-      }
-
-      if (m_mode == MESSAGE_CHECK || m_mode == MESSAGE_FATAL) {
-        m_test.m_passed = false;
-      }
+     
+      m_test.m_logger->message(lm);
       // unveil STACK of INFO (tbi latter)
+    } else {
+      m_test.m_logger->checkPassed();
     }
   }
 }
