@@ -1,8 +1,9 @@
 #ifndef FATIGUE_TEST_HPP
-#define FATIQUE_TEST_HPP
+#define FATIGUE_TEST_HPP
 
 #include "TestDriver.hpp"
 #include "utils.hpp"
+#include <cassert>
 #include <concepts>
 #include <exception>
 #include <ostream>
@@ -22,6 +23,13 @@ template <typename T> concept OutStreamable = requires(std::ostream &a, T const&
 };
 
 template <typename T> std::string to_string(T const &a);
+
+template <OutStreamable T> std::string to_string(T const &a)
+{
+  std::stringstream ss;
+  ss << a;
+  return ss.str();
+}
 
 template <typename T> concept ToStringable = requires(T const& a){
   { ftg::to_string(a) } -> std::same_as<std::string>;
@@ -60,19 +68,21 @@ template<typename T, typename U> concept Addable = requires (T const& left, U co
 template<typename T, typename U> concept Subbable = requires (T const& left, U const& right){   
   { left - right } ->std::same_as<T>;
 };
+
+template <typename T> concept LambdaProxy = requires (T const& a){
+  {a()}->std::same_as<void>;
+};
 // clang-format on
 
 class Test : public TestDriver {
 public:
-  Test();
+  Test(std::string const& name);
   virtual ~Test();
-  
 
 public:
   virtual void run() = 0;
-  virtual TestId name() = 0;
-  virtual void load();
-  virtual void unload();
+  virtual void load(){}
+  virtual void unload(){}
 
 protected:
   // clang-format off
@@ -139,7 +149,20 @@ protected:
 
   template <typename T, typename U>
   requires GEComparable<T, U>
-  CheckReporter check_greater_equal(T const& left, U const& right, std::string const& description);
+  CheckReporter check_greater_equal(T const& left, U const& right, std::string const& description);  
+
+ 
+  template <typename Except, LambdaProxy T>
+  CheckReporter check_throw(T const& expr);  
+
+  template <typename Except, LambdaProxy T>
+  CheckReporter check_throw(std::string const& description, T const& expr);  
+  
+  template <LambdaProxy T>
+  CheckReporter check_nothrow(T const& expr);
+
+  template <LambdaProxy T>
+  CheckReporter check_nothrow(std::string const& description, T const& expr);
 //clang-format on
 
 private: 
@@ -153,24 +176,22 @@ private:
 
 /** OTHER METHODS IMPLEMENTATION */
 
+inline Test::Test(std::string const& name) : TestDriver(name){}
+
+inline Test::~Test(){}
+
 template<Displayable T, Displayable U>
 std::string Test::formatBinaryCheck(std::string check, T const& left, U const& right){
   std::stringstream ss;
   ss << "" << check << " with ";
-  if constexpr (ToStringable<T>){
-    ss << ftg::to_string(left);
-  } else {
-    ss << left;
-  }
+  ss << ftg::to_string(left);
+  
   if(showTypes()){
     ss << " (" + type_to_string<T>() + ")";
   }
   ss << " and ";
-  if constexpr (ToStringable<U>){
-    ss << ftg::to_string(right);
-  } else {
-    ss << right;
-  }
+  ss << ftg::to_string(right);
+ 
   if(showTypes()){
     ss << " (" + type_to_string<U>() + ")";
   }
@@ -189,8 +210,9 @@ std::string Test::formatBinaryTolerantCheck(std::string check, T const& left, U 
     ss << tolerance;
   }
   if(showTypes()){
-    ss << "(" + type_to_string<V>() + ")";
+    ss << " (" + type_to_string<V>() + ")";
   }
+  return ss.str();
 }
 
 
@@ -261,7 +283,7 @@ template <Displayable T, Displayable U>
 requires LTComparable<T, U>
 CheckReporter Test::check_less_than(T const& left, U const& right)
 {
-  return check_less_equal(left, right, formatBinaryCheck("check_less_than", left, right));
+  return check_less_than(left, right, formatBinaryCheck("check_less_than", left, right));
 }
 
 template <typename T, typename U>
@@ -311,6 +333,48 @@ requires GEComparable<T, U>
 CheckReporter Test::check_greater_equal(T const& left, U const& right, std::string const& description)
 {
   return CheckReporter(*this, description, left >= right);
+}
+
+
+
+template <typename Except, LambdaProxy T>
+CheckReporter Test::check_throw(T const& expr)
+{
+  std::string dsc = "check_throw exception ";
+  dsc += type_to_string<Except>();
+  return check_throw<Except>(dsc, expr);
+}
+
+
+template <typename Except, LambdaProxy T>
+CheckReporter Test::check_throw(std::string const& description, T const& expr)
+{
+  bool thrown = false;
+  try {
+    expr();
+  } catch (Except &e) {
+    thrown = true;
+  }
+  return CheckReporter(*this, description, thrown);
+}
+  
+template <LambdaProxy T>
+CheckReporter Test::check_nothrow(T const& expr)
+{
+  return check_nothrow("check_nothrow", expr);
+}
+
+
+template <LambdaProxy T>
+CheckReporter Test::check_nothrow(std::string const& description, T const& expr)
+{
+  bool nothrown = true;
+  try{
+    expr();
+  } catch (...){
+    nothrown = false;
+  }
+  return CheckReporter(*this, description, nothrown);
 }
 
 } // namespace ftg

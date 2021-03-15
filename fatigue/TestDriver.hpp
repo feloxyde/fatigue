@@ -19,7 +19,7 @@ namespace ftg {
 
 enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_FATAL, MESSAGE_INFO };
 
-struct LogMessage {
+struct LogMessage final {
   LogMessage(size_t sindex, size_t tindex, MessageMode mode,
                               std::string const &description, bool important) :
   m_description(description), m_mode(mode), m_important(important), m_sindex(sindex), m_tindex(tindex)
@@ -63,17 +63,13 @@ struct ReportDisplay {
 // exception.
 typedef std::string TestId;
 
-struct FatalAssertionExit {
-    FatalAssertionExit(){};
-    virtual const char *what() {
-      return "Fatal assertion exit : test execution stopped because a fatal "
-             "check was not met";
-    }
+struct FatalCheckFailure final {
+    FatalCheckFailure(){};
 };
 
 class TestDriver;
 
-class CheckReporter {
+class CheckReporter final {
   private:
     std::string m_description;
     MessageMode m_mode;
@@ -97,7 +93,7 @@ class CheckReporter {
       m_mode = MESSAGE_FATAL;
       report();
       if(m_res != m_expected){
-        throw FatalAssertionExit();
+        throw FatalCheckFailure();
       }
     }
     
@@ -122,15 +118,17 @@ class CheckReporter {
 
 class TestDriver {
 public:
-  TestDriver(): m_showTypes(false), m_directReport(false), m_log(), m_passed(true), m_checkCount(0),
-  m_display(nullptr){}
+  TestDriver(std::string const& name): m_showTypes(false), m_directReport(false), m_log(), m_passed(true), m_checkCount(0),
+  m_display(nullptr), m_name(name){}
  
 public:
   std::vector<LogMessage> const &log() {return m_log;}
-  bool passed(){return m_passed;}
+  bool passed() const {return m_passed;}
   void setReportDisplay(ReportDisplay * rd) {m_display = rd;}
   void setShowTypes(bool show) {m_showTypes = show;}
   void setDirectReport(bool direct){m_directReport = direct;}
+  void markAsFailed(){m_passed = false;}
+  std::string const& name() const {return m_name;}
 
 protected:
   bool showTypes() const {return m_showTypes;}
@@ -142,6 +140,7 @@ private:
   bool m_passed;
   size_t m_checkCount;
   ReportDisplay* m_display;
+  std::string m_name;
 
 private:
   friend CheckReporter;

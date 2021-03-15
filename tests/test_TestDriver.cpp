@@ -8,7 +8,7 @@ using namespace ftg;
 int main(){
     size_t index = 0;
 
-    TestDriver td;
+    TestDriver td("name");
     assert(td.passed());
     assert(td.log().size() == 0);
 
@@ -19,7 +19,6 @@ int main(){
 
     assert(td.passed());
     assert(td.log().size() == 0);
-
 
     index++;
     auto r4 = std::make_unique<CheckReporter>(td, "warn fail", false);
@@ -67,7 +66,7 @@ int main(){
     try{
         r5->fatal();
         r5.reset();
-    } catch (FatalAssertionExit fe) {
+    } catch (FatalCheckFailure fe) {
         thrown = true;
     }
     assert(thrown);
