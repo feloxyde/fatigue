@@ -81,8 +81,8 @@ public:
 
 public:
   virtual void run() = 0;
-  virtual void load(){}
-  virtual void unload(){}
+  virtual bool load() noexcept {return true;}
+  virtual void unload() noexcept {}
 
 protected:
   // clang-format off

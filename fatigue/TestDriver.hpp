@@ -118,7 +118,7 @@ class CheckReporter final {
 
 class TestDriver {
 public:
-  TestDriver(std::string const& name): m_showTypes(false), m_directReport(false), m_log(), m_passed(true), m_checkCount(0),
+  TestDriver(TestId const& name): m_showTypes(false), m_directReport(false), m_log(), m_passed(true), m_checkCount(0),
   m_display(nullptr), m_name(name){}
  
 public:
@@ -128,7 +128,7 @@ public:
   void setShowTypes(bool show) {m_showTypes = show;}
   void setDirectReport(bool direct){m_directReport = direct;}
   void markAsFailed(){m_passed = false;}
-  std::string const& name() const {return m_name;}
+  TestId const& name() const {return m_name;}
 
 protected:
   bool showTypes() const {return m_showTypes;}
@@ -140,8 +140,7 @@ private:
   bool m_passed;
   size_t m_checkCount;
   ReportDisplay* m_display;
-  std::string m_name;
-
+  TestId m_name;
 private:
   friend CheckReporter;
 };
