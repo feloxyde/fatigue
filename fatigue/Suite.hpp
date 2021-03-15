@@ -31,6 +31,8 @@ class Suite
 
   SuiteReport run() const; // Will need to add ignore pattern latter on.
 
+  virtual std::unique_ptr<Suite> uses() const {};
+
   virtual TestList listTest() const = 0;
 
   std::string const& name() const;

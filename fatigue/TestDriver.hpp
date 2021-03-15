@@ -17,35 +17,36 @@ namespace ftg {
 // user to
 // customize its output !
 
-enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_FATAL, MESSAGE_INFO };
+enum MessageMode
+{
+  MESSAGE_CHECK,
+  MESSAGE_WARN,
+  MESSAGE_FATAL,
+  MESSAGE_INFO
+};
 
-struct LogMessage final {
-  LogMessage(size_t sindex, size_t tindex, MessageMode mode,
-                              std::string const &description, bool important) :
-  m_description(description), m_mode(mode), m_important(important), m_sindex(sindex), m_tindex(tindex)
+struct LogMessage final
+{
+  LogMessage(size_t sindex,
+             size_t tindex,
+             MessageMode mode,
+             std::string const& description,
+             bool important)
+    : m_description(description)
+    , m_mode(mode)
+    , m_important(important)
+    , m_sindex(sindex)
+    , m_tindex(tindex)
   {}
 
-  bool isImportant() const {
-    return m_important;
-  }
+  bool isImportant() const { return m_important; }
 
-  std::string const &description() const
-  {
-    return m_description;
-  }
-  MessageMode mode() const
-  {
-    return m_mode;
-  }
+  std::string const& description() const { return m_description; }
+  MessageMode mode() const { return m_mode; }
 
-  size_t sindex() const
-  {
-    return m_sindex;
-  }
-  
-  size_t tindex() const{
-  return m_tindex;
-}
+  size_t sindex() const { return m_sindex; }
+
+  size_t tindex() const { return m_tindex; }
 
 private:
   std::string m_description;
@@ -55,83 +56,103 @@ private:
   size_t m_tindex;
 };
 
-struct ReportDisplay {
-  virtual void operator<<(LogMessage const &message) = 0;
+struct ReportDisplay
+{
+  virtual void operator<<(LogMessage const& message) = 0;
 };
 
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
 typedef std::string TestId;
 
-struct FatalCheckFailure final {
-    FatalCheckFailure(){};
+struct FatalCheckFailure final
+{
+  FatalCheckFailure(){};
 };
 
 class TestDriver;
 
-class CheckReporter final {
-  private:
-    std::string m_description;
-    MessageMode m_mode;
-    bool m_res;
-    bool m_expected;
-    bool m_important;
-    TestDriver &m_test;
-    bool m_reported;
+class CheckReporter final
+{
+private:
+  std::string m_description;
+  MessageMode m_mode;
+  bool m_res;
+  bool m_expected;
+  bool m_important;
+  TestDriver& m_test;
+  bool m_reported;
 
-  public:
-     CheckReporter(TestDriver &test, std::string const &description, bool res): 
-      m_test(test), m_description(description), m_res(res),
-      m_mode(MESSAGE_CHECK), m_expected(true), m_important(false),
-      m_reported(false) {}
-    
-    ~CheckReporter() { report(); }
-
-    void warn() { m_mode = MESSAGE_WARN; }
-
-    void fatal() {
-      m_mode = MESSAGE_FATAL;
-      report();
-      if(m_res != m_expected){
-        throw FatalCheckFailure();
-      }
-    }
-    
-    CheckReporter &important() {
-      m_important = true;
-      return *this;
-    }
-
-    CheckReporter &fails() {
-      m_expected = false;
-      return *this;
-    }
-
-    CheckReporter &succeeds() {
-      m_expected = true;
-      return *this;
-    }
-
-  private:
-    void report();
-  };
-
-class TestDriver {
 public:
-  TestDriver(TestId const& name): m_showTypes(false), m_directReport(false), m_log(), m_passed(true), m_checkCount(0),
-  m_display(nullptr), m_name(name){}
- 
+  CheckReporter(TestDriver& test, std::string const& description, bool res)
+    : m_test(test)
+    , m_description(description)
+    , m_res(res)
+    , m_mode(MESSAGE_CHECK)
+    , m_expected(true)
+    , m_important(false)
+    , m_reported(false)
+  {}
+
+  ~CheckReporter() { report(); }
+
+  void warn() { m_mode = MESSAGE_WARN; }
+
+  void fatal()
+  {
+    m_mode = MESSAGE_FATAL;
+    report();
+    if (m_res != m_expected) {
+      throw FatalCheckFailure();
+    }
+  }
+
+  CheckReporter& important()
+  {
+    m_important = true;
+    return *this;
+  }
+
+  CheckReporter& fails()
+  {
+    m_expected = false;
+    return *this;
+  }
+
+  CheckReporter& succeeds()
+  {
+    m_expected = true;
+    return *this;
+  }
+
+private:
+  void report();
+};
+
+class TestDriver
+{
 public:
-  std::vector<LogMessage> const &log() {return m_log;}
-  bool passed() const {return m_passed;}
-  void setReportDisplay(ReportDisplay * rd) {m_display = rd;}
-  void setShowTypes(bool show) {m_showTypes = show;}
-  void setDirectReport(bool direct){m_directReport = direct;}
-  void markAsFailed(){m_passed = false;}
-  TestId const& name() const {return m_name;}
+  TestDriver(TestId const& name)
+    : m_showTypes(false)
+    , m_directReport(false)
+    , m_log()
+    , m_passed(true)
+    , m_checkCount(0)
+    , m_display(nullptr)
+    , m_name(name)
+  {}
+
+public:
+  std::vector<LogMessage> const& log() { return m_log; }
+  bool passed() const { return m_passed; }
+  void setReportDisplay(ReportDisplay* rd) { m_display = rd; }
+  void setShowTypes(bool show) { m_showTypes = show; }
+  void setDirectReport(bool direct) { m_directReport = direct; }
+  void markAsFailed() { m_passed = false; }
+  TestId const& name() const { return m_name; }
 
 protected:
-  bool showTypes() const {return m_showTypes;}
+  bool showTypes() const { return m_showTypes; }
 
 private:
   bool m_showTypes;
@@ -141,13 +162,16 @@ private:
   size_t m_checkCount;
   ReportDisplay* m_display;
   TestId m_name;
+
 private:
   friend CheckReporter;
 };
 
 /* ### IMPLEMENTATION ### */
 
-inline void CheckReporter::report() {
+inline void
+CheckReporter::report()
+{
   if (m_reported == false) {
     m_reported = true;
     m_test.m_checkCount++;
@@ -159,9 +183,8 @@ inline void CheckReporter::report() {
       } else {
         msg += " to fail, but succeeded.";
       }
-
-      LogMessage lm(m_test.m_checkCount, m_test.m_checkCount, m_mode,
-                    msg, m_important);
+      LogMessage lm(
+        m_test.m_checkCount, m_test.m_checkCount, m_mode, msg, m_important);
       m_test.m_log.push_back(lm);
 
       if (m_test.m_directReport) {
