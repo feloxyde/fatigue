@@ -96,7 +96,9 @@ class CheckReporter {
     void fatal() {
       m_mode = MESSAGE_FATAL;
       report();
-      throw FatalAssertionExit();
+      if(m_res != m_expected){
+        throw FatalAssertionExit();
+      }
     }
 
     void assert() { fatal(); }
@@ -122,15 +124,18 @@ class CheckReporter {
 
 class TestDriver {
 public:
-  TestDriver(){}
+  TestDriver(): m_showTypes(false), m_directReport(false), m_log(), m_passed(true), m_checkCount(0),
+  m_display(nullptr){}
  
 public:
-  std::vector<LogMessage> const &log(){return m_log;}
+  std::vector<LogMessage> const &log() {return m_log;}
   bool passed(){return m_passed;}
-  void setReportDisplay(ReportDisplay * rd){m_display = rd;}
+  void setReportDisplay(ReportDisplay * rd) {m_display = rd;}
+  void setShowTypes(bool show) {m_showTypes = show;}
+  void setDirectReport(bool direct){m_directReport = direct;}
 
 protected:
-  bool showTypes();
+  bool showTypes() const {return m_showTypes;}
 
 private:
   bool m_showTypes;
@@ -160,7 +165,7 @@ inline void CheckReporter::report() {
       }
 
       LogMessage lm(m_test.m_checkCount, m_test.m_checkCount, m_mode,
-                    m_description, m_important);
+                    msg, m_important);
       m_test.m_log.push_back(lm);
 
       if (m_test.m_directReport) {

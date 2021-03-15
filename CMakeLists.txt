@@ -1,0 +1,103 @@
+#[[
+Copyright or © or Copr. Félix Bertoni (2020)
+
+felix.bertoni987@gmail.com
+
+This software is a computer program whose purpose is to provide an easy way 
+to create softwares with a modulare design.
+
+This software is governed by the CeCILL-C license under French law and
+abiding by the rules of distribution of free software.  You can  use, 
+modify and/ or redistribute the software under the terms of the CeCILL-C
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info". 
+
+As a counterpart to the access to the source code and  rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability. 
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or 
+data to be ensured and,  more generally, to use and operate it in the 
+same conditions as regards security. 
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-C license and that you accept its terms.
+]]
+
+
+
+
+cmake_minimum_required(VERSION 3.1.0)
+option(ENABLE_GDB "enable gdb debug (-g) flag")
+
+#project declaration (noodle engine)
+project(fatigue)
+
+
+include(ProcessorCount)
+ProcessorCount(N_PROC)
+if(N_PROC EQUAL 0)
+     set(N_PROC 1)
+endif()
+
+
+#testing enabled, comment to disable
+enable_testing()
+add_custom_target(testo COMMAND ctest --output-on-failure)  
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+include(${CMAKE_CURRENT_LIST_DIR}/LLVMCoverage.cmake)
+#include(CMakeUtils.cmake)
+
+set(CMAKE_CXX_STANDARD 20)
+
+#to generate with proper flags, please use 
+#cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+if(ENABLE_LLVM_COVERAGE)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping -O0 -g")
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping -O0 -g")
+endif()
+
+#setting the root directory for includes as the root of the project, 
+#so files can be included as <skuldenka/...>
+include_directories(${CMAKE_CURRENT_LIST_DIR})
+
+########################################################### 
+########## TESTING ########################################
+###########################################################
+
+set(fatigue_headers 
+    fatigue/Suite.hpp
+    fatigue/Test.hpp
+    fatigue/TestDriver.hpp
+    fatigue/utils.hpp
+)
+
+
+set(fatigue_tests
+    tests/test_TestDriver.cpp
+)
+
+
+ADD_TEST_SUITE(ts_fatigue
+TESTS ${fatigue_tests}
+SOURCES ""
+LIBS 
+COVERING ${fatigue_headers}
+
+)
+
+
+
