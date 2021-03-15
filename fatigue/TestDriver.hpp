@@ -100,9 +100,7 @@ class CheckReporter {
         throw FatalAssertionExit();
       }
     }
-
-    void assert() { fatal(); }
-
+    
     CheckReporter &important() {
       m_important = true;
       return *this;

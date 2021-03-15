@@ -60,7 +60,7 @@ int main(){
     assert(!td.passed());
     assert(td.log().size() == 2);
 
-    //passing reporter, fatal
+    //failing reporter, fatal
     index++;
     bool thrown = false;
     auto r5 = std::make_unique<CheckReporter>(td, "fatal fail", false);
@@ -113,6 +113,21 @@ int main(){
     assert(lm7.mode() == MESSAGE_CHECK);
     assert(lm7.description() == "expected success to fail, but succeeded.");
    
+    //failing important
+    index++;
+    auto r8 = std::make_unique<CheckReporter>(td, "important fail succeeds", false);
+    r8->important().succeeds();
+    r8.reset();
 
+    assert(!td.passed());
+    assert(td.log().size() == 6);
+
+    LogMessage lm8 = td.log()[5];
+    assert(lm8.isImportant());
+    assert(lm8.sindex() == index);
+    assert(lm8.tindex() == index);
+    assert(lm8.mode() == MESSAGE_CHECK);
+    assert(lm8.description() == "expected important fail succeeds to succeed, but failed.");
+   
     return 0;
 }
