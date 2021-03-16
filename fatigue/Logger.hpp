@@ -57,8 +57,8 @@ struct TestLogger : public Logger
 {
   virtual ~TestLogger() = 0;
   virtual void name(std::string const& name) = 0;
-  virtual void message(TestMessage const& log) = 0;
-  virtual void uncaughtException(size_t sindex, size_t tindex) = 0;
+  virtual void message(MessageMode mode, std::string const& description, bool important) = 0;
+  virtual void uncaughtException() = 0;
   virtual void skipped() = 0;
   virtual void loadFailure() = 0;
   virtual void checkPassed() = 0;

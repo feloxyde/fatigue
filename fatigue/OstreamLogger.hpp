@@ -28,44 +28,44 @@ struct OstreamTestLogger : public TestLogger
     m_ostream << msg << std::endl;
   }
   
-  virtual void message(TestMessage const& log)
+    virtual void message(MessageMode mode, std::string const& description, bool important)
   {
     std::string msg;
-    if (log.isImportant()) {
+    if (important) {
       msg += "!!! ";
     }
 
-    if (log.mode() == MESSAGE_CHECK) {
+    if (mode == MESSAGE_CHECK) {
       msg += "[ERROR] ";
       m_failed = true;
       m_checkFailed++;
       m_checkRan++;
-    } else if (log.mode() == MESSAGE_WARN) {
+    } else if (mode == MESSAGE_WARN) {
       msg += "[WARNING] ";
       m_checkFailed++;
       m_checkRan++;
-    } else if (log.mode() == MESSAGE_FATAL) {
+    } else if (mode == MESSAGE_FATAL) {
       msg += "[FATAL] ";
       m_failed = true;
       m_checkFailed++; 
       m_checkRan++;
     }
     msg += "<";
-    msg += log.sindex();
+    msg += m_checkRan;
     msg += ";";
-    msg += log.tindex();
+    msg += m_checkRan;
     msg += "> ";
-    msg += log.description();
+    msg += description;
     m_ostream << msg << std::endl;
   }
 
-  virtual void uncaughtException(size_t sindex, size_t tindex)
+  virtual void uncaughtException()
   {
     std::string msg;
     msg += "Test failed due to an uncaught exception at or after <";
-    msg += sindex;
+    msg += m_checkRan;
     msg += ";";
-    msg += tindex;
+    msg += m_checkRan;
     msg += ">";
     m_ostream << msg << std::endl;
   }

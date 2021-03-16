@@ -17,13 +17,13 @@ struct VectorTestResult {
   std::string name;
 };
 
+
 struct VectorSuiteLogger;
 struct VectorGlobalLogger;
 struct VectorTestLogger : public TestLogger
 {
-  VectorTestLogger(VectorSuiteLogger& parent, std::ostream& stream)
+  VectorTestLogger(VectorSuiteLogger& parent)
     : m_parent(parent)
-    , m_ostream(stream)
     , m_checkRan(0)
     , m_checkFailed(0)
   {}
@@ -34,15 +34,17 @@ struct VectorTestLogger : public TestLogger
     m_name = name;
   }
   
-  virtual void message(TestMessage const& log)
+  virtual void message(MessageMode mode, std::string const& description, bool important)
   {
-    m_messages.push_back(log);
+    m_checkRan++;
+    m_checkFailed++;
+    m_messages.push_back(TestMessage(m_checkRan, m_checkRan, mode, description, important));
   }
 
-  virtual void uncaughtException(size_t sindex, size_t tindex)
+  virtual void uncaughtException()
   {
-      m_exceptionSindex = sindex;
-      m_exceptionTindex = tindex;
+      m_exceptionSindex = m_checkRan;
+      m_exceptionTindex = m_checkRan;
       m_status = TEST_EXCEPTION_EXIT;
   }
 
@@ -71,7 +73,6 @@ private:
   size_t m_exceptionTindex;
   TestStatus m_status;
   std::string m_name;
-  std::ostream& m_ostream;
 };
 
 struct VectorSuiteResult
@@ -82,7 +83,7 @@ struct VectorSuiteResult
 
 struct VectorSuiteLogger : public SuiteLogger
 {
-  VectorSuiteLogger(VectorGlobalLogger& parent, std::ostream& ostream) : m_parent(parent), m_ostream(ostream) {}
+  VectorSuiteLogger(VectorGlobalLogger& parent) : m_parent(parent) {}
   virtual ~VectorSuiteLogger(){}
   virtual void name(std::string const& name)
   {
@@ -91,7 +92,7 @@ struct VectorSuiteLogger : public SuiteLogger
 
   virtual std::unique_ptr<TestLogger> testLogger()
   {
-      return std::make_unique<VectorTestLogger>(*this, m_ostream);
+      return std::make_unique<VectorTestLogger>(*this);
   }
 
   void reportTest(VectorTestResult const& r){
@@ -100,23 +101,23 @@ struct VectorSuiteLogger : public SuiteLogger
 
   virtual void commit();
 
+  std::vector<VectorTestResult> const& results() const {return m_results;}
+
 private:
   VectorGlobalLogger& m_parent;
   std::vector<VectorTestResult> m_results;
   std::string m_name;
-  std::ostream& m_ostream;
 };
 
 struct VectorGlobalLogger : public GlobalLogger
 {
-  VectorGlobalLogger(std::ostream& ostream)
-    : m_ostream(ostream)
+  VectorGlobalLogger()
   {}
 
   virtual ~VectorGlobalLogger(){};
   virtual std::unique_ptr<SuiteLogger> suiteLogger()
   {
-    return std::make_unique<VectorSuiteLogger>(*this, m_ostream);
+    return std::make_unique<VectorSuiteLogger>(*this);
   };
 
   virtual bool passed() {return false;}
@@ -125,7 +126,7 @@ struct VectorGlobalLogger : public GlobalLogger
   virtual void commit()
   {}
 
-  std::vector<VectorSuiteResult> const& getResults() const;
+  std::vector<VectorSuiteResult> const& results() const;
 
   void reportSuite(VectorSuiteResult const& r) 
   {
@@ -133,7 +134,6 @@ struct VectorGlobalLogger : public GlobalLogger
   }
 
 private:
-  std::ostream& m_ostream;
   std::vector<VectorSuiteResult> m_results;
 };
 
