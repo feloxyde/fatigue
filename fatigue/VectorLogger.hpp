@@ -60,6 +60,8 @@ struct VectorTestLogger : public TestLogger
 
   virtual void commit();
 
+  std::vector<TestMessage> const& messages(){return m_messages;}
+
 private:
   VectorSuiteLogger& m_parent;
   std::vector<TestMessage> m_messages;

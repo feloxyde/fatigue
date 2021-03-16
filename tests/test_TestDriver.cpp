@@ -1,4 +1,4 @@
-#include "fatigue/TestDriver.hpp"
+#include <fatigue/TestDriver.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -28,7 +28,7 @@ int main(){
     assert(td.passed());
     assert(td.log().size() == 1);
 
-    LogMessage lm4 = td.log()[0];
+    TestMessage lm4 = td.log()[0];
     assert(!lm4.isImportant());
     assert(lm4.sindex() == index);
     assert(lm4.tindex() == index);
@@ -43,7 +43,7 @@ int main(){
     assert(!td.passed());
     assert(td.log().size() == 2);
 
-    LogMessage lm2 = td.log()[1];
+    TestMessage lm2 = td.log()[1];
     assert(!lm2.isImportant());
     assert(lm2.sindex() == index);
     assert(lm2.tindex() == index);
@@ -74,7 +74,7 @@ int main(){
     assert(!td.passed());
     assert(td.log().size() == 3);
 
-    LogMessage lm5 = td.log()[2];
+    TestMessage lm5 = td.log()[2];
     assert(!lm5.isImportant());
     assert(lm5.sindex() == index);
     assert(lm5.tindex() == index);
@@ -90,7 +90,7 @@ int main(){
     assert(!td.passed());
     assert(td.log().size() == 4);
 
-    LogMessage lm6 = td.log()[3];
+    TestMessage lm6 = td.log()[3];
     assert(lm6.isImportant());
     assert(lm6.sindex() == index);
     assert(lm6.tindex() == index);
@@ -105,7 +105,7 @@ int main(){
     assert(!td.passed());
     assert(td.log().size() == 5);
 
-    LogMessage lm7 = td.log()[4];
+    TestMessage lm7 = td.log()[4];
     assert(!lm7.isImportant());
     assert(lm7.sindex() == index);
     assert(lm7.tindex() == index);
@@ -121,7 +121,7 @@ int main(){
     assert(!td.passed());
     assert(td.log().size() == 6);
 
-    LogMessage lm8 = td.log()[5];
+    TestMessage lm8 = td.log()[5];
     assert(lm8.isImportant());
     assert(lm8.sindex() == index);
     assert(lm8.tindex() == index);
