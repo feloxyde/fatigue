@@ -11,6 +11,7 @@ typedef std::vector<std::unique_ptr<Test>> TestList;
 
 class Suite
 {
+public:
   Suite(std::string const& name);
 
   //is this mandatory ?
@@ -19,7 +20,7 @@ class Suite
     return std::move(std::vector<std::unique_ptr<Suite>>());
   }
 
-  virtual TestList listTest() const = 0;
+  virtual TestList tests() const = 0;
 
   std::string const& name() const;
 

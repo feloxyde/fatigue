@@ -21,7 +21,6 @@ namespace ftg {
 
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
-typedef std::string TestId;
 
 struct FatalCheckFailure final
 {
@@ -90,7 +89,7 @@ private:
 class TestDriver
 {
 public:
-  TestDriver(TestId const& name)
+  TestDriver(std::string const& name)
     : m_showTypes(false)
     , m_logger(nullptr)
     , m_name(name)
@@ -99,7 +98,7 @@ public:
 public:
   void setLogger(TestLogger* r) { m_logger = r; }
   void setShowTypes(bool show) { m_showTypes = show; }
-  TestId const& name() const { return m_name; }
+  std::string const& name() const { return m_name; }
 
 protected:
   bool showTypes() const { return m_showTypes; }
@@ -107,7 +106,7 @@ protected:
 private:
   bool m_showTypes;
   TestLogger* m_logger;
-  TestId m_name;
+  std::string m_name;
 
 private:
   friend CheckReporter;
