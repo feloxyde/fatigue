@@ -90,7 +90,8 @@ set(fatigue_tests
     #tests/test_Test_automsg_fail_showtypes.cpp
     #tests/test_Test_automsg_fail.cpp
     #tests/test_Test_automsg_pass.cpp
-    tests/test_TestDriver.cpp
+    #tests/test_TestDriver.cpp
+    tests/test_VectorLogger.cpp
 )
 
 

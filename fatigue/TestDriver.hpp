@@ -1,6 +1,6 @@
 #ifndef FATIGUE_TESTDRIVER_HPP
 #define FATIGUE_TESTDRIVER_HPP
-#include "Logger.hpp"
+#include "TestRunner.hpp"
 #include "utils.hpp"
 #include <concepts>
 #include <cstddef>
@@ -92,15 +92,11 @@ class TestDriver
 public:
   TestDriver(TestId const& name)
     : m_showTypes(false)
-    , m_directReport(false)
-    , m_log()
-    , m_checkCount(0)
     , m_logger(nullptr)
     , m_name(name)
   {}
 
 public:
-  std::vector<TestMessage> const& log() { return m_log; }
   void setLogger(TestLogger* r) { m_logger = r; }
   void setShowTypes(bool show) { m_showTypes = show; }
   TestId const& name() const { return m_name; }
@@ -110,9 +106,6 @@ protected:
 
 private:
   bool m_showTypes;
-  bool m_directReport;
-  std::vector<TestMessage> m_log;
-  size_t m_checkCount;
   TestLogger* m_logger;
   TestId m_name;
 
@@ -127,7 +120,6 @@ CheckReporter::report()
 {
   if (m_reported == false) {
     m_reported = true;
-    m_test.m_checkCount++;
     if ((m_res && !m_expected) || (!m_res && m_expected)) {
       std::string msg = "expected ";
       msg += m_description;
@@ -136,11 +128,7 @@ CheckReporter::report()
       } else {
         msg += " to fail, but succeeded.";
       }
-      TestMessage lm(
-        m_test.m_checkCount, m_test.m_checkCount, m_mode, msg, m_important);
-     
-      m_test.m_logger->message(lm);
-      // unveil STACK of INFO (tbi latter)
+      m_test.m_logger->checkFailed(m_mode, msg, m_important);
     } else {
       m_test.m_logger->checkPassed();
     }
