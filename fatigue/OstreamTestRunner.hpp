@@ -67,6 +67,7 @@ struct OstreamTestRunner : public TestRunner
     size_t totalPass = 0;
     size_t totalFailed = 0;
     
+    
     //running suites 
     for(auto& s : suites){
       m_ostream << std::endl << std::endl << std::endl;
