@@ -13,12 +13,11 @@ namespace ftg {
 
 struct OstreamTestLogger : public TestLogger {
 
-  OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0){}
+  OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0), m_showTypes(false){}
   virtual ~OstreamTestLogger(){}
 
-  virtual void checkFailed(MessageMode mode, std::string const& description, bool important)
+  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool important)
   {
-
     m_checkFailed++;
     
     if(important){
@@ -36,8 +35,24 @@ struct OstreamTestLogger : public TestLogger {
     } else if (mode == MESSAGE_WARN){
       m_ostream << "[WARN] ";
     }
-
-    m_ostream << description << std::endl;
+    m_ostream << " expected ";
+    m_ostream << description;
+    m_ostream << " with ";
+    
+    if(params.size() > 0){
+      m_ostream << "( ";
+      size_t i = 0;
+      for(auto const& p : params){
+        m_ostream << p.name << ": " << p.value ;
+        if(m_showTypes){
+          m_ostream << " [" << p.type << "]";
+        }
+        if(i < params.size() - 1 ){
+          m_ostream << ", " << std::endl;
+        }
+      }
+      m_ostream << " )";
+    }
   }
 
   virtual void checkPassed()
@@ -47,12 +62,14 @@ struct OstreamTestLogger : public TestLogger {
 
   bool passed() const {return m_passed;}
 
+  void setShowTypes(bool showTypes){m_showTypes = showTypes;}
 
 public: 
   std::ostream& m_ostream;
   size_t m_checkPassed;
   size_t m_checkFailed;
   bool m_passed;
+  bool m_showTypes;
 };
 
 struct OstreamTestRunner : public TestRunner
@@ -80,8 +97,7 @@ struct OstreamTestRunner : public TestRunner
         t->setLogger(&otl);
         
         if(t->load()){
-           if (this->RunLoadedTest(t, otl)) 
-           {
+           if (this->RunLoadedTest(t, otl)){
              totalPass++;
            } else {
              totalFailed++;

@@ -26,9 +26,16 @@ struct TestRunner
   virtual void run(std::vector<std::unique_ptr<Suite>> const& suites) = 0;
 };
 
+struct ParamInfo {
+  ParamInfo(std::string const& name, std::string const& value, std::string const& type) : name(name), value(value), type(type){}
+  std::string name;
+  std::string value;
+  std::string type;
+};
+
 struct TestLogger {
   virtual ~TestLogger(){};
-  virtual void checkFailed(MessageMode mode, std::string const& description, bool important) = 0;
+  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool important) = 0;
   virtual void checkPassed() = 0;
 };
 

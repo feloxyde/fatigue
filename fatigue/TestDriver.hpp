@@ -39,9 +39,10 @@ private:
   bool m_important;
   TestDriver& m_test;
   bool m_reported;
+  std::vector<ParamInfo> m_params;
 
 public:
-  CheckReporter(TestDriver& test, std::string const& description, bool res)
+  CheckReporter(TestDriver& test, std::string const& description, std::vector<ParamInfo> const& params, bool res)
     : m_test(test)
     , m_description(description)
     , m_res(res)
@@ -49,6 +50,8 @@ public:
     , m_expected(true)
     , m_important(false)
     , m_reported(false)
+    , m_params(params)
+    
   {}
 
   ~CheckReporter() { report(); }
@@ -128,7 +131,7 @@ CheckReporter::report()
       } else {
         msg += " to fail, but succeeded.";
       }
-      m_test.m_logger->checkFailed(m_mode, msg, m_important);
+      m_test.m_logger->checkFailed(m_mode, msg, m_params, m_important);
     } else {
       m_test.m_logger->checkPassed();
     }

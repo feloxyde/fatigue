@@ -1,7 +1,7 @@
 #ifndef FATIGUE_UTILS_HPP
 #define FATIGUE_UTILS_HPP
 
-namespace ftg {};
+namespace ftg {
 
 #include <iostream>
 #include <typeinfo>
@@ -30,4 +30,6 @@ template <typename T> std::string type_to_string() {
   return demangle(typeid(T).name());
 }
 
+
+};
 #endif
