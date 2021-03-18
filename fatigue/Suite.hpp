@@ -13,6 +13,7 @@ class Suite
 {
 public:
   Suite(std::string const& name);
+  virtual ~Suite(){};
 
   //is this mandatory ?
   virtual std::vector<std::unique_ptr<Suite>> uses() const 

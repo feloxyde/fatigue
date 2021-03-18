@@ -25,7 +25,7 @@ struct OstreamTestLogger : public TestLogger {
       m_ostream << "!!! ";
     }
 
-    m_ostream << "<" << m_checkFailed + m_checkPassed << "> ";
+    m_ostream << "(" << m_checkFailed + m_checkPassed << ") ";
 
     if(mode == MESSAGE_CHECK){
       m_ostream << "[ERROR] ";
@@ -46,6 +46,7 @@ struct OstreamTestLogger : public TestLogger {
   }
 
   bool passed() const {return m_passed;}
+
 
 public: 
   std::ostream& m_ostream;
@@ -76,31 +77,15 @@ struct OstreamTestRunner : public TestRunner
       for (auto& t : s->tests()){
         m_ostream  << std::endl << "-- " << t->name() << " --";
         OstreamTestLogger otl(m_ostream);
-        bool exceptPass = true;
         t->setLogger(&otl);
+        
         if(t->load()){
-
-          try {
-          
-          } 
-          catch (ftg::FatalCheckFailure & e){
-            m_ostream << "Test ended due to fatal check failing." << std::endl;
-          }
-          catch (...) {
-            m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
-            exceptPass = false;
-          }
-           
-          if(totalPass && otl.passed()){
-            m_ostream << "-- passed : ";
-            totalPass++;
-          } else {
-            m_ostream << "-- failed : ";
-            totalFailed++;
-          }
-
-          m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << "failed. --";
-
+           if (this->RunLoadedTest(t, otl)) 
+           {
+             totalPass++;
+           } else {
+             totalFailed++;
+           }
         } else {
           m_ostream << "-- failed : error during load phase --" << std::endl;
           totalFailed++;
@@ -119,6 +104,37 @@ struct OstreamTestRunner : public TestRunner
       m_ostream << "failed : "<< totalFailed << std::endl; 
     }
     m_ostream << "---------------------------" << std::endl;
+  }
+
+private:
+  bool RunLoadedTest(std::unique_ptr<Test> & t, OstreamTestLogger& otl)
+  {
+      bool exceptPass = true;
+      bool passed = true;
+      try {
+        t->run();
+        t->unload();
+      }
+      catch (ftg::FatalCheckFailure & e){
+        m_ostream << "Test ended due to fatal check failing." << std::endl;
+        t->unload();            
+      }
+      catch (...) {
+        m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
+        exceptPass = false;
+        t->unload();
+      }
+
+      if(exceptPass && otl.passed()){
+        m_ostream << "-- passed : ";
+        passed = true;
+      } else {
+        m_ostream << "-- failed : ";
+        passed = false;
+      }
+
+      m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << "failed. --";
+      return passed;
   }
 
 private:

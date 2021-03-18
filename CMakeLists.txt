@@ -79,19 +79,21 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 ###########################################################
 
 set(fatigue_headers 
+    fatigue/OstreamTestRunner.hpp
     fatigue/Suite.hpp
     fatigue/Test.hpp
     fatigue/TestDriver.hpp
+    fatigue/TestRunner.hpp
     fatigue/utils.hpp
 )
 
-
 set(fatigue_tests
+    tests/test_OstreamTestLogger.cpp 
     #tests/test_Test_automsg_fail_showtypes.cpp
     #tests/test_Test_automsg_fail.cpp
     #tests/test_Test_automsg_pass.cpp
     #tests/test_TestDriver.cpp
-    tests/test_VectorLogger.cpp
+    #tests/test_VectorLogger.cpp
 )
 
 

@@ -120,6 +120,7 @@ CheckReporter::report()
   if (m_reported == false) {
     m_reported = true;
     if ((m_res && !m_expected) || (!m_res && m_expected)) {
+      std::cout << "reporting because a failure occurred" << std::endl;
       std::string msg = "expected ";
       msg += m_description;
       if (m_expected == true) {
