@@ -35,7 +35,7 @@ struct ParamInfo {
 
 struct TestLogger {
   virtual ~TestLogger(){};
-  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool important) = 0;
+  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool expected, bool result, bool important) = 0;
   virtual void checkPassed() = 0;
 };
 

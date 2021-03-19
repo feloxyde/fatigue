@@ -330,7 +330,7 @@ CheckReporter Test::check_throw(T const& expr)
   } catch (Except &e) {
     thrown = true;
   }
-  return CheckReporter(*this, std::string("check_throw") + type_to_string<Except>(), std::vector<ParamInfo>(), thrown);
+  return CheckReporter(*this, std::string("check_throw<") + type_to_string<Except>() + std::string(">"), std::vector<ParamInfo>(), thrown);
 }
 
 

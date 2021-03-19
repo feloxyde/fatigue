@@ -123,15 +123,7 @@ CheckReporter::report()
   if (m_reported == false) {
     m_reported = true;
     if ((m_res && !m_expected) || (!m_res && m_expected)) {
-      std::cout << "reporting because a failure occurred" << std::endl;
-      std::string msg = "expected ";
-      msg += m_description;
-      if (m_expected == true) {
-        msg += " to succeed, but failed.";
-      } else {
-        msg += " to fail, but succeeded.";
-      }
-      m_test.m_logger->checkFailed(m_mode, msg, m_params, m_important);
+      m_test.m_logger->checkFailed(m_mode, m_description, m_params, m_expected, m_res, m_important);
     } else {
       m_test.m_logger->checkPassed();
     }

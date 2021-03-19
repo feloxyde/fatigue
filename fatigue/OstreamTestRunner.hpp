@@ -13,10 +13,10 @@ namespace ftg {
 
 struct OstreamTestLogger : public TestLogger {
 
-  OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0), m_showTypes(false){}
+  OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0), m_showTypes(false), m_showParamNames(false){}
   virtual ~OstreamTestLogger(){}
 
-  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool important)
+  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool expected, bool result, bool important)
   {
     m_checkFailed++;
     
@@ -35,23 +35,32 @@ struct OstreamTestLogger : public TestLogger {
     } else if (mode == MESSAGE_WARN){
       m_ostream << "[WARN] ";
     }
-    m_ostream << " expected ";
+    m_ostream << "expected ";
     m_ostream << description;
-    m_ostream << " with ";
     
     if(params.size() > 0){
       m_ostream << "( ";
       size_t i = 0;
       for(auto const& p : params){
-        m_ostream << p.name << ": " << p.value ;
+        if(m_showParamNames){
+          m_ostream << p.name << ": ";
+        } 
+        m_ostream << p.value ;
         if(m_showTypes){
           m_ostream << " [" << p.type << "]";
         }
         if(i < params.size() - 1 ){
-          m_ostream << ", " << std::endl;
+          m_ostream << ", ";
         }
+        i++;
       }
       m_ostream << " )";
+    }
+
+    if(expected){
+      m_ostream << " to succeed, but failed." << std::endl;
+    } else {
+      m_ostream << " to fail, but succeeded." << std::endl;
     }
   }
 
@@ -63,6 +72,7 @@ struct OstreamTestLogger : public TestLogger {
   bool passed() const {return m_passed;}
 
   void setShowTypes(bool showTypes){m_showTypes = showTypes;}
+  void setParamNames(bool showNames){m_showParamNames = showNames;}
 
 public: 
   std::ostream& m_ostream;
@@ -70,6 +80,7 @@ public:
   size_t m_checkFailed;
   bool m_passed;
   bool m_showTypes;
+  bool m_showParamNames;
 };
 
 struct OstreamTestRunner : public TestRunner
