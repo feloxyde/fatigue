@@ -2,7 +2,7 @@
 
 fatigue (Framework for Advanced Testing Including Grotesque User Experience), a simple and flexible testing framework. Probably not as user friendly as others, but more flexible and still simple
 
-(namespace ftg)
+(namespace ftg) NOTE : depends on cxxopts
 
 # Problem
 

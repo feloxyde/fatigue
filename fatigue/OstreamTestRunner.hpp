@@ -14,63 +14,14 @@ namespace ftg {
 
 struct OstreamTestLogger : public TestLogger {
 
-  OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0){}
-  virtual ~OstreamTestLogger(){}
+  OstreamTestLogger(std::ostream& ostream);
+  virtual ~OstreamTestLogger();
 
-  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool expected, bool result, bool important)
-  {
-    m_checkFailed++;
-    
-    if(important){
-      m_ostream << "!!! ";
-    }
+  virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool expected, bool result, bool important);
 
-    m_ostream << "(" << m_checkFailed + m_checkPassed << ") ";
+  virtual void checkPassed();
 
-    if(mode == MESSAGE_CHECK){
-      m_ostream << "[ERROR] ";
-      m_passed = false;
-    } else if (mode == MESSAGE_FATAL){
-      m_passed = false;
-      m_ostream << "[FATAL] ";
-    } else if (mode == MESSAGE_WARN){
-      m_ostream << "[WARN] ";
-    }
-    m_ostream << "expected ";
-    m_ostream << description;
-    
-    if(params.size() > 0){
-      m_ostream << "( ";
-      size_t i = 0;
-      for(auto const& p : params){
-        if(ftg::config().showParamNames){
-          m_ostream << p.name << ": ";
-        } 
-        m_ostream << p.value ;
-        if(ftg::config().showParamTypes){
-          m_ostream << " [" << p.type << "]";
-        }
-        if(i < params.size() - 1 ){
-          m_ostream << ", ";
-        }
-        i++;
-      }
-      m_ostream << " )";
-    }
-
-    if(expected){
-      m_ostream << " to succeed, but failed." << std::endl;
-    } else {
-      m_ostream << " to fail, but succeeded." << std::endl;
-    }
-  }
-
-  virtual void checkPassed()
-  {
-    m_checkPassed++;
-  }
-
-  bool passed() const {return m_passed;}
+  bool passed() const;
 
 public: 
   std::ostream& m_ostream;
@@ -81,83 +32,12 @@ public:
 
 struct OstreamTestRunner : public TestRunner
 {
-  OstreamTestRunner(std::ostream& ostream) : m_ostream(ostream){}
-  virtual ~OstreamTestRunner(){}
-  virtual void run(std::vector<std::unique_ptr<Suite>> const& suites)
-  {
-    m_ostream << "---------------------------" << std::endl;
-    m_ostream << "------ RUNNING TESTS ------" << std::endl;
-    m_ostream << "---------------------------" << std::endl; 
-    size_t totalPass = 0;
-    size_t totalFailed = 0;
-    
-    
-    //running suites 
-    for(auto& s : suites){
-      m_ostream << std::endl << std::endl << std::endl;
-      m_ostream << "##### "  << s->name() << " ##### " << std::endl;
-      
-      for (auto& t : s->tests()){
-        m_ostream  << std::endl << "-- " << t->name() << " --";
-        OstreamTestLogger otl(m_ostream);
-        t->setLogger(&otl);
-        
-        if(t->load()){
-           if (this->RunLoadedTest(t, otl)){
-             totalPass++;
-           } else {
-             totalFailed++;
-           }
-        } else {
-          m_ostream << "-- failed : error during load phase --" << std::endl;
-          totalFailed++;
-        }
-      }
-    } 
-    
-    m_ostream << "---------------------------" << std::endl;
-    if(totalFailed == 0){
-      m_ostream << "---------- PASSED ---------" << std::endl;
-    } else {
-      m_ostream << "---------- FAILED ---------" << std::endl;
-    }
-      m_ostream << "ran : "<< totalPass + totalFailed <<  std::endl; 
-    if(totalFailed != 0){
-      m_ostream << "failed : "<< totalFailed << std::endl; 
-    }
-    m_ostream << "---------------------------" << std::endl;
-  }
+  OstreamTestRunner(std::ostream& ostream);
+  virtual ~OstreamTestRunner();
+  virtual void run(std::vector<std::unique_ptr<Suite>> const& suites);
 
 private:
-  bool RunLoadedTest(std::unique_ptr<Test> & t, OstreamTestLogger& otl)
-  {
-      bool exceptPass = true;
-      bool passed = true;
-      try {
-        t->run();
-        t->unload();
-      }
-      catch (ftg::FatalCheckFailure & e){
-        m_ostream << "Test ended due to fatal check failing." << std::endl;
-        t->unload();            
-      }
-      catch (...) {
-        m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
-        exceptPass = false;
-        t->unload();
-      }
-
-      if(exceptPass && otl.passed()){
-        m_ostream << "-- passed : ";
-        passed = true;
-      } else {
-        m_ostream << "-- failed : ";
-        passed = false;
-      }
-
-      m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << "failed. --";
-      return passed;
-  }
+  bool runLoadedTest(std::unique_ptr<Test> & t, OstreamTestLogger& otl);
 
 private:
   std::ostream& m_ostream;

@@ -24,7 +24,7 @@ namespace ftg {
 
 struct FatalCheckFailure final
 {
-  FatalCheckFailure(){};
+  FatalCheckFailure();
 };
 
 class TestDriver;
@@ -42,48 +42,19 @@ private:
   std::vector<ParamInfo> m_params;
 
 public:
-  CheckReporter(TestDriver& test, std::string const& description, std::vector<ParamInfo> const& params, bool res)
-    : m_test(test)
-    , m_description(description)
-    , m_res(res)
-    , m_mode(MESSAGE_CHECK)
-    , m_expected(true)
-    , m_important(false)
-    , m_reported(false)
-    , m_params(params)
-    
-  {}
+  CheckReporter(TestDriver& test, std::string const& description, std::vector<ParamInfo> const& params, bool res);
 
-  ~CheckReporter() { report(); }
+  ~CheckReporter();
 
-  void warn() { m_mode = MESSAGE_WARN; }
+  void warn();
 
-  void fatal()
-  {
-    m_mode = MESSAGE_FATAL;
-    report();
-    if (m_res != m_expected) {
-      throw FatalCheckFailure();
-    }
-  }
+  void fatal();
 
-  CheckReporter& important()
-  {
-    m_important = true;
-    return *this;
-  }
+  CheckReporter& important();
 
-  CheckReporter& fails()
-  {
-    m_expected = false;
-    return *this;
-  }
+  CheckReporter& fails();
 
-  CheckReporter& succeeds()
-  {
-    m_expected = true;
-    return *this;
-  }
+  CheckReporter& succeeds();
 
 private:
   void report();
@@ -92,19 +63,15 @@ private:
 class TestDriver
 {
 public:
-  TestDriver(std::string const& name)
-    : m_showTypes(false)
-    , m_logger(nullptr)
-    , m_name(name)
-  {}
+  TestDriver(std::string const& name);
 
 public:
-  void setLogger(TestLogger* r) { m_logger = r; }
-  void setShowTypes(bool show) { m_showTypes = show; }
-  std::string const& name() const { return m_name; }
+  void setLogger(TestLogger* r);
+  void setShowTypes(bool show);
+  std::string const& name() const;
 
 protected:
-  bool showTypes() const { return m_showTypes; }
+  bool showTypes() const;
 
 private:
   bool m_showTypes;
@@ -115,20 +82,6 @@ private:
   friend CheckReporter;
 };
 
-/* ### IMPLEMENTATION ### */
-
-inline void
-CheckReporter::report()
-{
-  if (m_reported == false) {
-    m_reported = true;
-    if ((m_res && !m_expected) || (!m_res && m_expected)) {
-      m_test.m_logger->checkFailed(m_mode, m_description, m_params, m_expected, m_res, m_important);
-    } else {
-      m_test.m_logger->checkPassed();
-    }
-  }
-}
 
 } // namespace ftg
 

@@ -74,11 +74,8 @@ endif()
 #so files can be included as <skuldenka/...>
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-########################################################### 
-########## TESTING ########################################
-###########################################################
-
-set(fatigue_headers 
+set(headers 
+    fatigue/Config.hpp
     fatigue/OstreamTestRunner.hpp
     fatigue/Suite.hpp
     fatigue/Test.hpp
@@ -87,7 +84,22 @@ set(fatigue_headers
     fatigue/utils.hpp
 )
 
-set(fatigue_tests
+set(sources
+    fatigue/Config.cpp
+    fatigue/OstreamTestRunner.cpp
+    fatigue/Suite.cpp
+    fatigue/TestDriver.cpp
+)
+
+
+add_library(fatigue ${sources})
+
+########################################################### 
+########## TESTING ########################################
+###########################################################
+
+
+set(tests
     tests/test_OstreamTestLogger_noparam.cpp 
     tests/test_Test_automsg_fail_showtypes.cpp
     tests/test_Test_automsg_fail.cpp
@@ -95,12 +107,11 @@ set(fatigue_tests
     #tests/test_TestDriver.cpp
 )
 
-
 ADD_TEST_SUITE(ts_fatigue
-TESTS ${fatigue_tests}
+TESTS ${tests}
 SOURCES ""
-LIBS 
-COVERING ${fatigue_headers}
+LIBS fatigue
+COVERING ${headers}
 
 )
 

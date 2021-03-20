@@ -1,15 +1,17 @@
 #ifndef FATIGUE_UTILS_HPP
 #define FATIGUE_UTILS_HPP
 
-namespace ftg {
-
 #include <iostream>
 #include <typeinfo>
+
+#include <memory>
+
+namespace ftg {
+
 
 #ifdef __GNUG__
 #include <cstdlib>
 #include <cxxabi.h>
-#include <memory>
 inline std::string demangle(const char *name) {
   int status = -4; // some arbitrary value to eliminate the compiler warning
 

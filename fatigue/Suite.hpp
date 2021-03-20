@@ -13,13 +13,10 @@ class Suite
 {
 public:
   Suite(std::string const& name);
-  virtual ~Suite(){};
+  virtual ~Suite();
 
   //is this mandatory ?
-  virtual std::vector<std::unique_ptr<Suite>> uses() const 
-  {
-    return std::move(std::vector<std::unique_ptr<Suite>>());
-  }
+  virtual std::vector<std::unique_ptr<Suite>> uses() const;
 
   virtual TestList tests() const = 0;
 
@@ -29,15 +26,6 @@ private:
   std::string m_name;
 };
 
-inline Suite::Suite(std::string const& name)
-  : m_name()
-{}
-
-inline std::string const&
-Suite::name() const
-{
-  return m_name;
-}
 
 }
 
