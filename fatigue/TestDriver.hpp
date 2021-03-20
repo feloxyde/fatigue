@@ -67,14 +67,12 @@ public:
 
 public:
   void setLogger(TestLogger* r);
-  void setShowTypes(bool show);
   std::string const& name() const;
 
 protected:
   bool showTypes() const;
 
 private:
-  bool m_showTypes;
   TestLogger* m_logger;
   std::string m_name;
 

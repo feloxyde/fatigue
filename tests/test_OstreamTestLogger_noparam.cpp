@@ -42,8 +42,6 @@ int main(){
     assert(otl.m_checkPassed == 1);
     assert(otl.m_checkFailed == 1);
     res << "(2) [WARN] expected warn fail to succeed, but failed." << std::endl;
-    std::cout << res.str() << std::endl;
-    std::cout << ss.str() << std::endl;
     assert(ss.str() == res.str());
 
     //failing reporter, default msg

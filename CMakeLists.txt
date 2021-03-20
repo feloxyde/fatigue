@@ -111,7 +111,7 @@ ADD_TEST_SUITE(ts_fatigue
 TESTS ${tests}
 SOURCES ""
 LIBS fatigue
-COVERING ${headers}
+COVERING ${headers} ${sources}
 
 )
 

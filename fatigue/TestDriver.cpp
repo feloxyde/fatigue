@@ -83,18 +83,15 @@ CheckReporter::report()
 }
 
 
-TestDriver::TestDriver(std::string const& name)
-    : m_showTypes(false)
-    , m_logger(nullptr)
+TestDriver::TestDriver(std::string const& name) :
+    m_logger(nullptr)
     , m_name(name)
   {}
 
 
   void TestDriver::setLogger(TestLogger* r) { m_logger = r; }
-  void TestDriver::setShowTypes(bool show) { m_showTypes = show; }
   std::string const& TestDriver::name() const { return m_name; }
 
-  bool TestDriver::showTypes() const { return m_showTypes; }
 
 
 

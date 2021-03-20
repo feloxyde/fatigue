@@ -90,8 +90,6 @@ struct TestAutoMsgFail : public Test {
         assert(otl.m_checkPassed == 0);
         assert(otl.m_checkFailed == 11);
         res << "(11) [ERROR] expected check_throw<int> to succeed, but failed." << std::endl;
-        std::cout << res.str() << std::endl;
-        std::cout << ss.str() << std::endl;
         assert(ss.str() == res.str());
 
         check_nothrow([](){throw 1;});
