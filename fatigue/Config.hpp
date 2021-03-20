@@ -14,14 +14,12 @@ struct Config final {
 
 
 public:
-    static Config& instance() {
-        return inst;
-    }
+    static Config& instance();
 private:
-    static Config inst;
+    static std::unique_ptr<Config> instancePtr;
 public:
     Config() : showParamNames(false), showParamTypes(false){}
-    ~Config();
+    ~Config(){}
 
     void loadFromCLI(int argc, char**argv)
     {
@@ -39,6 +37,13 @@ public:
 
 inline Config& config() {
     return Config::instance();
+}
+
+inline Config& Config::instance() {
+    if(!instancePtr){
+        instancePtr = std::make_unique<Config>(); 
+    }
+    return *instancePtr;
 }
 
 }

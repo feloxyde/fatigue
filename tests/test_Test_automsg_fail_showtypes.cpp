@@ -126,7 +126,7 @@ int main(){
     std::stringstream ss;
     OstreamTestLogger otl(ss);
     TestAutoMsgFail t(otl, ss);
-    otl.setShowTypes(true);
+    ftg::config().showParamTypes = true;
     t.setLogger(&otl);
     t.run();
    

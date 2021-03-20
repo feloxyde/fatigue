@@ -7,13 +7,14 @@
 #include <cstddef>
 #include <exception>
 #include <ostream>
+#include "Config.hpp"
 
 
 namespace ftg {
 
 struct OstreamTestLogger : public TestLogger {
 
-  OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0), m_showTypes(false), m_showParamNames(false){}
+  OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0){}
   virtual ~OstreamTestLogger(){}
 
   virtual void checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool expected, bool result, bool important)
@@ -42,11 +43,11 @@ struct OstreamTestLogger : public TestLogger {
       m_ostream << "( ";
       size_t i = 0;
       for(auto const& p : params){
-        if(m_showParamNames){
+        if(ftg::config().showParamNames){
           m_ostream << p.name << ": ";
         } 
         m_ostream << p.value ;
-        if(m_showTypes){
+        if(ftg::config().showParamTypes){
           m_ostream << " [" << p.type << "]";
         }
         if(i < params.size() - 1 ){
@@ -71,16 +72,11 @@ struct OstreamTestLogger : public TestLogger {
 
   bool passed() const {return m_passed;}
 
-  void setShowTypes(bool showTypes){m_showTypes = showTypes;}
-  void setParamNames(bool showNames){m_showParamNames = showNames;}
-
 public: 
   std::ostream& m_ostream;
   size_t m_checkPassed;
   size_t m_checkFailed;
   bool m_passed;
-  bool m_showTypes;
-  bool m_showParamNames;
 };
 
 struct OstreamTestRunner : public TestRunner
