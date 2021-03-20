@@ -87,7 +87,6 @@ struct OstreamTestRunner : public TestRunner
 {
   OstreamTestRunner(std::ostream& ostream) : m_ostream(ostream){}
   virtual ~OstreamTestRunner(){}
-  virtual void configure(int argc, const char** argv){/* nothing to do here */}
   virtual void run(std::vector<std::unique_ptr<Suite>> const& suites)
   {
     m_ostream << "---------------------------" << std::endl;

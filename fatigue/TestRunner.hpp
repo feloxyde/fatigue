@@ -22,7 +22,6 @@ class Suite;
 struct TestRunner 
 {
   virtual ~TestRunner(){};
-  virtual void configure(int argc, const char** argv) = 0;
   virtual void run(std::vector<std::unique_ptr<Suite>> const& suites) = 0;
 };
 
