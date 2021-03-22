@@ -1,16 +1,9 @@
-#include "fatigue/TestDriver.hpp"
-#include "fatigue/TestRunner.hpp"
+#include <fatigue/TestDriver.hpp>
+#include <fatigue/TestRunner.hpp>
 #include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
 #include <sstream>
-
-void ssr(std::stringstream& ss1, std::stringstream& ss2){
-    ss1.clear();
-    ss1.str(std::string());
-    ss2.clear();
-    ss2.str(std::string());
-}
-
+#include <cassert>
 
 using namespace ftg;
 

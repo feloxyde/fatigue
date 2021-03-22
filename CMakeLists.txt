@@ -101,6 +101,7 @@ add_library(fatigue ${sources})
 
 set(tests
     tests/test_OstreamTestLogger_noparam.cpp 
+    tests/test_OstreamTestRunner_noparam.cpp 
     tests/test_Test_automsg_fail_showtypes.cpp
     tests/test_Test_automsg_fail.cpp
     tests/test_Test_automsg_pass.cpp

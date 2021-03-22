@@ -70,7 +70,7 @@ void OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suites)
   {
     m_ostream << "---------------------------" << std::endl;
     m_ostream << "------ RUNNING TESTS ------" << std::endl;
-    m_ostream << "---------------------------" << std::endl; 
+    m_ostream << "---------------------------"; 
     size_t totalPass = 0;
     size_t totalFailed = 0;
     
@@ -78,10 +78,10 @@ void OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suites)
     //running suites 
     for(auto& s : suites){
       m_ostream << std::endl << std::endl << std::endl;
-      m_ostream << "##### "  << s->name() << " ##### " << std::endl;
+      m_ostream << "##### "  << s->name() << " ##### ";
       
       for (auto& t : s->tests()){
-        m_ostream  << std::endl << "-- " << t->name() << " --";
+        m_ostream  << std::endl << std::endl << "-- " << t->name() << " --"  << std::endl;
         OstreamTestLogger otl(m_ostream);
         t->setLogger(&otl);
         
@@ -98,7 +98,7 @@ void OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suites)
       }
     } 
     
-    m_ostream << "---------------------------" << std::endl;
+    m_ostream << std::endl << std::endl << "---------------------------" << std::endl;
     if(totalFailed == 0){
       m_ostream << "---------- PASSED ---------" << std::endl;
     } else {
@@ -137,7 +137,7 @@ bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test> & t, OstreamTestLogg
         passed = false;
       }
 
-      m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << "failed. --";
+      m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << " failed. --";
       return passed;
   }
 

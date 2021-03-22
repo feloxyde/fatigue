@@ -12,13 +12,14 @@ typedef std::vector<std::unique_ptr<Test>> TestList;
 class Suite
 {
 public:
+  virtual TestList tests() const = 0;
+
+public:
   Suite(std::string const& name);
   virtual ~Suite();
 
   //is this mandatory ?
-  virtual std::vector<std::unique_ptr<Suite>> uses() const;
-
-  virtual TestList tests() const = 0;
+  //virtual std::vector<std::unique_ptr<Suite>> uses() const;
 
   std::string const& name() const;
 

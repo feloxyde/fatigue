@@ -18,10 +18,10 @@ Suite::~Suite(){};
 
 
   //is this mandatory ?
-std::vector<std::unique_ptr<Suite>> Suite::uses() const 
-  {
-    return std::move(std::vector<std::unique_ptr<Suite>>());
-  }
+//std::vector<std::unique_ptr<Suite>> Suite::uses() const 
+  //{
+    //return std::move(std::vector<std::unique_ptr<Suite>>());
+  //}
 
 std::string const&
 Suite::name() const
