@@ -62,7 +62,42 @@ int main(){
     OstreamTestRunner otr(ss);
     otr.run(suites);
     
+    res << "---------------------------" << std::endl;
+    res << "------ RUNNING TESTS ------" << std::endl;
+    res << "---------------------------" << std::endl;
+    res << std::endl;
+    res << std::endl;
+    res << "##### suite1 #####" << std::endl;
+    res << std::endl;
+    res << "-- MockTest1:0 --" << std::endl;
+    res <<"(1) [ERROR] expected check_true to succeed, but failed." << std::endl;
+    res << "-- failed : out of 1 checks, 1 failed. --" << std::endl;
+    res << std::endl;
+    res << "-- MockTest4:1 --" << std::endl;
+    res << "-- passed : out of 1 checks, 0 failed. --" << std::endl;
+    res << std::endl;
+    res << std::endl;
+    res << "---------------------------" << std::endl;
+    res << "---------- FAILED ---------" << std::endl;
+    res << "ran : 2" << std::endl;
+    res << "failed : 1" << std::endl;
+    res << "---------------------------" << std::endl;
+    /* HERE TO HELP DEBUG
+    size_t i(0);
+    while(i < res.str().size() && i < ss.str().size()){
+        if(res.str()[i] != ss.str()[i]){
+            std::cout << "wong char at "<< i << std::endl;
+            std::cout << "found" << res.str()[i] << " vs " << ss.str()[i] << std::endl;
+            break;
+        }
+        i++;
+    }
     
+
+    std::cout << res.str() << std::endl;
+    std::cout << ss.str() << std::endl;
+    */
+    assert(res.str() == ss.str());
 
     return 0;
 }

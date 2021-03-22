@@ -70,15 +70,15 @@ void OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suites)
   {
     m_ostream << "---------------------------" << std::endl;
     m_ostream << "------ RUNNING TESTS ------" << std::endl;
-    m_ostream << "---------------------------"; 
+    m_ostream << "---------------------------" << std::endl; 
     size_t totalPass = 0;
     size_t totalFailed = 0;
     
     
     //running suites 
     for(auto& s : suites){
-      m_ostream << std::endl << std::endl << std::endl;
-      m_ostream << "##### "  << s->name() << " ##### ";
+      m_ostream << std::endl << std::endl;
+      m_ostream << "##### "  << s->name() << " #####";
       
       for (auto& t : s->tests()){
         m_ostream  << std::endl << std::endl << "-- " << t->name() << " --"  << std::endl;
@@ -98,7 +98,7 @@ void OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suites)
       }
     } 
     
-    m_ostream << std::endl << std::endl << "---------------------------" << std::endl;
+    m_ostream << std::endl << std::endl << std::endl << "---------------------------" << std::endl;
     if(totalFailed == 0){
       m_ostream << "---------- PASSED ---------" << std::endl;
     } else {
