@@ -119,9 +119,9 @@ COVERING ${headers} ${sources}
 )
 
 set(system_tests
-    tests/system_tests
+    manual/system_tests
 )
 
-add_executable(system_Fatigue tests/system_Fatigue.cpp)
-target_link_libraries(system_Fatigue fatigue)
+add_executable(manual_Fatigue tests/manual_Fatigue.cpp)
+target_link_libraries(manual_Fatigue fatigue)
 
