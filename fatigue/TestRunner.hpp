@@ -22,7 +22,7 @@ class Suite;
 struct TestRunner 
 {
   virtual ~TestRunner(){};
-  virtual void run(std::vector<std::unique_ptr<Suite>> const& suites) = 0;
+  virtual unsigned run(std::vector<std::unique_ptr<Suite>> const& suites) = 0;
 };
 
 struct ParamInfo {

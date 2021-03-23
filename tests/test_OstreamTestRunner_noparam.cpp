@@ -60,8 +60,10 @@ int main(){
     std::stringstream res;
 
     OstreamTestRunner otr(ss);
-    otr.run(suites);
+    unsigned f = otr.run(suites);
+    assert(f == 1);
     
+
     res << "---------------------------" << std::endl;
     res << "------ RUNNING TESTS ------" << std::endl;
     res << "---------------------------" << std::endl;

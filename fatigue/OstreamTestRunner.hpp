@@ -34,7 +34,7 @@ struct OstreamTestRunner : public TestRunner
 {
   OstreamTestRunner(std::ostream& ostream);
   virtual ~OstreamTestRunner();
-  virtual void run(std::vector<std::unique_ptr<Suite>> const& suites);
+  virtual unsigned run(std::vector<std::unique_ptr<Suite>> const& suites);
 
 private:
   bool runLoadedTest(std::unique_ptr<Test> & t, OstreamTestLogger& otl);

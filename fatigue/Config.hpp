@@ -2,6 +2,7 @@
 #define FATIGUE_CONFIG_HPP  
 
 
+#include "fatigue/TestRunner.hpp"
 #include <memory>
 #include <cxxopts.hpp>
 
@@ -14,6 +15,7 @@ Config& config();
 struct Config final {
     bool showParamNames;
     bool showParamTypes;
+    std::unique_ptr<TestRunner> runner;
 
 public:
     static Config& instance();

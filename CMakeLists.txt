@@ -76,6 +76,7 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 
 set(headers 
     fatigue/Config.hpp
+    fatigue/fatigue.hpp
     fatigue/OstreamTestRunner.hpp
     fatigue/Suite.hpp
     fatigue/Test.hpp
@@ -86,6 +87,7 @@ set(headers
 
 set(sources
     fatigue/Config.cpp
+    fatigue/fatigue.cpp
     fatigue/OstreamTestRunner.cpp
     fatigue/Suite.cpp
     fatigue/TestDriver.cpp
@@ -114,8 +116,12 @@ TESTS ${tests}
 SOURCES ""
 LIBS fatigue
 COVERING ${headers} ${sources}
-
 )
 
+set(system_tests
+    tests/system_tests
+)
 
+add_executable(system_Fatigue tests/system_Fatigue.cpp)
+target_link_libraries(system_Fatigue fatigue)
 
