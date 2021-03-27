@@ -129,5 +129,5 @@ ADD_COVERED_TEST(testcover CMD ${CMAKE_CURRENT_LIST_DIR}/test_coverage.sh)
 
 
 
-ADD_COVERAGE_REPORT(report_coverage CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)
+ADD_COVERAGE_REPORT(coverage_all CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)
 

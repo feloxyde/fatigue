@@ -2,6 +2,7 @@ option(ENABLE_LLVM_COVERAGE "Enable llvm coverage. Needs clang++ and/or clang to
 option(ENABLE_LLVM_COVERAGE_INSTANTIATION "Enable reporting llvm coverage with instantiation details, needs ENABLE_LLVM_COVERAGE to be set to ON and proper configuration for it.")
 
 
+set(LLVM_COVERAGE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/llvmcoverage)
 
 function(ADD_COVERED_TEST test_name)
     set(options "")
@@ -9,9 +10,7 @@ function(ADD_COVERED_TEST test_name)
     set(multiValuesArgs "")
     set(ARGP ${test_name}_ARGS)
     cmake_parse_arguments(${ARGP} "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) 
-    add_test(NAME ${test_name} COMMAND env LLVM_PROFILE_FILE=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${full_tname}.profraw  ${${ARGP}_CMD})
-    message("coverage output file")
-    message(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${full_tname}.profraw)
+    add_test(NAME ${test_name} COMMAND env LLVM_PROFILE_FILE=${LLVM_COVERAGE_OUTPUT_DIR}/${full_tname}.profraw  ${${ARGP}_CMD})
 endfunction()
 
 
@@ -67,15 +66,15 @@ function(ADD_COVERAGE_REPORT suite_name)
     endforeach()
 
     foreach(tst ${${ARGP}_TESTS})
-        set(${suite_name}_covering_tests ${${suite_name}_covering_tests} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tst}.profraw)
+        set(${suite_name}_covering_tests ${${suite_name}_covering_tests} ${LLVM_COVERAGE_OUTPUT_DIR}/${tst}.profraw)
     endforeach()
 
-    add_custom_target(${suite_name}_profdata COMMAND llvm-profdata merge ${${suite_name}_covering_tests} -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata)
-    add_custom_target(${suite_name}_txt COMMAND llvm-cov report --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.txt DEPENDS ${suite_name}_profdata)
+    add_custom_target(${suite_name}_profdata COMMAND llvm-profdata merge ${${suite_name}_covering_tests} -o ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.profdata)
+    add_custom_target(${suite_name}_txt COMMAND llvm-cov report --instr-profile=${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} > ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.txt DEPENDS ${suite_name}_profdata)
     if(ENABLE_LLVM_COVERAGE_INSTANTIATION)
         set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations)
     else()
         set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations=false)
     endif()
-    add_custom_target(${suite_name}_html COMMAND llvm-cov show --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} ${llvmcovshowflags} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.html DEPENDS ${suite_name}_profdata)
+    add_custom_target(${suite_name}_html COMMAND llvm-cov show --instr-profile=${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} ${llvmcovshowflags} > ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.html DEPENDS ${suite_name}_profdata)
 endfunction()
