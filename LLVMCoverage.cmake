@@ -25,12 +25,9 @@ function(ADD_TEST_SUITE suite_name)
 #parsing arguments
     set(options "")
     set(oneValueArgs "")
-    set(multiValuesArgs TESTS SOURCES LIBS COVERING)
+    set(multiValuesArgs TESTS SOURCES LIBS)
     set(ARGP ${suite_name}_ARGS)
     cmake_parse_arguments(${ARGP} "${options}" "${oneValueArgs}" "${multiValuesArgs}" ${ARGN})
-    
-    
-    add_custom_target(${suite_name}_coverage_profraws)
 
     add_custom_target(${suite_name}_testr COMMAND ctest -R "${suite_name}_*")   
     add_custom_target(${suite_name}_testo COMMAND ctest --output-on-failure -R "${suite_name}_*")   
@@ -48,39 +45,16 @@ function(ADD_TEST_SUITE suite_name)
         ADD_COVERED_TEST(${full_tname} CMD ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${full_tname})
         add_dependencies(${suite_name}_testr ${full_tname})
         add_dependencies(${suite_name}_testo ${full_tname})
+
     endforeach()
-
-
-    #creating a target to run all tests from the suite
-    
-    if(ENABLE_LLVM_COVERAGE)
-        #gathering profraws and exporting report
-
-        #building up a list of sources 
-        foreach(cvrd ${${ARGP}_COVERING})
-            set(${suite_name}_covered ${${suite_name}_covered} ${CMAKE_CURRENT_SOURCE_DIR}/${cvrd})
-        endforeach()
-
-        add_custom_target(${suite_name}_coverage_profdata COMMAND llvm-profdata merge ${${suite_name}_profraws} -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata DEPENDS ${suite_name}_coverage_profraws)
-        add_custom_target(${suite_name}_coverage_report COMMAND llvm-cov report --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  ${${suite_name}_tests} ${${suite_name}_covered} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}_coverage.txt DEPENDS ${suite_name}_coverage_profdata)
-        if(ENABLE_LLVM_COVERAGE_INSTANTIATION)
-            set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations)
-        else()
-            set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations=false)
-        endif()
-        add_custom_target(${suite_name}_coverage_html COMMAND llvm-cov show --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  ${${suite_name}_tests} ${${suite_name}_covered} ${llvmcovshowflags} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}_coverage.html DEPENDS ${suite_name}_coverage_profdata)
-
-        ##REGISTER SOURCES AND PROFILE-tS INTO A GLOBAL VAR FOR GENERAL COVERAGE !
-    endif()
-
     add_custom_target(${suite_name}_coverage )
 
 endfunction(ADD_TEST_SUITE)
 
-function(ADD_COVERAGE_REPORTS suite_name)
+function(ADD_COVERAGE_REPORT suite_name)
 #parsing arguments
     set(options "")
-    set(oneValueArgs CMD)
+    set(oneValueArgs CMD BIN)
     set(multiValuesArgs COVERING TESTS)
     set(ARGP ${suite_name}_ARGS)
     cmake_parse_arguments(${ARGP} "${options}" "${oneValueArgs}" "${multiValuesArgs}" ${ARGN})
@@ -88,17 +62,20 @@ function(ADD_COVERAGE_REPORTS suite_name)
     #creating a target to run all tests from the suite
     
     #building up a list of sources 
-    foreach(cvrd ${${ARGP}_COVERING})
+    foreach(cvrd ${${ARGP}_BIN})
         set(${suite_name}_covered ${${suite_name}_covered} ${CMAKE_CURRENT_SOURCE_DIR}/${cvrd})
     endforeach()
-    if()
 
-    add_custom_target(${suite_name}_profdata COMMAND llvm-profdata merge ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${${ARGP}_TESTS}.profraw -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata)
-    add_custom_target(${suite_name}_txt COMMAND llvm-cov report --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  ${${ARGP}_TESTS} ${${suite_name}_covered} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.txt DEPENDS ${suite_name}_profdata)
+    foreach(tst ${${ARGP}_TESTS})
+        set(${suite_name}_covering_tests ${${suite_name}_covering_tests} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tst}.profraw)
+    endforeach()
+
+    add_custom_target(${suite_name}_profdata COMMAND llvm-profdata merge ${${suite_name}_covering_tests} -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata)
+    add_custom_target(${suite_name}_txt COMMAND llvm-cov report --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.txt DEPENDS ${suite_name}_profdata)
     if(ENABLE_LLVM_COVERAGE_INSTANTIATION)
         set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations)
     else()
         set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations=false)
     endif()
-    add_custom_target(${suite_name}_html COMMAND llvm-cov show --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  ${${ARGP}_TESTS} ${${suite_name}_covered} ${llvmcovshowflags} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.html DEPENDS ${suite_name}_profdata)
+    add_custom_target(${suite_name}_html COMMAND llvm-cov show --instr-profile=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} ${llvmcovshowflags} > ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${suite_name}.html DEPENDS ${suite_name}_profdata)
 endfunction()

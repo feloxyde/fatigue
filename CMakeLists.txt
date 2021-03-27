@@ -115,7 +115,6 @@ ADD_TEST_SUITE(ts_fatigue
 TESTS ${tests}
 SOURCES ""
 LIBS fatigue
-COVERING ${headers} ${sources}
 )
 
 set(system_tests
@@ -127,4 +126,8 @@ target_link_libraries(manual_Fatigue fatigue)
 
 ADD_COVERED_TEST(testcover CMD ${CMAKE_CURRENT_LIST_DIR}/test_coverage.sh)
 
-ADD_COVERAGE_REPORTS(report_coverage CMD ctest COVERING ${headers} ${sources} TESTS "*")
+
+
+
+ADD_COVERAGE_REPORT(report_coverage CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)
+
