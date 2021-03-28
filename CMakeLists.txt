@@ -101,30 +101,29 @@ add_library(fatigue ${sources})
 ###########################################################
 
 
-set(tests
-    tests/test_Config.cpp
-    tests/test_OstreamTestLogger_noparam.cpp 
-    tests/test_OstreamTestRunner_noparam.cpp 
-    tests/test_Test_automsg_fail_showtypes.cpp
-    tests/test_Test_automsg_fail.cpp
-    tests/test_Test_automsg_pass.cpp
+set(unit_tests
+    tests/unit/test_Config.cpp
+    tests/unit/test_OstreamTestLogger_noparam.cpp 
+    tests/unit/test_OstreamTestRunner_noparam.cpp 
+    tests/unit/test_Test_automsg_fail_showtypes.cpp
+    tests/unit/test_Test_automsg_fail.cpp
+    tests/unit/test_Test_automsg_pass.cpp
     #tests/test_TestDriver.cpp
 )
 
-ADD_TEST_SUITE(ts_fatigue
-TESTS ${tests}
+ADD_SUITE(ts_fatigue)
+
+BUILD_TESTS_TO_SUITE(ts_fatigue
+TESTS ${unit_tests}
 SOURCES ""
 LIBS fatigue
 )
 
-set(system_tests
-    manual/system_tests
-)
+add_executable(test_fatigue tests/system/test_Fatigue.cpp)
+target_link_libraries(test_fatigue fatigue)
 
-add_executable(manual_Fatigue tests/manual_Fatigue.cpp)
-target_link_libraries(manual_Fatigue fatigue)
 
-ADD_COVERED_TEST(testcover CMD ${CMAKE_CURRENT_LIST_DIR}/test_coverage.sh)
+ADD_COVERED_TEST(test_fatigue_cmdline CMD ${CMAKE_BINARY_DIR}/test_fatigue)
 
 
 

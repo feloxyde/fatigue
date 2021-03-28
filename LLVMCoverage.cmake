@@ -6,30 +6,35 @@ set(LLVM_COVERAGE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/llvmcoverage)
 
 function(ADD_COVERED_TEST test_name)
     set(options "")
-    set(oneValueArgs CMD)
+    set(oneValueArgs CMD SUITE)
     set(multiValuesArgs "")
     set(ARGP ${test_name}_ARGS)
     cmake_parse_arguments(${ARGP} "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}) 
-    add_test(NAME ${test_name} COMMAND env LLVM_PROFILE_FILE=${LLVM_COVERAGE_OUTPUT_DIR}/${full_tname}.profraw  ${${ARGP}_CMD})
+    if(NOT DEFINED ${ARGP}_SUITE)
+        set(full_tname "${test_name}")
+    else()
+        set(full_tname "${${ARGP}_SUITE}_${test_name}")
+    endif()
+    add_test(NAME ${full_tname} COMMAND env LLVM_PROFILE_FILE=${LLVM_COVERAGE_OUTPUT_DIR}/${full_tname}.profraw  ${${ARGP}_CMD})
+endfunction()
+ù
+function(ADD_TEST_SUITE test_suite)
+    add_custom_target(${suite_name}_testr COMMAND ctest -R "${suite_name}_*")   
+    add_custom_target(${suite_name}_testo COMMAND ctest --output-on-failure -R "${suite_name}_*")   
 endfunction()
 
-
-#this adds a test_suite from a directory
+#this allow to create several tests from C++ sources at once and add them to suite
 #params are :  
-#TESTS [list] : a list of all test files that are in the suite
-#SOURCES [list] : a list of all sources that are needed to link with test
+#TESTS [list] : a list of all test files to add
+#SOURCES [list] : a list of all sources that are needed to be used to build with tests
 #LIBS [list] a list of all libs that has to be linked to tests
-#COVERING [list] : a list of all sources, hpp included, to add to the suite for coverage
-function(ADD_TEST_SUITE suite_name)
+function(BUILD_TESTS_TO_SUITE suite_name)
 #parsing arguments
     set(options "")
     set(oneValueArgs "")
     set(multiValuesArgs TESTS SOURCES LIBS)
     set(ARGP ${suite_name}_ARGS)
     cmake_parse_arguments(${ARGP} "${options}" "${oneValueArgs}" "${multiValuesArgs}" ${ARGN})
-
-    add_custom_target(${suite_name}_testr COMMAND ctest -R "${suite_name}_*")   
-    add_custom_target(${suite_name}_testo COMMAND ctest --output-on-failure -R "${suite_name}_*")   
     #PARSE ALL TEST FILES
     foreach(testf ${${ARGP}_TESTS})
         #creating test executable and linking
@@ -39,42 +44,38 @@ function(ADD_TEST_SUITE suite_name)
         foreach(source ${${ARGP}_SOURCES})
             list(APPEND local_source "${CMAKE_CURRENT_SOURCE_DIR}/${source}")
         endforeach()
-        add_executable(${full_tname} ${CMAKE_CURRENT_SOURCE_DIR}/${testf})
+        add_executable(${full_tname} ${CMAKE_CURRENT_SOURCE_DIR}/${testf} ${local_source})
         target_link_libraries(${full_tname} ${${ARGP}_LIBS})
-        ADD_COVERED_TEST(${full_tname} CMD ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${full_tname})
-        add_dependencies(${suite_name}_testr ${full_tname})
-        add_dependencies(${suite_name}_testo ${full_tname})
-
+        ADD_COVERED_TEST(${full_tname} CMD ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${full_tname} SUITE ${suite_name})
     endforeach()
-    add_custom_target(${suite_name}_coverage )
-
 endfunction(ADD_TEST_SUITE)
 
-function(ADD_COVERAGE_REPORT suite_name)
+
+function(ADD_COVERAGE_REPORT report_name)
 #parsing arguments
     set(options "")
     set(oneValueArgs CMD BIN)
     set(multiValuesArgs COVERING TESTS)
-    set(ARGP ${suite_name}_ARGS)
+    set(ARGP ${report_name}_ARGS)
     cmake_parse_arguments(${ARGP} "${options}" "${oneValueArgs}" "${multiValuesArgs}" ${ARGN})
     
     #creating a target to run all tests from the suite
     
     #building up a list of sources 
     foreach(cvrd ${${ARGP}_BIN})
-        set(${suite_name}_covered ${${suite_name}_covered} ${CMAKE_CURRENT_SOURCE_DIR}/${cvrd})
+        set(${report_name}_covered ${${report_name}_covered} ${CMAKE_CURRENT_SOURCE_DIR}/${cvrd})
     endforeach()
 
     foreach(tst ${${ARGP}_TESTS})
-        set(${suite_name}_covering_tests ${${suite_name}_covering_tests} ${LLVM_COVERAGE_OUTPUT_DIR}/${tst}.profraw)
+        set(${report_name}_covering_tests ${${report_name}_covering_tests} ${LLVM_COVERAGE_OUTPUT_DIR}/${tst}.profraw)
     endforeach()
 
-    add_custom_target(${suite_name}_profdata COMMAND llvm-profdata merge ${${suite_name}_covering_tests} -o ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.profdata)
-    add_custom_target(${suite_name}_txt COMMAND llvm-cov report --instr-profile=${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} > ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.txt DEPENDS ${suite_name}_profdata)
+    add_custom_target(${report_name}_profdata COMMAND llvm-profdata merge ${${report_name}_covering_tests} -o ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.profdata)
+    add_custom_target(${report_name}_txt COMMAND llvm-cov report --instr-profile=${LLVM_COVERAGE_OUTPUT_DIR}/${report_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} > ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.txt DEPENDS ${suite_name}_profdata)
     if(ENABLE_LLVM_COVERAGE_INSTANTIATION)
         set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations)
     else()
         set(llvmcovshowflags --show-line-counts-or-regions --format html --use-color -Xdemangler llvm-cxxfilt --show-instantiations=false)
     endif()
-    add_custom_target(${suite_name}_html COMMAND llvm-cov show --instr-profile=${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} ${llvmcovshowflags} > ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.html DEPENDS ${suite_name}_profdata)
+    add_custom_target(${report_name}_html COMMAND llvm-cov show --instr-profile=${LLVM_COVERAGE_OUTPUT_DIR}/${report_name}.profdata  $<TARGET_FILE:${${ARGP}_BIN}> ${${suite_name}_covered} ${llvmcovshowflags} > ${LLVM_COVERAGE_OUTPUT_DIR}/${suite_name}.html DEPENDS ${suite_name}_profdata)
 endfunction()
