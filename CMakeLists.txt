@@ -58,7 +58,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include(${CMAKE_CURRENT_LIST_DIR}/LLVMCoverage.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake_llvm_coverage/LLVMCoverage.cmake)
 #include(CMakeUtils.cmake)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -111,7 +111,7 @@ set(unit_tests
     #tests/test_TestDriver.cpp
 )
 
-ADD_SUITE(ts_fatigue)
+ADD_TEST_SUITE(ts_fatigue)
 
 BUILD_TESTS_TO_SUITE(ts_fatigue
 TESTS ${unit_tests}
@@ -119,14 +119,13 @@ SOURCES ""
 LIBS fatigue
 )
 
-add_executable(test_fatigue tests/system/test_Fatigue.cpp)
+add_executable(test_fatigue tests/system/test_fatigue.cpp)
 target_link_libraries(test_fatigue fatigue)
 
+set (comp_py ${CMAKE_CURRENT_LIST_DIR}/tests/system/compare.py)
+set (test_sys_dir ${CMAKE_CURRENT_LIST_DIR}/tests/system)
 
-ADD_COVERED_TEST(test_fatigue_cmdline CMD ${CMAKE_BINARY_DIR}/test_fatigue)
-
-
-
+ADD_COVERED_TEST(test_fatigue_cmdline CMD ${comp_py} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${test_dir_sys}/test_fatigue.expected)
 
 ADD_COVERAGE_REPORT(coverage_all CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)
 

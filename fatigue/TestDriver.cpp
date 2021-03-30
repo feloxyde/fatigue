@@ -24,8 +24,6 @@ namespace ftg {
 
 FatalCheckFailure::FatalCheckFailure(){}
 
-
-
   CheckReporter::CheckReporter(TestDriver& test, std::string const& description, std::vector<ParamInfo> const& params, bool res)
     : m_test(test)
     , m_description(description)
