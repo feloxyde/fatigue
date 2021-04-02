@@ -128,4 +128,3 @@ set (test_sys_dir ${CMAKE_CURRENT_LIST_DIR}/tests/system)
 ADD_COVERED_TEST(test_fatigue_cmdline CMD ${comp_py} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${test_sys_dir}/test_fatigue.expected)
 
 ADD_COVERAGE_REPORT(coverage_all CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)
-

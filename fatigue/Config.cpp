@@ -23,7 +23,7 @@ Config& Config::instance() {
 
 std::unique_ptr<Config> Config::instancePtr;
 
-Config::Config() : showParamNames(false), showParamTypes(false){}
+Config::Config() : showParamNames(false), showParamTypes(false), runner(std::make_unique<OstreamTestRunner>(std::cout)){}
 Config::~Config(){}
 
 void Config::loadFromCLI(int argc, char**argv)
@@ -41,10 +41,8 @@ void Config::loadFromCLI(int argc, char**argv)
     
     if(results["runner"].as<std::string>() == "SequentialCout"){
         runner = std::make_unique<OstreamTestRunner>(std::cout);
-    } else {
-        runner = std::make_unique<OstreamTestRunner>(std::cout);
-    }
-
+    } 
+   
 }
 
 
