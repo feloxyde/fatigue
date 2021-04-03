@@ -45,5 +45,4 @@ void Config::loadFromCLI(int argc, char**argv)
    
 }
 
-
 }
