@@ -10,6 +10,16 @@
 namespace ftg {
 //fixme need to use regex, check if a regex can be negated, and policy to combine multiple filter ???
 //maybe just "run" and "excludes" regexes for both suite and test
+
+
+struct Filter final{
+    Filter();
+    ~Filter();
+    std::optional<std::regex> select;
+    std::optional<std::regex> exclude;
+    std::string separator;
+    bool shouldRun(std::string const& suite, std::string const& test) const;
+};
 class Config;
 
 Config& config();
@@ -18,15 +28,13 @@ struct Config final {
     bool showParamNames;
     bool showParamTypes;
     std::unique_ptr<TestRunner> runner;
+    Filter filter;
 
 public:
     static Config& instance();
-    bool filter(std::string const& suite, std::string const& test);
+    bool shouldRun(std::string const& suite, std::string const& test);
 private:
     static std::unique_ptr<Config> instancePtr;
-
-
-
 public:
     Config();
     ~Config();

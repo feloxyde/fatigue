@@ -3,9 +3,31 @@
 #include <iostream>
 #include <memory>
 #include <cxxopts.hpp>
+#include <regex>
 #include "OstreamTestRunner.hpp"
 
 namespace ftg {
+
+
+
+Filter::Filter() : select(), exclude(), separator("//"){}
+Filter::~Filter(){}
+
+bool Filter::shouldRun(std::string const& suite, std::string const& test) const
+{
+    std::string fullname=suite + separator + test;
+
+    bool run = true;
+    if(select.has_value()){
+        run = std::regex_match(fullname, select.value());
+    }
+    if(exclude.has_value()){
+        run = ! std::regex_match(fullname, exclude.value());
+    }
+
+    return run;
+}
+
 
 
 Config& config() {
@@ -23,7 +45,7 @@ Config& Config::instance() {
 
 std::unique_ptr<Config> Config::instancePtr;
 
-Config::Config() : showParamNames(false), showParamTypes(false), runner(std::make_unique<OstreamTestRunner>(std::cout)){}
+Config::Config() : showParamNames(false), showParamTypes(false), runner(std::make_unique<OstreamTestRunner>(std::cout)), filter(){}
 Config::~Config(){}
 
 void Config::loadFromCLI(int argc, char**argv)
