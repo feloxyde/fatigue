@@ -24,6 +24,7 @@ struct OstreamTestLogger : public TestLogger {
   bool passed() const;
 
 public: 
+  std::string m_suite;
   std::ostream& m_ostream;
   size_t m_checkPassed;
   size_t m_checkFailed;

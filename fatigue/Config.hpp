@@ -32,7 +32,6 @@ struct Config final {
 
 public:
     static Config& instance();
-    bool shouldRun(std::string const& suite, std::string const& test);
 private:
     static std::unique_ptr<Config> instancePtr;
 public:

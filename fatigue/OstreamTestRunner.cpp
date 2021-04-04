@@ -1,4 +1,5 @@
 #include "OstreamTestRunner.hpp"
+#include "fatigue/Config.hpp"
 
 
 namespace ftg {
@@ -73,24 +74,45 @@ unsigned OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suite
     m_ostream << "---------------------------";
     size_t totalPass = 0;
     size_t totalFailed = 0;
-    
+    size_t totalSkipped = 0;
     
     //running suites 
     for(auto& s : suites){
+      //if entire suite is skipped, we dont display individual tests
+      size_t countSkip = 0;
+      auto tests = s->tests();
+      for (auto& t : tests){
+        if(!ftg::config().filter.shouldRun(s->name(), t->name())){
+          countSkip++;
+        }
+      }
+      if(countSkip == tests.size()){
+        m_ostream << std::endl << std::endl << std::endl;
+        m_ostream << "##### "  << s->name() << " ##### (skipped)";
+        totalSkipped += countSkip;
+        continue;
+      }
+
       m_ostream << std::endl << std::endl << std::endl;
       m_ostream << "##### "  << s->name() << " #####";
       
-      for (auto& t : s->tests()){
+      for (auto& t : tests){
+        if(!ftg::config().filter.shouldRun(s->name(), t->name())){
+          m_ostream  << std::endl << std::endl << "-- " << t->name() << " -- (skipped)"  << std::endl;
+          totalSkipped++;
+          continue;
+        }
         m_ostream  << std::endl << std::endl << "-- " << t->name() << " --"  << std::endl;
+        
         OstreamTestLogger otl(m_ostream);
         t->setLogger(&otl);
         
         if(t->load()){
-           if (this->runLoadedTest(t, otl)){
-             totalPass++;
-           } else {
-             totalFailed++;
-           }
+          if (this->runLoadedTest(t, otl)){
+            totalPass++;
+          } else {
+            totalFailed++;
+          }
         } else {
           m_ostream << "-- failed : error during load phase --" << std::endl;
           totalFailed++;
@@ -107,6 +129,9 @@ unsigned OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suite
       m_ostream << "ran : "<< totalPass + totalFailed <<  std::endl; 
     if(totalFailed != 0){
       m_ostream << "failed : "<< totalFailed << std::endl; 
+    }
+    if(totalSkipped != 0){
+      m_ostream << "skipped : " << totalSkipped << std::endl;
     }
     m_ostream << "---------------------------" << std::endl;
   

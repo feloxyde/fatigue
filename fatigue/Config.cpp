@@ -54,7 +54,9 @@ void Config::loadFromCLI(int argc, char**argv)
     opts.add_options()
     ("t,showtypes", "show parameter types when displaying checks results", cxxopts::value<bool>()->default_value("false"))
     ("n,shownames", "show parameter names when displaying checks results", cxxopts::value<bool>()->default_value("false"))
-    ("r,runner", "selects which runner to use to conduct tests", cxxopts::value<std::string>()->default_value("SequentialCout"));
+    ("r,runner", "selects which runner to use to conduct tests", cxxopts::value<std::string>()->default_value("SequentialCout"))
+    ("s,select", "runs tests matching a regular expression", cxxopts::value<std::string>())
+    ("e,exclude", "excludes tests matching a regular expression", cxxopts::value<std::string>());
 
     auto results = opts.parse(argc, argv);
 
@@ -63,8 +65,16 @@ void Config::loadFromCLI(int argc, char**argv)
     
     if(results["runner"].as<std::string>() == "SequentialCout"){
         runner = std::make_unique<OstreamTestRunner>(std::cout);
-    } 
-   
+    }
+
+    if(results["select"].count()){
+        filter.select = results["select"].as<std::string>();
+    }
+
+    if(results["exclude"].count()){
+        filter.exclude = results["exclude"].as<std::string>();
+    }
+
 }
 
 }
