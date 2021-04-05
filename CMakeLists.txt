@@ -105,7 +105,11 @@ set(unit_tests
     tests/unit/test_Config.cpp
     tests/unit/test_Filter.cpp
     tests/unit/test_OstreamTestLogger_noparam.cpp 
-    tests/unit/test_OstreamTestRunner_noparam.cpp 
+    tests/unit/test_OstreamTestRunner_noparam.cpp
+    tests/unit/test_OstreamTestRunner_exception.cpp
+    tests/unit/test_OstreamTestRunner_fatal.cpp
+    tests/unit/test_OstreamTestRunner_load_failure.cpp
+    tests/unit/test_OstreamTestRunner_passing.cpp
     tests/unit/test_Test_automsg_fail_showtypes.cpp
     tests/unit/test_Test_automsg_fail.cpp
     tests/unit/test_Test_automsg_pass.cpp

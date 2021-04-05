@@ -114,7 +114,7 @@ unsigned OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suite
             totalFailed++;
           }
         } else {
-          m_ostream << "-- failed : error during load phase --" << std::endl;
+          m_ostream << "-- failed : error during load phase --";
           totalFailed++;
         }
       }
