@@ -17,7 +17,8 @@ test:
      - develop
   stage: test
   before_script: 
-     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake cxxopts
+     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake yay
+     - yay -S cxxopts
      - git submodule update --init --recursive
      - mkdir build
      - cd build
