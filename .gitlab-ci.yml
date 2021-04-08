@@ -18,6 +18,7 @@ test:
   stage: test
   before_script: 
      - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake
+     - mkdir build
      - cd build
      - cmake ..
      - make 
