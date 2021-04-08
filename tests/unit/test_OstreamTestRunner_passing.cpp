@@ -35,13 +35,35 @@ struct Suite1 : ftg::Suite {
     }
 };
 
+struct BoolTest : public ftg::Test {
+    BoolTest():Test(std::string("BoolTest")){
 
+    }
+    virtual ~BoolTest(){}
+    virtual void run(){
+        check_true(true, "some message");
+        check_false(false, "some message");
+    }
+};
+
+struct Suite2 : ftg::Suite {
+    Suite2 () : Suite("suite2"){}
+    virtual ~Suite2(){}
+
+    virtual TestList tests() const{
+        TestList tl;
+        tl.push_back(std::move(std::make_unique<BoolTest>()));
+    
+        return tl;
+    }
+};
 
 
 int main(){
 
     std::vector<std::unique_ptr<Suite>> suites;
     suites.push_back(std::make_unique<Suite1>());
+    suites.push_back(std::make_unique<Suite2>());
     
     std::stringstream ss;
     std::stringstream res;
@@ -64,10 +86,16 @@ int main(){
     res << "-- MockTest4:1 --" << std::endl;
     res << "-- passed : out of 1 checks, 0 failed. --" << std::endl;
     res << std::endl;
+    res << std::endl;    
+    res << "##### suite2 #####" << std::endl;
+    res << std::endl;
+    res << "-- BoolTest --" << std::endl;
+    res << "-- passed : out of 2 checks, 0 failed. --" << std::endl;
+    res << std::endl;
     res << std::endl;
     res << "---------------------------" << std::endl;
     res << "---------- PASSED ---------" << std::endl;
-    res << "ran : 2" << std::endl;
+    res << "ran : 3" << std::endl;
     res << "---------------------------" << std::endl;
     /* HERE TO HELP DEBUG */
     size_t i(0);
