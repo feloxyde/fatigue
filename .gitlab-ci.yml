@@ -17,11 +17,16 @@ test:
      - develop
   stage: test
   before_script: 
-     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake pamac
-     - pamac build cxxopts
+     #installing dependencies 
+     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake
+     #pulling submodule 
      - git submodule update --init --recursive
      - mkdir build
      - cd build
+     #pulling cxxopts from its repos and installing it. 
+     - git pull https://github.com/jarro2783/cxxopts
+     #as it is header only, just copy header lol.
+     - cp cxxopts/include/cxxopts.hpp /usr/include/
      - cmake ..
      - make 
   script: 
