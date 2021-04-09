@@ -9,6 +9,11 @@ code_quality:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
     - if: '$CI_COMMIT_BRANCH == "master"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
     - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
+  variables:
+    REPORT_FORMAT: html
+  artifacts:
+   #to be able to DL as artifact
+    paths: [gl-code-quality-report.html]
 
 test:
   only:
@@ -24,7 +29,7 @@ test:
      - mkdir build
      - cd build
      #pulling cxxopts from its repos and installing it. 
-     - git pull https://github.com/jarro2783/cxxopts
+     - git clone https://github.com/jarro2783/cxxopts
      #as it is header only, just copy header lol.
      - cp cxxopts/include/cxxopts.hpp /usr/include/
      - cmake ..
