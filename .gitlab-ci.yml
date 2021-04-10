@@ -1,6 +1,5 @@
 image: carterjones/manjaro
 
-
 include:
     - template: Code-Quality.gitlab-ci.yml
 
@@ -16,10 +15,10 @@ code_quality:
     paths: [gl-code-quality-report.html]
 
 test:
-  only:
-     - master
-     - dev
-     - develop
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
+    - if: '$CI_COMMIT_BRANCH == "master"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
   stage: test
   before_script: 
      #installing dependencies 
@@ -36,3 +35,28 @@ test:
      - make 
   script: 
      - make test
+
+coverage:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
+    - if: '$CI_COMMIT_BRANCH == "master"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
+    - allow_failure: true
+  stage: test
+  before_script: 
+     #installing dependencies 
+     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake llvm
+     #pulling submodule 
+     - git submodule update --init --recursive
+     - mkdir build
+     - cd build
+     #pulling cxxopts from its repos and installing it. 
+     - git clone https://github.com/jarro2783/cxxopts
+     #as it is header only, just copy header lol.
+     - cp cxxopts/include/cxxopts.hpp /usr/include/
+     - cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+     - make 
+     - make test
+     - make coverage_all_txt
+  script: 
+     - tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1
