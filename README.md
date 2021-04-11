@@ -144,14 +144,51 @@ The project is still in progress, and features will be added depending on my tim
 
 - More checks than current available ones, especially regarding string and data collections
 - Better display runners
+- Test archetypes, as for example for testing ```==``` operator quickly.
 
 # Installing
 
-**to be completed**
 
-## Manual build and install
+## Linux
 
-**to be completed**
+To build and install the project, you will need : 
+- **CMake**
+- **Make** or any other build system, as **Ninja** 
+- C++20-ready compiler
+- **Python 3**, if you want to run tests
+- Git, for submodules handling
+
+Once dependencies are installed, clone the repository. 
+
+```
+git clone https://gitlab.com/feloxyde/fatigue
+```
+
+Change into the directory and run update submodules. 
+
+```
+cd fatigue
+git submodule init --recursive 
+```
+
+Then, create a ```build``` directory, change into it and call CMake.
+
+```
+mkdir build
+cd build
+cmake ..
+cmake --build
+```
+
+Optionally, you can run tests to check that everything went right, by running ```cmake --target test```.
+
+Finally, install using CMake :
+
+```
+sudo cmake --install
+```
+
+fatigue should now be installed on your computer, by default under ```/usr/local/lib``` and ```/usr/local/include```.
 
 # Using fatigue
 
