@@ -99,7 +99,7 @@ check_equal(a, b, "custom msg").important().fatal();
 
 ## CLI and display
 
-Currently, there is only one runner available, which executes tests sequentially
+Currently, there is only one runner available, which executes tests sequentially. It is currently NOT segfault-proof, and one segfault will result into the crash of the entire test software. A more advanced runner is planned, but default one should be sufficient for most cases, as usually, segfaults are critical errors you want to solve first. Even if it crashes, it will report which test run caused segfault.
 
 Default runner supports running certain tests based on regex matching on the name of tests and suites. 
 
@@ -109,17 +109,70 @@ Default runner supports running certain tests based on regex matching on the nam
 
 Runs all tests belonging to ```MySuite```, while excluding every test which name begins by ```Integer```.
 
+As we don't use macros, it's fairly difficult to know the exact line and file from which the error originates. Failed checks are reported by their index in the test run. For example, 
+
+```cpp
+//in run method
+check_true(true);
+check_equal(10, 20.0);
+//end run method
+```
+
+will produce :
+```
+(2) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
+```
+because second check failed.
+
 There are switches to tell runner to display names or types (```-t```) of checks arguments (```-n```). 
 
 ```
-./mytests -p -n
+(2) [ERROR] expected check_equal( l: 10 [int), r: 20 [double] ) to succeed, but failed.
 ```
 
 ## Planned features
 
-The project is still in progress, and there is a lot left to do.
+
+The project is still in progress, and features will be added depending on my time and needs. 
+
+### Guaranteed features
+
 - parallel and segfault proof tests
 - dependencies between tests
 
-## Inspirations 
+### On the fly features
+
+- More checks than current available ones, especially regarding string and data collections
+- Better display runners
+
+# Installing
+
+**to be completed**
+
+## Manual build and install
+
+**to be completed**
+
+# Using fatigue
+
+(here add an example)
+
+# Contributing
+
+## Dependencies 
+
+(clang etc... for coverage)
+
+**to be completed**
+
+# Other
+
+**to be completed**
+
+## Inspirations and other tests frameworks
 UnitTest++, pyunit
+
+
+## Story of the project
+
+**to be completed**
