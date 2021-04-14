@@ -41,7 +41,7 @@ What came in my mind when needing to test that was simply : I want to write a te
 
 ```cpp
 template<typename T>
-RESULT testJSONCopy(std::vector<Factory<T>> variations)
+RESULT testJSONInterchange(std::vector<Factory<T>> variations)
 {
     for (auto const& v : variations){
         T origin = v.create();
@@ -71,4 +71,28 @@ And then I decided to build my own testing framework. A framework actually not f
 
 ## Goal features
 
-What interests me the most in testing frameworks, is the ease of driving tests and getting a clean report of a test run. 
+What interests me the most in testing frameworks, is the ease of driving tests and getting a clean report of a test run. This is usually what takes most time if you want to create tests from scratch. 
+
+I like to see testing as some sort of mathematical proof : 
+because some component is tested and working, I can use it to test other components. Being able to express dependencies between tests is something I long for, but it will probably be a late feature.
+For example, in previous ```JSON``` interchange test,
+
+```cpp
+template<typename T>
+RESULT testJSONInterchange(std::vector<Factory<T>> variations)
+{
+    for (auto const& v : variations){
+        T origin = v.create();
+        T target(JSON(v));
+        if(!(target == origin)){
+            return FAIL; //of course with more info
+        }
+    }
+    return PASS;
+}
+```
+we used ```bool T::operator==(T const& origin)``` to check the result. Which means that the result of ```testJSONInterchange``` is meaningless if ```operator==``` isn't functional. I want my framework to allow expressing such dependencies, so I get warned if either tests for ```operator==``` do not exist, or if some are failing.
+
+Additionally, since testing revolves heavily around templates, I also want the testing framework to ouput clean messages in case of template error, which is trivial with C++20 *concepts*.
+
+Finally, I initially wanted the framework to be header-only, hence allowing for great portability and ease of use, but it turns up quite difficult to implement in a clean way without having some implementation files to avoid mutual inclusion, so for now I decided to keep it as a compiled library.

@@ -177,7 +177,7 @@ Then, create a ```build``` directory, change into it and call CMake.
 mkdir build
 cd build
 cmake ..
-cmake --build
+cmake --build .
 ```
 
 Optionally, you can run tests to check that everything went right, by running ```cmake --target test```.
@@ -194,6 +194,85 @@ fatigue should now be installed on your computer, by default under ```/usr/local
 
 (here add an example)
 
+## Example sources
+
+```cpp 
+//file StructToTest.hpp
+#include <string>
+
+/* a simple class that says something about an integer */
+struct StructToTest {
+    int itos123(std::string s){
+        if(s == "1"){
+            return 1;
+        } else if (s == "2"){
+            return 2;
+        } else if (s == "3"){
+            return 3;
+        } else {
+            return 0;
+        }
+    }
+}
+```
+
+```cpp
+//file TestStruct.hpp
+#include <fatigue/Test.hpp>
+#include <fatigue/Suite.hpp>
+#include <StructToTest.hpp>
+
+struct TestOkValues : public ftg::Test {
+    TestOkValues() : ftg::Test("TestOkValues"){}
+
+    void run() {
+        StructToTest stt;
+        check_equal(stt.itos123("1"), 1);
+        check_equal(stt.itos123("2"), 2, "itos(2) should be returning 2");
+        check_equal(stt.itos123("3"), 3);
+    }
+}
+
+struct TestNokValues : public ftg::Test {
+
+    TestNokValues() : ftg::Test("TestOkValues"){}
+
+    void run() {
+        StructToTest stt;
+        check_equal(stt.itos123("0"), 0);
+        check_equal(stt.itos123("1200"), 0);
+        check_equal(stt.itos123("-273"), 0);
+        check_equal(stt.itos123("-2222"), 0);
+    }
+}
+
+struct STTSuite : public ftg::Suite {
+    STTSuite() : ftg::Suite("STTSuite"){}
+
+    TestList tests() {
+        TestList tl;
+        tl.push_back(std::make_unique<TestOkValues>());
+        tl.push_back(std::make_unique<TestNokValues>());
+        return tl;
+    }
+}
+```
+
+```cpp
+//file TestMain.cpp
+#include "TestStruct.hpp"
+#include "fatigue/fatigue.hpp"
+
+int main(int argc, char** argv){
+    return fatigue(argc, argv)
+        .declare(std::make_unique<STTSuite>())
+        .run();
+}
+```
+
+## CMake build example
+
+
 # Contributing
 
 ## Dependencies 
@@ -202,14 +281,17 @@ fatigue should now be installed on your computer, by default under ```/usr/local
 
 **to be completed**
 
+
 # Other
 
-**to be completed**
+## Q and A
 
+**to be completed**
 ## Inspirations and other tests frameworks
 UnitTest++, pyunit
 
 
 ## Story of the project
 
-**to be completed**
+**to be completed, link to misc/story.md**
+
