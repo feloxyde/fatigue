@@ -272,8 +272,19 @@ int main(int argc, char** argv){
 
 ## CMake build example
 
+We can now build our tests by linking them with fatigue library.
+
+```cmake
+add_executable(TestMain TestMain.cpp)
+target_link_libraries(TestMain fatigue)
+add_test(TestMain COMMAND TestMain)
+```
+
+You can also use *cmake_llvm_coverage* (FIXME add link).
 
 # Contributing
+
+**to be completed**
 
 ## Dependencies 
 
