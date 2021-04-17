@@ -4,7 +4,7 @@
 
 namespace ftg {
 
-OstreamTestLogger::OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream), m_checkFailed(0), m_passed(true), m_checkPassed(0){}
+OstreamTestLogger::OstreamTestLogger(std::ostream& ostream) : m_ostream(ostream),  m_passed(true), m_checkPassed(0), m_checkFailed(0){}
 OstreamTestLogger::~OstreamTestLogger(){}
 
 void OstreamTestLogger::checkFailed(MessageMode mode, std::string const& description, std::vector<ParamInfo> const& params, bool expected, bool result, bool important)
@@ -48,9 +48,9 @@ void OstreamTestLogger::checkFailed(MessageMode mode, std::string const& descrip
       m_ostream << " )";
     }
 
-    if(expected){
+    if(expected && !result){
       m_ostream << " to succeed, but failed." << std::endl;
-    } else {
+    } else if (!expected && result) {
       m_ostream << " to fail, but succeeded." << std::endl;
     }
 }

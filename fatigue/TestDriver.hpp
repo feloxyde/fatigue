@@ -32,12 +32,12 @@ class TestDriver;
 class CheckReporter final
 {
 private:
+  TestDriver& m_test;
   std::string m_description;
-  MessageMode m_mode;
   bool m_res;
+  MessageMode m_mode;
   bool m_expected;
   bool m_important;
-  TestDriver& m_test;
   bool m_reported;
   std::vector<ParamInfo> m_params;
 

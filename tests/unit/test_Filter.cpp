@@ -1,4 +1,4 @@
-#include <fatigue/Config.cpp>
+#include <fatigue/Config.hpp>
 #include <cassert>
 
 

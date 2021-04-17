@@ -59,3 +59,34 @@ coverage:
      - make coverage_all_txt
   script: 
      - tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1
+
+install:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
+    - if: '$CI_COMMIT_BRANCH == "stable"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
+  stage: test
+  before_script: 
+     #installing dependencies 
+     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake
+     #pulling submodule 
+     - git submodule update --init --recursive
+     - mkdir build
+     - cd build
+     #pulling cxxopts from its repos and installing it. 
+     - git clone https://github.com/jarro2783/cxxopts
+     #as it is header only, just copy header lol.
+     - cp cxxopts/include/cxxopts.hpp /usr/include/
+     # building
+     - cmake .. -DCMAKE_BUILD_TYPE=Release 
+     - cmake --build . --target fatigue
+     # installing
+     - sudo cmake --build . --target install
+     # preparing tests
+     - cd ../tests/install
+     - mkdir build
+     - cd build
+     - cmake .. 
+     - cmake --build .
+  script: 
+     - cmake --build . --target test

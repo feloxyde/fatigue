@@ -37,7 +37,6 @@ knowledge of the CeCILL-C license and that you accept its terms.
 
 
 cmake_minimum_required(VERSION 3.1.0)
-option(ENABLE_GDB "enable gdb debug (-g) flag")
 
 #project declaration (noodle engine)
 project(fatigue)
@@ -50,6 +49,8 @@ if(N_PROC EQUAL 0)
 endif()
 
 
+include(GNUInstallDirs)
+
 #testing enabled, comment to disable
 enable_testing()
 add_custom_target(testo COMMAND ctest --output-on-failure)  
@@ -58,6 +59,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+#Setting compiler flags and build types
+
+SET(CMAKE_CXX_FLAGS "-Wall -Wextra")
+SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O2")
+SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g -Werror")
+
 include(${CMAKE_CURRENT_LIST_DIR}/cmake_llvm_coverage/LLVMCoverage.cmake)
 #include(CMakeUtils.cmake)
 
@@ -65,9 +73,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 #to generate with proper flags, please use 
 #cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+
 if(ENABLE_LLVM_COVERAGE)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping -O0 -g")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping -O0 -g")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 endif()
 
 #setting the root directory for includes as the root of the project, 
@@ -93,47 +102,19 @@ set(sources
     fatigue/TestDriver.cpp
 )
 
-
 add_library(fatigue ${sources})
+
+
+
+set_target_properties(fatigue PROPERTIES PUBLIC_HEADER "${headers}")
+
+install(TARGETS fatigue PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fatigue)
 
 ########################################################### 
 ########## TESTING ########################################
 ###########################################################
 
 
-set(unit_tests
-    tests/unit/test_Config.cpp
-    tests/unit/test_Filter.cpp
-    tests/unit/test_OstreamTestLogger_noparam.cpp 
-    tests/unit/test_OstreamTestRunner_noparam.cpp
-    tests/unit/test_OstreamTestRunner_exception.cpp
-    tests/unit/test_OstreamTestRunner_fatal.cpp
-    tests/unit/test_OstreamTestRunner_load_failure.cpp
-    tests/unit/test_OstreamTestRunner_passing.cpp
-    tests/unit/test_Test_automsg_fail_showtypes.cpp
-    tests/unit/test_Test_automsg_fail_showtypes_shownames.cpp
-    tests/unit/test_Test_automsg_fail.cpp
-    tests/unit/test_Test_automsg_pass.cpp
-    #tests/test_TestDriver.cpp
-)
-
-ADD_TEST_SUITE(ts_fatigue)
-
-BUILD_TESTS_TO_SUITE(ts_fatigue
-TESTS ${unit_tests}
-SOURCES ""
-LIBS fatigue
-)
-
-add_executable(test_fatigue tests/system/test_fatigue.cpp)
-target_link_libraries(test_fatigue fatigue)
-
-set (comp_py ${CMAKE_CURRENT_LIST_DIR}/tests/system/compare.py)
-set (test_sys_dir ${CMAKE_CURRENT_LIST_DIR}/tests/system)
-
-ADD_COVERED_TEST(test_fatigue_cmdline CMD ${comp_py} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${test_sys_dir}/test_fatigue_cmdline.expected)
-ADD_COVERED_TEST(test_exclude_ostream CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --exclude 'suite3//.*|suite2.*//.*:0'" ${test_sys_dir}/test_exclude_ostream.expected)
-ADD_COVERED_TEST(test_select_ostream CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --select 'suite3//.*|suite2.*//.*:0'" ${test_sys_dir}/test_select_ostream.expected)
-ADD_COVERED_TEST(test_select_exclude_ostream CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --select 'suite3//.*|suite2.*//.*:0' --exclude '.*2:0.*'" ${test_sys_dir}/test_select_exclude_ostream.expected)
+add_subdirectory(tests)
 
 ADD_COVERAGE_REPORT(coverage_all CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)

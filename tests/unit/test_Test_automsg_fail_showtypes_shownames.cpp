@@ -115,8 +115,8 @@ struct TestAutoMsgFail : public Test {
         assert(ss.str() == res.str());
     }
 
-    std::stringstream const& ss;
     OstreamTestLogger const& otl;
+    std::stringstream const& ss;
 };
 
 int main(){

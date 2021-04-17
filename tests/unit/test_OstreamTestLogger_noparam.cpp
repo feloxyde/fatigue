@@ -8,7 +8,6 @@
 using namespace ftg;
 
 int main(){
-    size_t index = 0;
 
     TestDriver td("name");
     std::stringstream ss;

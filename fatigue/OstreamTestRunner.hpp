@@ -24,11 +24,10 @@ struct OstreamTestLogger : public TestLogger {
   bool passed() const;
 
 public: 
-  std::string m_suite;
   std::ostream& m_ostream;
+  bool m_passed;
   size_t m_checkPassed;
   size_t m_checkFailed;
-  bool m_passed;
 };
 
 struct OstreamTestRunner : public TestRunner
