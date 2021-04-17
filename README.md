@@ -95,6 +95,10 @@ check_equal(a, b).fatal();
 
 //important can be combined with warn or fatal : 
 check_equal(a, b, "custom msg").important().fatal();
+
+//fails tells that the check result shall be false
+//following check will trigger and error if a==b
+check_equal(a, b).fails();
 ```
 
 ## CLI and display
@@ -148,15 +152,14 @@ The project is still in progress, and features will be added depending on my tim
 
 # Installing
 
-
 ## Linux
 
 To build and install the project, you will need : 
-- **CMake**
-- **Make** or any other build system, as **Ninja** 
-- C++20-ready compiler
-- **Python 3**, if you want to run tests
-- Git, for submodules handling
+- **CMake**.
+- **Make** or any other build system, as **Ninja**.
+- C++20-ready compiler.
+- **Python 3**, if you want to run tests.
+- Git, for submodules handling.
 
 Once dependencies are installed, clone the repository. 
 
@@ -171,24 +174,42 @@ cd fatigue
 git submodule init --recursive 
 ```
 
-Then, create a ```build``` directory, change into it and call CMake.
+Then, create a ```build``` directory, change into it and call CMake to build target ```fatigue```.
 
 ```
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --target fatigue
+```
+
+Install using CMake :
+
+```
+sudo cmake --build . --target install
+```
+
+Fatigue should now be installed on your computer, likely under ```/usr/local/lib``` and ```/usr/local/include```.
+
+Optionally, you can run tests with installed version, by changing into ```tests/install```, and then running CMake there, to build and run tests with installed
+library. You will need Python3 to do that.
+
+```
+cd ../tests/install
+mkdir build
+cd build
+cmake .. 
 cmake --build .
+cmake --build . --target test
 ```
 
-Optionally, you can run tests to check that everything went right, by running ```cmake --target test```.
+## Windows
 
-Finally, install using CMake :
+Honestly, no idea, will be added and enforced later. Contributions are welcome.
 
-```
-sudo cmake --install
-```
+## MacOS
 
-fatigue should now be installed on your computer, by default under ```/usr/local/lib``` and ```/usr/local/include```.
+Honestly, no idea, will be added and enforced later. Contributions are welcome.
 
 # Using fatigue
 
@@ -282,6 +303,23 @@ add_test(TestMain COMMAND TestMain)
 
 You can also use *cmake_llvm_coverage* (FIXME add link).
 
+# Uninstalling 
+
+## Linux 
+
+To uninstall fatigue, you will have to manually remove files created by installation.
+
+- ```libfatigue.*```, probably found in ```/usr/local/lib```.
+- ```fatigue/``` directory, containing headers, and probably found in ```/usr/local/include```.
+
+## Windows
+
+Honestly, no idea, will be added and enforced later. Contributions are welcome.
+
+## MacOS
+
+Honestly, no idea, will be added and enforced later. Contributions are welcome.
+
 # Contributing
 
 **to be completed**
@@ -292,13 +330,12 @@ You can also use *cmake_llvm_coverage* (FIXME add link).
 
 **to be completed**
 
-
 # Other
 
 ## Q and A
 
 **to be completed**
-## Inspirations and other tests frameworks
+## Inspirations
 UnitTest++, pyunit
 
 
