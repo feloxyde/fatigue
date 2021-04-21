@@ -6,11 +6,9 @@
 
 namespace ftg {
 
-
 typedef std::vector<std::unique_ptr<Test>> TestList;
 
-class Suite
-{
+class Suite {
 public:
   virtual TestList tests() const = 0;
 
@@ -27,7 +25,6 @@ private:
   std::string m_name;
 };
 
-
-}
+} // namespace ftg
 
 #endif

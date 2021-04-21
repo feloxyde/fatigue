@@ -82,7 +82,7 @@ public:
 
 public:
   virtual void run() = 0;
-  virtual bool load() noexcept {return true;}
+  virtual bool load() noexcept { return true; }
   virtual void unload() noexcept {}
 
 protected:

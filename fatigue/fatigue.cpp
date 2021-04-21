@@ -5,25 +5,22 @@ namespace ftg {
 
 std::vector<std::unique_ptr<Suite>> FatigueDriver::suites = std::vector<std::unique_ptr<Suite>>();
 
-    
 FatigueDriver FatigueDriver::declare(std::unique_ptr<Suite> suite) const
 {
-    suites.push_back(std::move(suite));
-    return FatigueDriver();
+  suites.push_back(std::move(suite));
+  return FatigueDriver();
 }
 
-
-
-unsigned FatigueDriver::run() const{
-    assert(config().runner);
-    return config().runner->run(suites);
+unsigned FatigueDriver::run() const
+{
+  assert(config().runner);
+  return config().runner->run(suites);
 };
 
-FatigueDriver fatigue(int argc, char**argv)
+FatigueDriver fatigue(int argc, char** argv)
 {
-    config().loadFromCLI(argc, argv);
-    return FatigueDriver();
+  config().loadFromCLI(argc, argv);
+  return FatigueDriver();
 }
 
-
-}
+} // namespace ftg

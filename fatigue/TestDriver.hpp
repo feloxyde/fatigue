@@ -18,19 +18,16 @@ namespace ftg {
 // user to
 // customize its output !
 
-
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
 
-struct FatalCheckFailure final
-{
+struct FatalCheckFailure final {
   FatalCheckFailure();
 };
 
 class TestDriver;
 
-class CheckReporter final
-{
+class CheckReporter final {
 private:
   TestDriver& m_test;
   std::string m_description;
@@ -60,8 +57,7 @@ private:
   void report();
 };
 
-class TestDriver
-{
+class TestDriver {
 public:
   TestDriver(std::string const& name);
 
@@ -79,7 +75,6 @@ private:
 private:
   friend CheckReporter;
 };
-
 
 } // namespace ftg
 

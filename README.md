@@ -5,6 +5,8 @@ A simple C++ testing framework, template based and macro free. It is mainly orie
 
 This document presents the framework quickly, and provides links to additional resources in case you want to learn more, would it be for using it or developing. 
 
+[[_TOC_]]
+
 # Overview
 
 ## Minimal test setup
@@ -128,7 +130,7 @@ will produce :
 ```
 because second check failed.
 
-There are switches to tell runner to display names or types (```-t```) of checks arguments (```-n```). 
+There are switches to tell runner to display names (```-n```) or types (```-t```) of checks arguments . 
 
 ```
 (2) [ERROR] expected check_equal( l: 10 [int), r: 20 [double] ) to succeed, but failed.
@@ -152,14 +154,17 @@ The project is still in progress, and features will be added depending on my tim
 
 # Installing
 
-## Linux
+## Dependencies
 
-To build and install the project, you will need : 
+To build the project for installation, you will need : 
 - **CMake**.
 - **Make** or any other build system, as **Ninja**.
 - C++20-ready compiler.
 - **Python 3**, if you want to run tests.
-- Git, for submodules handling.
+- **Git**, for submodules handling.
+- **[cxxopts](https://github.com/jarro2783/cxxopts)** library, that you can either install from package manager or build and install from Gihub, which should be fairly fast since library is header-only.
+
+## Linux
 
 Once dependencies are installed, clone the repository. 
 
@@ -320,26 +325,24 @@ Honestly, no idea, will be added and enforced later. Contributions are welcome.
 
 Honestly, no idea, will be added and enforced later. Contributions are welcome.
 
-# Contributing
+# Contributions
 
-**to be completed**
+Contributions are welcome, please read [Contributing.md](Contributing.md). 
 
-## Dependencies 
+This project has currently not received contributions aside from maintainer.
 
-(clang etc... for coverage)
+# Repository structure
 
-**to be completed**
+- ```fatigue``` directory contains all sources of the project, including headers.
+- ```tests``` directory is obviously for tests :
+    - ```install``` is an additional, trivial CMake project to build tests when checking installation.
+    - ```system``` are CLI-based tests.
+    - ```unit``` are unit tests, which are actually more like integration tests somehow.
+- ```cmake_llvm_coverage``` is a submodule containing cmake utility for test and coverage.
+- ```docs``` contains docs and doxygen configs.
+- ```misc``` contains various stuff, as logo, story, ...
 
-# Other
+# Misc
 
-## Q and A
-
-**to be completed**
-## Inspirations
-UnitTest++, pyunit
-
-
-## Story of the project
-
-**to be completed, link to misc/story.md**
+Project is currently developed by Felix Bertoni, [felix.bertoni987@gmail.com)](felix.bertoni987@gmail.com)
 
