@@ -1,40 +1,38 @@
-#include <fatigue/Config.hpp>
 #include <cassert>
-
+#include <fatigue/Config.hpp>
 
 using namespace ftg;
 
-int main(){
-    char command[] = "command";
+int main()
+{
+  char command[] = "command";
 
-    Config conf;
-    assert(conf.showParamNames == false);
-    assert(conf.showParamTypes == false);
-    assert(conf.runner != nullptr);
+  Config conf;
+  assert(conf.showParamNames == false);
+  assert(conf.showParamTypes == false);
+  assert(conf.runner != nullptr);
 
-    Config conft;
-    assert(conft.showParamNames == false);
-    assert(conft.showParamTypes == false);
-    char t[] = "-t";
-    char * argv[] = {command, t};
-    conft.loadFromCLI(2, argv);
-    assert(conft.showParamNames == false);
-    assert(conft.showParamTypes == true);
-    assert(conft.runner != nullptr);
-    
-    Config confn;
-    assert(confn.showParamNames == false);
-    assert(confn.showParamTypes == false);
-    assert(confn.runner != nullptr);
+  Config conft;
+  assert(conft.showParamNames == false);
+  assert(conft.showParamTypes == false);
+  char t[] = "-t";
+  char* argv[] = {command, t};
+  conft.loadFromCLI(2, argv);
+  assert(conft.showParamNames == false);
+  assert(conft.showParamTypes == true);
+  assert(conft.runner != nullptr);
 
-    char n[] = "-n";
-    char * argvn[] = {command, n};
-    confn.loadFromCLI(2, argvn);
-    assert(confn.showParamNames == true);
-    assert(confn.showParamTypes == false);
-    assert(conf.runner != nullptr);
+  Config confn;
+  assert(confn.showParamNames == false);
+  assert(confn.showParamTypes == false);
+  assert(confn.runner != nullptr);
 
-    return 0;
+  char n[] = "-n";
+  char* argvn[] = {command, n};
+  confn.loadFromCLI(2, argvn);
+  assert(confn.showParamNames == true);
+  assert(confn.showParamTypes == false);
+  assert(conf.runner != nullptr);
+
+  return 0;
 }
-
-
