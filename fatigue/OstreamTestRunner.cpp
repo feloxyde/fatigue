@@ -1,5 +1,7 @@
 #include "OstreamTestRunner.hpp"
 #include "fatigue/Config.hpp"
+#include "fatigue/Suite.hpp"
+#include <variant>
 
 namespace ftg {
 
@@ -10,7 +12,10 @@ OstreamTestLogger::OstreamTestLogger(std::ostream& ostream) :
     m_checkFailed(0)
 {
 }
-OstreamTestLogger::~OstreamTestLogger() {}
+
+OstreamTestLogger::~OstreamTestLogger()
+{
+}
 
 void OstreamTestLogger::checkFailed(MessageMode mode,
 				    std::string const& description,
@@ -75,61 +80,31 @@ bool OstreamTestLogger::passed() const
   return m_passed;
 }
 
-OstreamTestRunner::OstreamTestRunner(std::ostream& ostream) : m_ostream(ostream) {}
+OstreamTestRunner::OstreamTestRunner(std::ostream& ostream) :
+    m_ostream(ostream),
+    totalPass(0),
+    totalFailed(0),
+    totalSkipped(0)
+{
+}
 
-OstreamTestRunner::~OstreamTestRunner() {}
+OstreamTestRunner::~OstreamTestRunner()
+{
+}
 
-unsigned OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suites)
+
+unsigned OstreamTestRunner::run(TestList const& tests)
 {
   m_ostream << "---------------------------" << std::endl;
   m_ostream << "------ RUNNING TESTS ------" << std::endl;
   m_ostream << "---------------------------";
-  size_t totalPass = 0;
-  size_t totalFailed = 0;
-  size_t totalSkipped = 0;
 
   //running suites
-  for (auto& s : suites) {
+  std::vector<std::string> prefixes;
+  SuiteVisitor visitor(*this, prefixes);
+  for (auto& s : tests) {
     //if entire suite is skipped, we dont display individual tests
-    size_t countSkip = 0;
-    auto tests = s->tests();
-    for (auto& t : tests) {
-      if (!ftg::config().filter.shouldRun(s->name(), t->name())) {
-	countSkip++;
-      }
-    }
-    if (countSkip == tests.size()) {
-      m_ostream << std::endl << std::endl << std::endl;
-      m_ostream << "##### " << s->name() << " ##### (skipped)";
-      totalSkipped += countSkip;
-      continue;
-    }
-
-    m_ostream << std::endl << std::endl << std::endl;
-    m_ostream << "##### " << s->name() << " #####";
-
-    for (auto& t : tests) {
-      if (!ftg::config().filter.shouldRun(s->name(), t->name())) {
-	m_ostream << std::endl << std::endl << "-- " << t->name() << " -- (skipped)" << std::endl;
-	totalSkipped++;
-	continue;
-      }
-      m_ostream << std::endl << std::endl << "-- " << t->name() << " --" << std::endl;
-
-      OstreamTestLogger otl(m_ostream);
-      t->setLogger(&otl);
-
-      if (t->load()) {
-	if (this->runLoadedTest(t, otl)) {
-	  totalPass++;
-	} else {
-	  totalFailed++;
-	}
-      } else {
-	m_ostream << "-- failed : error during load phase --";
-	totalFailed++;
-      }
-    }
+    std::visit(visitor, s);
   }
 
   m_ostream << std::endl << std::endl << std::endl << "---------------------------" << std::endl;
@@ -150,10 +125,29 @@ unsigned OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suite
   return totalFailed;
 }
 
-bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test>& t, OstreamTestLogger& otl)
+void OstreamTestRunner::runSuite(std::unique_ptr<Suite> const& suite, std::vector<std::string> const& prefixes)
+{
+  std::vector<std::string> pre = prefixes;
+  pre.push_back(suite->name());
+  m_ostream << std::endl << std::endl << std::endl;
+  m_ostream << "##### " << suite->name() << " #####";
+
+  SuiteVisitor visitor(*this, pre);
+  for (auto& s : suite->tests()) {
+    //if entire suite is skipped, we dont display individual tests
+    std::visit(visitor, s);
+  }
+}
+
+
+bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test> const& t)
 {
   bool exceptPass = true;
   bool passed = true;
+
+  OstreamTestLogger otl(m_ostream);
+  t->setLogger(&otl);
+
   try {
     t->run();
     t->unload();
@@ -176,6 +170,40 @@ bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test>& t, OstreamTestLogge
 
   m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << " failed. --";
   return passed;
+}
+
+OstreamTestRunner::SuiteVisitor::SuiteVisitor(OstreamTestRunner& runner, std::vector<std::string> const& prefixes) :
+    runner(runner),
+    prefixes(prefixes)
+{
+}
+
+void OstreamTestRunner::SuiteVisitor::operator()(std::unique_ptr<Test> const& t)
+{
+
+  if (!ftg::config().filter.shouldRun(prefixes, t->name())) {
+    runner.m_ostream << std::endl << std::endl << "-- " << t->name() << " -- (skipped)" << std::endl;
+    runner.totalSkipped++;
+    return;
+  }
+  runner.m_ostream << std::endl << std::endl << "-- " << t->name() << " --" << std::endl;
+
+
+  if (t->load()) {
+    if (runner.runLoadedTest(t)) {
+      runner.totalPass++;
+    } else {
+      runner.totalFailed++;
+    }
+  } else {
+    runner.m_ostream << "-- failed : error during load phase --";
+    runner.totalFailed++;
+  }
+}
+
+
+void OstreamTestRunner::SuiteVisitor::operator()(std::unique_ptr<Suite> const& t)
+{
 }
 
 } // namespace ftg

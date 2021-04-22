@@ -8,12 +8,22 @@
 
 namespace ftg {
 
-Filter::Filter() : select(), exclude(), separator("//") {}
-Filter::~Filter() {}
-
-bool Filter::shouldRun(std::string const& suite, std::string const& test) const
+Filter::Filter() : select(), exclude(), separator("//")
 {
-  std::string fullname = suite + separator + test;
+}
+Filter::~Filter()
+{
+}
+
+bool Filter::shouldRun(std::vector<std::string> const& prefixes, std::string const& test) const
+{
+  std::string fullname = "";
+
+  for (auto const& s : prefixes) {
+    fullname += s + separator;
+  }
+
+  fullname = separator + test;
 
   bool run = true;
   if (select.has_value()) {
@@ -50,7 +60,9 @@ Config::Config() :
     filter()
 {
 }
-Config::~Config() {}
+Config::~Config()
+{
+}
 
 void Config::loadFromCLI(int argc, char** argv)
 {
