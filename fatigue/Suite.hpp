@@ -3,13 +3,13 @@
 
 #include "Test.hpp"
 #include "TestDriver.hpp"
+#include "TestRunner.hpp"
 #include <variant>
 
 namespace ftg {
 
 class Suite;
 
-typedef std::vector<std::variant<std::unique_ptr<Test>, std::unique_ptr<Suite>>> TestList;
 
 class Suite {
 public:

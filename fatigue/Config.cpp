@@ -23,14 +23,14 @@ bool Filter::shouldRun(std::vector<std::string> const& prefixes, std::string con
     fullname += s + separator;
   }
 
-  fullname = separator + test;
+  fullname += separator + test;
 
   bool run = true;
   if (select.has_value()) {
-    run = std::regex_match(fullname, select.value());
+    run = run && std::regex_match(fullname, select.value());
   }
   if (exclude.has_value()) {
-    run = !std::regex_match(fullname, exclude.value());
+    run = run && !std::regex_match(fullname, exclude.value());
   }
 
   return run;

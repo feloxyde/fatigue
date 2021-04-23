@@ -204,6 +204,7 @@ void OstreamTestRunner::SuiteVisitor::operator()(std::unique_ptr<Test> const& t)
 
 void OstreamTestRunner::SuiteVisitor::operator()(std::unique_ptr<Suite> const& t)
 {
+  runner.runSuite(t, prefixes);
 }
 
 } // namespace ftg

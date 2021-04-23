@@ -1,4 +1,5 @@
 #include "fatigue/Suite.hpp"
+#include "fatigue/TestRunner.hpp"
 #include <fatigue/fatigue.hpp>
 #include <memory>
 #include <string>
@@ -62,9 +63,9 @@ struct Suite2 : ftg::Suite {
   }
 };
 
-SuiteList buildSuites()
+TestList buildSuites()
 {
-  SuiteList tl;
+  TestList tl;
   tl.push_back(std::make_unique<Suite2<0>>());
   tl.push_back(std::make_unique<Suite2<10>>());
   tl.push_back(std::make_unique<Suite2<20>>());

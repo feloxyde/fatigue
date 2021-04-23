@@ -5,41 +5,50 @@
 
 ##### suite1 #####
 
--- MockTest1:0 --
+-- MockTest1:0 -- (skipped)
+
+
+-- MockTest4:1 -- (skipped)
+
+
+
+##### suite2:0 #####
+
+-- MockTest1:1 -- (skipped)
+
+
+-- MockTest2:0 --
 (1) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
 -- failed : out of 1 checks, 1 failed. --
 
--- MockTest4:1 --
--- passed : out of 1 checks, 0 failed. --
+-- MockTest3:0 -- (skipped)
 
-
-##### suite2:0 ##### (skipped)
 
 
 ##### suite2:10 #####
 
--- MockTest11:1 --
--- passed : out of 1 checks, 0 failed. --
-
--- MockTest12:0 -- (skipped)
+-- MockTest11:1 -- (skipped)
 
 
--- MockTest13:0 --
+-- MockTest12:0 --
 (1) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
 -- failed : out of 1 checks, 1 failed. --
+
+-- MockTest13:0 -- (skipped)
+
 
 
 ##### suite2:20 #####
 
--- MockTest21:1 --
--- passed : out of 1 checks, 0 failed. --
-
--- MockTest22:0 -- (skipped)
+-- MockTest21:1 -- (skipped)
 
 
--- MockTest23:0 --
+-- MockTest22:0 --
 (1) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
 -- failed : out of 1 checks, 1 failed. --
+
+-- MockTest23:0 -- (skipped)
+
 
 
 ##### suite3 #####
@@ -53,7 +62,7 @@
 
 ---------------------------
 ---------- FAILED ---------
-ran : 8
+ran : 5
 failed : 3
-skipped : 5
+skipped : 8
 ---------------------------

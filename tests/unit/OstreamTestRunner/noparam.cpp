@@ -48,7 +48,7 @@ struct Suite2 : ftg::Suite {
 int main()
 {
 
-  std::vector<std::unique_ptr<Suite>> suites;
+  TestList suites;
   suites.push_back(std::make_unique<Suite1>());
 
   std::stringstream ss;
