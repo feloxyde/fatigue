@@ -42,21 +42,10 @@ struct OstreamTestRunner : public TestRunner {
 
 
 private:
-  bool runLoadedTest(std::unique_ptr<Test> const& t);
+  void dispatchTestList(TestList const& tests, std::vector<std::string> const& prefixes);
   void runSuite(std::unique_ptr<Suite> const& suite, std::vector<std::string> const& prefixes);
-
-
-  struct SuiteVisitor {
-    SuiteVisitor(OstreamTestRunner& runner, std::vector<std::string> const& prefixes);
-
-    void operator()(std::unique_ptr<Test> const& t);
-    void operator()(std::unique_ptr<Suite> const& t);
-
-    OstreamTestRunner& runner;
-    std::vector<std::string> prefixes;
-  };
-
-  friend SuiteVisitor;
+  void runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes);
+  bool runLoadedTest(std::unique_ptr<Test> const& t);
 
 private:
   std::ostream& m_ostream;
