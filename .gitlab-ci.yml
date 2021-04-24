@@ -53,7 +53,7 @@ coverage:
      - git clone https://github.com/jarro2783/cxxopts
      #as it is header only, just copy header lol.
      - cp cxxopts/include/cxxopts.hpp /usr/include/
-     - cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+     - cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug
      - make 
      - make test
      - make coverage_all_txt

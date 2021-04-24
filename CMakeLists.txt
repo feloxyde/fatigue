@@ -76,7 +76,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 if(ENABLE_LLVM_COVERAGE)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 endif()
 
 #setting the root directory for includes as the root of the project, 
@@ -117,4 +116,4 @@ install(TARGETS fatigue PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fa
 
 add_subdirectory(tests)
 
-ADD_COVERAGE_REPORT(coverage_all CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)
+ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BIN ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/* COVERING ${headers} ${sources})
