@@ -19,7 +19,7 @@ struct Filter final {
   bool shouldRun(std::vector<std::string> const& prefixes, std::string const& test) const;
 };
 
-class Config;
+struct Config;
 
 Config& config();
 
