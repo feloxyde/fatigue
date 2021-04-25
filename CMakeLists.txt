@@ -116,4 +116,4 @@ install(TARGETS fatigue PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fa
 
 add_subdirectory(tests)
 
-ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BIN ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/* COVERING ${headers} ${sources})
+ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ts_fatigue_unit_Config_Config COVERING ${headers} ${sources})
