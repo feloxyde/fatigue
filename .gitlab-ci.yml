@@ -58,7 +58,7 @@ coverage:
      - make test
      - make coverage_all_txt
   script: 
-     - tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1
+     - '{echo "coverage"; tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1;} | tr "\n" " "'
 
 install:
   rules:
