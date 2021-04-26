@@ -58,8 +58,7 @@ coverage:
      - make test
      - make coverage_all_txt
   script: 
-     - '{echo "coverage"; tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1;} | tr "\n" " "'
-
+     - echo "coverage" "$(tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1)"
 install:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
