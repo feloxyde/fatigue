@@ -17,25 +17,28 @@ concept TestListBuilder = requires(T a)
   ->std::same_as<TestList>;
 };
 
-struct FatigueDriver {
-  FatigueDriver declare(std::unique_ptr<Suite> suite) const;
-  FatigueDriver declare(std::unique_ptr<Test> test) const;
+struct fatigue {
+
+  fatigue(int argc, char** argv);
+
+  fatigue& declare(std::unique_ptr<Suite> suite);
+  fatigue& declare(std::unique_ptr<Test> test);
   template<TestListBuilder Builder>
-  FatigueDriver declare(Builder b) const;
+  fatigue& declare(Builder b);
   unsigned run() const;
 
 private:
-  static TestList tests;
+  TestList tests;
+  Config config;
 };
 
-FatigueDriver fatigue(int argc, char** argv);
 
 template<TestListBuilder Builder>
-FatigueDriver FatigueDriver::declare(Builder b) const
+fatigue& fatigue::declare(Builder b)
 {
   auto testlist = b();
   tests.insert(tests.end(), std::make_move_iterator(testlist.begin()), std::make_move_iterator(testlist.end()));
-  return FatigueDriver();
+  return *this;
 }
 
 } // namespace ftg

@@ -43,7 +43,8 @@ int main()
   std::stringstream ss;
   std::stringstream res;
 
-  OstreamTestRunner otr(ss);
+  Config conf;
+  OstreamTestRunner otr(ss, conf);
   unsigned f = otr.run(suites);
   assert(f == 1);
 

@@ -14,7 +14,7 @@ namespace ftg {
 
 struct OstreamTestLogger : public TestLogger {
 
-  OstreamTestLogger(std::ostream& ostream);
+  OstreamTestLogger(std::ostream& ostream, Config const& config);
   virtual ~OstreamTestLogger();
 
   virtual void checkFailed(MessageMode mode,
@@ -29,6 +29,7 @@ struct OstreamTestLogger : public TestLogger {
   bool passed() const;
 
 public:
+  Config const& m_config;
   std::ostream& m_ostream;
   bool m_passed;
   size_t m_checkPassed;
@@ -36,7 +37,7 @@ public:
 };
 
 struct OstreamTestRunner : public TestRunner {
-  OstreamTestRunner(std::ostream& ostream);
+  OstreamTestRunner(std::ostream& ostream, Config const& config);
   virtual ~OstreamTestRunner();
   virtual unsigned run(TestList const& tests);
 
@@ -48,6 +49,7 @@ private:
   bool runLoadedTest(std::unique_ptr<Test> const& t);
 
 private:
+  Config const& m_config;
   std::ostream& m_ostream;
   size_t totalPass;
   size_t totalFailed;

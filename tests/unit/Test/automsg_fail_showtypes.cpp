@@ -125,11 +125,11 @@ struct TestAutoMsgFail : public Test {
 
 int main()
 {
-
+  Config conf;
+  conf.showParamTypes = true;
   std::stringstream ss;
-  OstreamTestLogger otl(ss);
+  OstreamTestLogger otl(ss, conf);
   TestAutoMsgFail t(otl, ss);
-  ftg::config().showParamTypes = true;
   t.setLogger(&otl);
   t.run();
 

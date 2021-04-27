@@ -19,27 +19,17 @@ struct Filter final {
   bool shouldRun(std::vector<std::string> const& prefixes, std::string const& test) const;
 };
 
-struct Config;
-
-Config& config();
-
 struct Config final {
-  bool showParamNames;
-  bool showParamTypes;
-  std::unique_ptr<TestRunner> runner;
-  Filter filter;
 
-public:
-  static Config& instance();
-
-private:
-  static std::unique_ptr<Config> instancePtr;
-
-public:
   Config();
   ~Config();
-
   void loadFromCLI(int argc, char** argv);
+
+public:
+  bool showParamNames;
+  bool showParamTypes;
+  std::string runner;
+  Filter filter;
 };
 
 } // namespace ftg
