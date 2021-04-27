@@ -5,6 +5,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace ftg {
@@ -12,10 +13,13 @@ namespace ftg {
 enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_FATAL, MESSAGE_INFO };
 
 class Suite;
+class Test;
+
+typedef std::vector<std::variant<std::unique_ptr<Test>, std::unique_ptr<Suite>>> TestList;
 
 struct TestRunner {
   virtual ~TestRunner(){};
-  virtual unsigned run(std::vector<std::unique_ptr<Suite>> const& suites) = 0;
+  virtual unsigned run(TestList const& suites) = 0;
 };
 
 struct ParamInfo {

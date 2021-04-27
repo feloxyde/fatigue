@@ -1,5 +1,8 @@
 #include "OstreamTestRunner.hpp"
 #include "fatigue/Config.hpp"
+#include "fatigue/Suite.hpp"
+#include "fatigue/TestRunner.hpp"
+#include <variant>
 
 namespace ftg {
 
@@ -10,7 +13,10 @@ OstreamTestLogger::OstreamTestLogger(std::ostream& ostream) :
     m_checkFailed(0)
 {
 }
-OstreamTestLogger::~OstreamTestLogger() {}
+
+OstreamTestLogger::~OstreamTestLogger()
+{
+}
 
 void OstreamTestLogger::checkFailed(MessageMode mode,
 				    std::string const& description,
@@ -75,62 +81,28 @@ bool OstreamTestLogger::passed() const
   return m_passed;
 }
 
-OstreamTestRunner::OstreamTestRunner(std::ostream& ostream) : m_ostream(ostream) {}
+OstreamTestRunner::OstreamTestRunner(std::ostream& ostream) :
+    m_ostream(ostream),
+    totalPass(0),
+    totalFailed(0),
+    totalSkipped(0)
+{
+}
 
-OstreamTestRunner::~OstreamTestRunner() {}
+OstreamTestRunner::~OstreamTestRunner()
+{
+}
 
-unsigned OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suites)
+
+unsigned OstreamTestRunner::run(TestList const& tests)
 {
   m_ostream << "---------------------------" << std::endl;
   m_ostream << "------ RUNNING TESTS ------" << std::endl;
   m_ostream << "---------------------------";
-  size_t totalPass = 0;
-  size_t totalFailed = 0;
-  size_t totalSkipped = 0;
 
   //running suites
-  for (auto& s : suites) {
-    //if entire suite is skipped, we dont display individual tests
-    size_t countSkip = 0;
-    auto tests = s->tests();
-    for (auto& t : tests) {
-      if (!ftg::config().filter.shouldRun(s->name(), t->name())) {
-	countSkip++;
-      }
-    }
-    if (countSkip == tests.size()) {
-      m_ostream << std::endl << std::endl << std::endl;
-      m_ostream << "##### " << s->name() << " ##### (skipped)";
-      totalSkipped += countSkip;
-      continue;
-    }
-
-    m_ostream << std::endl << std::endl << std::endl;
-    m_ostream << "##### " << s->name() << " #####";
-
-    for (auto& t : tests) {
-      if (!ftg::config().filter.shouldRun(s->name(), t->name())) {
-	m_ostream << std::endl << std::endl << "-- " << t->name() << " -- (skipped)" << std::endl;
-	totalSkipped++;
-	continue;
-      }
-      m_ostream << std::endl << std::endl << "-- " << t->name() << " --" << std::endl;
-
-      OstreamTestLogger otl(m_ostream);
-      t->setLogger(&otl);
-
-      if (t->load()) {
-	if (this->runLoadedTest(t, otl)) {
-	  totalPass++;
-	} else {
-	  totalFailed++;
-	}
-      } else {
-	m_ostream << "-- failed : error during load phase --";
-	totalFailed++;
-      }
-    }
-  }
+  std::vector<std::string> prefixes;
+  dispatchTestList(tests, prefixes);
 
   m_ostream << std::endl << std::endl << std::endl << "---------------------------" << std::endl;
   if (totalFailed == 0) {
@@ -150,10 +122,63 @@ unsigned OstreamTestRunner::run(std::vector<std::unique_ptr<Suite>> const& suite
   return totalFailed;
 }
 
-bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test>& t, OstreamTestLogger& otl)
+
+void OstreamTestRunner::dispatchTestList(TestList const& tests, std::vector<std::string> const& prefixes)
+{
+  static_assert(std::variant_size_v<TestList::value_type> == 2,
+		"OstreamTestRunner expects 2 differents alternatives in the TestList variant");
+  for (auto& s : tests) {
+    if (std::holds_alternative<std::unique_ptr<Test>>(s)) {
+      runTest(std::get<std::unique_ptr<Test>>(s), prefixes);
+    } else if (std::holds_alternative<std::unique_ptr<Suite>>(s)) {
+      runSuite(std::get<std::unique_ptr<Suite>>(s), prefixes);
+    }
+  }
+}
+
+void OstreamTestRunner::runSuite(std::unique_ptr<Suite> const& suite, std::vector<std::string> const& prefixes)
+{
+
+  m_ostream << std::endl << std::endl << std::endl;
+  m_ostream << "##### " << suite->name() << " #####";
+
+  std::vector<std::string> pre = prefixes;
+  pre.push_back(suite->name());
+  dispatchTestList(suite->tests(), pre);
+}
+
+
+void OstreamTestRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes)
+{
+  if (!ftg::config().filter.shouldRun(prefixes, test->name())) {
+    m_ostream << std::endl << std::endl << "-- " << test->name() << " -- (skipped)" << std::endl;
+    totalSkipped++;
+    return;
+  }
+  m_ostream << std::endl << std::endl << "-- " << test->name() << " --" << std::endl;
+
+
+  if (test->load()) {
+    if (runLoadedTest(test)) {
+      totalPass++;
+    } else {
+      totalFailed++;
+    }
+  } else {
+    m_ostream << "-- failed : error during load phase --";
+    totalFailed++;
+  }
+}
+
+
+bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test> const& t)
 {
   bool exceptPass = true;
   bool passed = true;
+
+  OstreamTestLogger otl(m_ostream);
+  t->setLogger(&otl);
+
   try {
     t->run();
     t->unload();

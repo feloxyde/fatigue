@@ -4,9 +4,9 @@
 
 namespace ftg {
 
-typedef std::vector<std::unique_ptr<Test>> TestList;
-
-Suite::Suite(std::string const& name) : m_name(name) {}
+Suite::Suite(std::string const& name) : m_name(name)
+{
+}
 
 Suite::~Suite(){};
 

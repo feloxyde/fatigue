@@ -1,4 +1,5 @@
 #include "fatigue/Suite.hpp"
+#include "fatigue/TestRunner.hpp"
 #include <fatigue/fatigue.hpp>
 #include <memory>
 #include <string>
@@ -26,8 +27,8 @@ struct Suite1 : ftg::Suite {
   virtual TestList tests() const
   {
     TestList tl;
-    tl.push_back(std::move(std::make_unique<MockTest<1, false>>()));
-    tl.push_back(std::move(std::make_unique<MockTest<4, true>>()));
+    tl.push_back(std::make_unique<MockTest<1, false>>());
+    tl.push_back(std::make_unique<MockTest<4, true>>());
 
     return tl;
   }
@@ -40,8 +41,8 @@ struct Suite3 : ftg::Suite {
   virtual TestList tests() const
   {
     TestList tl;
-    tl.push_back(std::move(std::make_unique<MockTest<1, true>>()));
-    tl.push_back(std::move(std::make_unique<MockTest<4, true>>()));
+    tl.push_back(std::make_unique<MockTest<1, true>>());
+    tl.push_back(std::make_unique<MockTest<4, true>>());
 
     return tl;
   }
@@ -55,16 +56,16 @@ struct Suite2 : ftg::Suite {
   virtual TestList tests() const
   {
     TestList tl;
-    tl.push_back(std::move(std::make_unique<MockTest<1 + num, true>>()));
-    tl.push_back(std::move(std::make_unique<MockTest<2 + num, false>>()));
-    tl.push_back(std::move(std::make_unique<MockTest<3 + num, false>>()));
+    tl.push_back(std::make_unique<MockTest<1 + num, true>>());
+    tl.push_back(std::make_unique<MockTest<2 + num, false>>());
+    tl.push_back(std::make_unique<MockTest<3 + num, false>>());
     return tl;
   }
 };
 
-SuiteList buildSuites()
+TestList buildSuites()
 {
-  SuiteList tl;
+  TestList tl;
   tl.push_back(std::make_unique<Suite2<0>>());
   tl.push_back(std::make_unique<Suite2<10>>());
   tl.push_back(std::make_unique<Suite2<20>>());

@@ -12,8 +12,8 @@ cmd = argv[1]
 p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
 stdout, stderr = p.communicate()
 
-with open("expected.txt", "w+") as f:
-    f.write(stdout.decode())
+#with open("expected.txt", "w+") as f:
+#    f.write(stdout.decode())
 print(stdout.decode())
 
 with open(argv[2], 'r') as f:

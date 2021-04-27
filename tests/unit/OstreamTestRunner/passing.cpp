@@ -24,8 +24,8 @@ struct Suite1 : ftg::Suite {
   virtual TestList tests() const
   {
     TestList tl;
-    tl.push_back(std::move(std::make_unique<MockTest<1, true>>()));
-    tl.push_back(std::move(std::make_unique<MockTest<4, true>>()));
+    tl.push_back(std::make_unique<MockTest<1, true>>());
+    tl.push_back(std::make_unique<MockTest<4, true>>());
 
     return tl;
   }
@@ -48,7 +48,7 @@ struct Suite2 : ftg::Suite {
   virtual TestList tests() const
   {
     TestList tl;
-    tl.push_back(std::move(std::make_unique<BoolTest>()));
+    tl.push_back(std::make_unique<BoolTest>());
 
     return tl;
   }
@@ -57,7 +57,7 @@ struct Suite2 : ftg::Suite {
 int main()
 {
 
-  std::vector<std::unique_ptr<Suite>> suites;
+  TestList suites;
   suites.push_back(std::make_unique<Suite1>());
   suites.push_back(std::make_unique<Suite2>());
 

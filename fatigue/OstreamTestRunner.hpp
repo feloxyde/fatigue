@@ -6,6 +6,7 @@
 #include "TestRunner.hpp"
 #include "fatigue/TestDriver.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <ostream>
 
@@ -37,13 +38,20 @@ public:
 struct OstreamTestRunner : public TestRunner {
   OstreamTestRunner(std::ostream& ostream);
   virtual ~OstreamTestRunner();
-  virtual unsigned run(std::vector<std::unique_ptr<Suite>> const& suites);
+  virtual unsigned run(TestList const& tests);
+
 
 private:
-  bool runLoadedTest(std::unique_ptr<Test>& t, OstreamTestLogger& otl);
+  void dispatchTestList(TestList const& tests, std::vector<std::string> const& prefixes);
+  void runSuite(std::unique_ptr<Suite> const& suite, std::vector<std::string> const& prefixes);
+  void runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes);
+  bool runLoadedTest(std::unique_ptr<Test> const& t);
 
 private:
   std::ostream& m_ostream;
+  size_t totalPass;
+  size_t totalFailed;
+  size_t totalSkipped;
 };
 
 } // namespace ftg

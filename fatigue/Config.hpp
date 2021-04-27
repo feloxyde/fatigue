@@ -16,9 +16,10 @@ struct Filter final {
   std::optional<std::regex> select;
   std::optional<std::regex> exclude;
   std::string separator;
-  bool shouldRun(std::string const& suite, std::string const& test) const;
+  bool shouldRun(std::vector<std::string> const& prefixes, std::string const& test) const;
 };
-class Config;
+
+struct Config;
 
 Config& config();
 

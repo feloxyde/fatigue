@@ -3,38 +3,38 @@
 
 #include "Config.hpp"
 #include "Suite.hpp"
+#include "fatigue/TestRunner.hpp"
 #include <iterator>
 
 namespace ftg {
 
-typedef std::vector<std::unique_ptr<Suite>> SuiteList;
-
 template<typename T>
-concept SuiteBuilder = requires(T a)
+concept TestListBuilder = requires(T a)
 {
   {
     a()
   }
-  ->std::same_as<SuiteList>;
+  ->std::same_as<TestList>;
 };
 
 struct FatigueDriver {
   FatigueDriver declare(std::unique_ptr<Suite> suite) const;
-  template<SuiteBuilder Builder>
+  FatigueDriver declare(std::unique_ptr<Test> test) const;
+  template<TestListBuilder Builder>
   FatigueDriver declare(Builder b) const;
   unsigned run() const;
 
 private:
-  static SuiteList suites;
+  static TestList tests;
 };
 
 FatigueDriver fatigue(int argc, char** argv);
 
-template<SuiteBuilder Builder>
+template<TestListBuilder Builder>
 FatigueDriver FatigueDriver::declare(Builder b) const
 {
-  auto suitelist = b();
-  suites.insert(suites.end(), std::make_move_iterator(suitelist.begin()), std::make_move_iterator(suitelist.end()));
+  auto testlist = b();
+  tests.insert(tests.end(), std::make_move_iterator(testlist.begin()), std::make_move_iterator(testlist.end()));
   return FatigueDriver();
 }
 
