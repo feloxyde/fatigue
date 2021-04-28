@@ -1,25 +1,18 @@
 #include "fatigue/Suite.hpp"
 #include <cassert>
-#include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
+#include <fatigue/runners/DefaultRunner.hpp>
 #include <memory>
 #include <sstream>
 #include <string>
 
 using namespace ftg;
 
-template<int num, bool excep>
+template<int num, bool pass>
 struct MockTest : public ftg::Test {
-  MockTest() : Test(std::string("MockTest") + std::to_string(num) + ":" + std::to_string(excep)) {}
+  MockTest() : Test(std::string("MockTest") + std::to_string(num) + ":" + std::to_string(pass)) {}
   virtual ~MockTest() {}
-
-  virtual void run()
-  {
-    check_true(true);
-    if (excep) {
-      throw 1;
-    }
-  }
+  virtual void run() { check_true(pass); }
 };
 
 struct Suite1 : ftg::Suite {
@@ -30,7 +23,30 @@ struct Suite1 : ftg::Suite {
   {
     TestList tl;
     tl.push_back(std::make_unique<MockTest<1, true>>());
-    tl.push_back(std::make_unique<MockTest<4, false>>());
+    tl.push_back(std::make_unique<MockTest<4, true>>());
+
+    return tl;
+  }
+};
+
+struct BoolTest : public ftg::Test {
+  BoolTest() : Test(std::string("BoolTest")) {}
+  virtual ~BoolTest() {}
+  virtual void run()
+  {
+    check_true(true, "some message");
+    check_false(false, "some message");
+  }
+};
+
+struct Suite2 : ftg::Suite {
+  Suite2() : Suite("suite2") {}
+  virtual ~Suite2() {}
+
+  virtual TestList tests() const
+  {
+    TestList tl;
+    tl.push_back(std::make_unique<BoolTest>());
 
     return tl;
   }
@@ -41,14 +57,15 @@ int main()
 
   TestList suites;
   suites.push_back(std::make_unique<Suite1>());
+  suites.push_back(std::make_unique<Suite2>());
 
   std::stringstream ss;
   std::stringstream res;
 
   Config conf;
-  OstreamTestRunner otr(ss, conf);
-  unsigned f = otr.run(suites);
-  assert(f == 1);
+  DefaultRunner dr(ss, conf);
+  unsigned f = dr.run(suites);
+  assert(f == 0);
 
   res << "---------------------------" << std::endl;
   res << "------ RUNNING TESTS ------" << std::endl;
@@ -58,17 +75,21 @@ int main()
   res << "##### suite1 #####" << std::endl;
   res << std::endl;
   res << "-- MockTest1:1 --" << std::endl;
-  res << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
-  res << "-- failed : out of 1 checks, 0 failed. --" << std::endl;
+  res << "-- passed : out of 1 checks, 0 failed. --" << std::endl;
   res << std::endl;
-  res << "-- MockTest4:0 --" << std::endl;
+  res << "-- MockTest4:1 --" << std::endl;
   res << "-- passed : out of 1 checks, 0 failed. --" << std::endl;
   res << std::endl;
   res << std::endl;
+  res << "##### suite2 #####" << std::endl;
+  res << std::endl;
+  res << "-- BoolTest --" << std::endl;
+  res << "-- passed : out of 2 checks, 0 failed. --" << std::endl;
+  res << std::endl;
+  res << std::endl;
   res << "---------------------------" << std::endl;
-  res << "---------- FAILED ---------" << std::endl;
-  res << "ran : 2" << std::endl;
-  res << "failed : 1" << std::endl;
+  res << "---------- PASSED ---------" << std::endl;
+  res << "ran : 3" << std::endl;
   res << "---------------------------" << std::endl;
   /* HERE TO HELP DEBUG */
   size_t i(0);

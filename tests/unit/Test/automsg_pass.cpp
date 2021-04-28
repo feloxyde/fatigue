@@ -1,5 +1,5 @@
-#include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
+#include <fatigue/runners/DefaultRunner.hpp>
 
 #include <cassert>
 #include <sstream>
@@ -45,13 +45,13 @@ int main()
   std::stringstream ss;
   TestAutoMsgPass t;
   Config conf;
-  OstreamTestLogger otl(ss, conf);
-  t.setLogger(&otl);
+  DefaultLogger dl(ss, conf);
+  t.setLogger(&dl);
 
   t.run();
-  assert(otl.passed());
-  assert(otl.m_checkPassed == 15);
-  assert(otl.m_checkFailed == 0);
+  assert(dl.passed());
+  assert(dl.m_checkPassed == 15);
+  assert(dl.m_checkFailed == 0);
   assert(ss.str().empty());
 
   return 0;

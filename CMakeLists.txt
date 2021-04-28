@@ -86,10 +86,10 @@ set(headers
     fatigue/Checker.hpp
     fatigue/Config.hpp
     fatigue/fatigue.hpp
-    fatigue/OstreamTestRunner.hpp
+    fatigue/runners/DefaultRunner.hpp
     fatigue/Suite.hpp
     fatigue/Test.hpp
-    fatigue/TestRunner.hpp
+    fatigue/Runner.hpp
     fatigue/utils.hpp
 )
 
@@ -97,7 +97,7 @@ set(sources
     fatigue/Checker.cpp
     fatigue/Config.cpp
     fatigue/fatigue.cpp
-    fatigue/OstreamTestRunner.cpp
+    fatigue/runners/DefaultRunner.cpp
     fatigue/Suite.cpp
 )
 

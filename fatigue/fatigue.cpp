@@ -1,6 +1,6 @@
 #include "fatigue.hpp"
-#include "OstreamTestRunner.hpp"
 #include "Runner.hpp"
+#include "runners/DefaultRunner.hpp"
 #include <memory>
 
 namespace ftg {
@@ -27,7 +27,7 @@ unsigned fatigue::run() const
   std::unique_ptr<Runner> runner;
 
   if (config.runner == "default") {
-    runner = std::make_unique<OstreamTestRunner>(std::cout, config);
+    runner = std::make_unique<DefaultRunner>(std::cout, config);
   } else {
     std::cout << "runner " << config.runner << "not found !" << std::endl;
     return -1; //#FIXME should be changed for proper error handling !

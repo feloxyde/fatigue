@@ -1,7 +1,7 @@
 #include "fatigue/Suite.hpp"
 #include <cassert>
-#include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
+#include <fatigue/runners/DefaultRunner.hpp>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -42,8 +42,8 @@ int main()
   std::stringstream res;
 
   Config conf;
-  OstreamTestRunner otr(ss, conf);
-  unsigned f = otr.run(suites);
+  DefaultRunner dr(ss, conf);
+  unsigned f = dr.run(suites);
   assert(f == 1);
 
   res << "---------------------------" << std::endl;

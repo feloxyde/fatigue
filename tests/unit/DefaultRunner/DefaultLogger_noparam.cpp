@@ -1,7 +1,7 @@
 #include <cassert>
 #include <fatigue/Checker.hpp>
-#include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
+#include <fatigue/runners/DefaultRunner.hpp>
 #include <sstream>
 
 using namespace ftg;
@@ -14,36 +14,36 @@ int main()
   std::stringstream res;
 
   Config conf;
-  OstreamTestLogger otl(ss, conf);
+  DefaultLogger dr(ss, conf);
 
-  td.setLogger(&otl);
-  assert(otl.passed());
-  assert(otl.m_checkPassed == 0);
-  assert(otl.m_checkFailed == 0);
+  td.setLogger(&dr);
+  assert(dr.passed());
+  assert(dr.m_checkPassed == 0);
+  assert(dr.m_checkFailed == 0);
   assert(ss.str() == res.str());
 
   //passing reporter
   auto r1 = std::make_unique<Check>(td, "pass", std::vector<ParamInfo>(), true);
   r1.reset();
-  assert(otl.m_checkPassed == 1);
-  assert(otl.m_checkFailed == 0);
+  assert(dr.m_checkPassed == 1);
+  assert(dr.m_checkFailed == 0);
   assert(ss.str() == res.str());
 
   auto r4 = std::make_unique<Check>(td, "warn fail", std::vector<ParamInfo>(), false);
   r4->warn();
   r4.reset();
-  assert(otl.passed());
-  assert(otl.m_checkPassed == 1);
-  assert(otl.m_checkFailed == 1);
+  assert(dr.passed());
+  assert(dr.m_checkPassed == 1);
+  assert(dr.m_checkFailed == 1);
   res << "(2) [WARN] expected warn fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing reporter, default msg
   auto r2 = std::make_unique<Check>(td, "fail", std::vector<ParamInfo>(), false);
   r2.reset();
-  assert(!otl.passed());
-  assert(otl.m_checkPassed == 1);
-  assert(otl.m_checkFailed == 2);
+  assert(!dr.passed());
+  assert(dr.m_checkPassed == 1);
+  assert(dr.m_checkFailed == 2);
   res << "(3) [ERROR] expected fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
@@ -51,9 +51,9 @@ int main()
   auto r3 = std::make_unique<Check>(td, "fatal pass", std::vector<ParamInfo>(), true);
   r3->fatal();
   r3.reset();
-  assert(!otl.passed());
-  assert(otl.m_checkPassed == 2);
-  assert(otl.m_checkFailed == 2);
+  assert(!dr.passed());
+  assert(dr.m_checkPassed == 2);
+  assert(dr.m_checkFailed == 2);
   assert(ss.str() == res.str());
 
   //failing reporter, fatal
@@ -66,9 +66,9 @@ int main()
     thrown = true;
   }
   assert(thrown);
-  assert(!otl.passed());
-  assert(otl.m_checkPassed == 2);
-  assert(otl.m_checkFailed == 3);
+  assert(!dr.passed());
+  assert(dr.m_checkPassed == 2);
+  assert(dr.m_checkFailed == 3);
   res << "(5) [FATAL] expected fatal fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
@@ -77,9 +77,9 @@ int main()
   r6->important();
   r6.reset();
 
-  assert(!otl.passed());
-  assert(otl.m_checkPassed == 2);
-  assert(otl.m_checkFailed == 4);
+  assert(!dr.passed());
+  assert(dr.m_checkPassed == 2);
+  assert(dr.m_checkFailed == 4);
   res << "!!! (6) [ERROR] expected important fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
@@ -87,9 +87,9 @@ int main()
   r7->fails();
   r7.reset();
 
-  assert(!otl.passed());
-  assert(otl.m_checkPassed == 2);
-  assert(otl.m_checkFailed == 5);
+  assert(!dr.passed());
+  assert(dr.m_checkPassed == 2);
+  assert(dr.m_checkFailed == 5);
   res << "(7) [ERROR] expected success to fail, but succeeded." << std::endl;
   assert(ss.str() == res.str());
 
@@ -98,9 +98,9 @@ int main()
   r8->important().succeeds();
   r8.reset();
 
-  assert(!otl.passed());
-  assert(otl.m_checkPassed == 2);
-  assert(otl.m_checkFailed == 6);
+  assert(!dr.passed());
+  assert(dr.m_checkPassed == 2);
+  assert(dr.m_checkFailed == 6);
   res << "!!! (8) [ERROR] expected important fail succeeds to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 

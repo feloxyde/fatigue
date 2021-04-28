@@ -1,9 +1,9 @@
-#ifndef FATIGUE_OSTREAMTESTRUNNER_HPP
-#define FATIGUE_OSTREAMTESTRUNNER_HPP
+#ifndef FATIGUE_DEFAULTRUNNER_HPP
+#define FATIGUE_DEFAULTRUNNER_HPP
 
-#include "Config.hpp"
-#include "Runner.hpp"
-#include "Suite.hpp"
+#include "../Config.hpp"
+#include "../Runner.hpp"
+#include "../Suite.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -11,10 +11,10 @@
 
 namespace ftg {
 
-struct OstreamTestLogger : public Logger {
+struct DefaultLogger : public Logger {
 
-  OstreamTestLogger(std::ostream& ostream, Config const& config);
-  virtual ~OstreamTestLogger();
+  DefaultLogger(std::ostream& ostream, Config const& config);
+  virtual ~DefaultLogger();
 
   virtual void checkFailed(MessageMode mode,
 			   std::string const& description,
@@ -35,9 +35,9 @@ public:
   size_t m_checkFailed;
 };
 
-struct OstreamTestRunner : public Runner {
-  OstreamTestRunner(std::ostream& ostream, Config const& config);
-  virtual ~OstreamTestRunner();
+struct DefaultRunner : public Runner {
+  DefaultRunner(std::ostream& ostream, Config const& config);
+  virtual ~DefaultRunner();
   virtual unsigned run(TestList const& tests);
 
 

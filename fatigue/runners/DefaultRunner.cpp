@@ -1,12 +1,12 @@
-#include "OstreamTestRunner.hpp"
-#include "Config.hpp"
-#include "Runner.hpp"
-#include "Suite.hpp"
+#include "DefaultRunner.hpp"
+#include "../Config.hpp"
+#include "../Runner.hpp"
+#include "../Suite.hpp"
 #include <variant>
 
 namespace ftg {
 
-OstreamTestLogger::OstreamTestLogger(std::ostream& ostream, Config const& config) :
+DefaultLogger::DefaultLogger(std::ostream& ostream, Config const& config) :
     m_config(config),
     m_ostream(ostream),
     m_passed(true),
@@ -15,16 +15,16 @@ OstreamTestLogger::OstreamTestLogger(std::ostream& ostream, Config const& config
 {
 }
 
-OstreamTestLogger::~OstreamTestLogger()
+DefaultLogger::~DefaultLogger()
 {
 }
 
-void OstreamTestLogger::checkFailed(MessageMode mode,
-				    std::string const& description,
-				    std::vector<ParamInfo> const& params,
-				    bool expected,
-				    bool result,
-				    bool important)
+void DefaultLogger::checkFailed(MessageMode mode,
+				std::string const& description,
+				std::vector<ParamInfo> const& params,
+				bool expected,
+				bool result,
+				bool important)
 {
   m_checkFailed++;
 
@@ -72,17 +72,17 @@ void OstreamTestLogger::checkFailed(MessageMode mode,
   }
 }
 
-void OstreamTestLogger::checkPassed()
+void DefaultLogger::checkPassed()
 {
   m_checkPassed++;
 }
 
-bool OstreamTestLogger::passed() const
+bool DefaultLogger::passed() const
 {
   return m_passed;
 }
 
-OstreamTestRunner::OstreamTestRunner(std::ostream& ostream, Config const& config) :
+DefaultRunner::DefaultRunner(std::ostream& ostream, Config const& config) :
     m_config(config),
     m_ostream(ostream),
     totalPass(0),
@@ -91,12 +91,12 @@ OstreamTestRunner::OstreamTestRunner(std::ostream& ostream, Config const& config
 {
 }
 
-OstreamTestRunner::~OstreamTestRunner()
+DefaultRunner::~DefaultRunner()
 {
 }
 
 
-unsigned OstreamTestRunner::run(TestList const& tests)
+unsigned DefaultRunner::run(TestList const& tests)
 {
   m_ostream << "---------------------------" << std::endl;
   m_ostream << "------ RUNNING TESTS ------" << std::endl;
@@ -125,10 +125,10 @@ unsigned OstreamTestRunner::run(TestList const& tests)
 }
 
 
-void OstreamTestRunner::dispatchTestList(TestList const& tests, std::vector<std::string> const& prefixes)
+void DefaultRunner::dispatchTestList(TestList const& tests, std::vector<std::string> const& prefixes)
 {
   static_assert(std::variant_size_v<TestList::value_type> == 2,
-		"OstreamTestRunner expects 2 differents alternatives in the TestList variant");
+		"DefaultRunner expects 2 differents alternatives in the TestList variant");
   for (auto& s : tests) {
     if (std::holds_alternative<std::unique_ptr<Test>>(s)) {
       runTest(std::get<std::unique_ptr<Test>>(s), prefixes);
@@ -138,7 +138,7 @@ void OstreamTestRunner::dispatchTestList(TestList const& tests, std::vector<std:
   }
 }
 
-void OstreamTestRunner::runSuite(std::unique_ptr<Suite> const& suite, std::vector<std::string> const& prefixes)
+void DefaultRunner::runSuite(std::unique_ptr<Suite> const& suite, std::vector<std::string> const& prefixes)
 {
 
   m_ostream << std::endl << std::endl << std::endl;
@@ -150,7 +150,7 @@ void OstreamTestRunner::runSuite(std::unique_ptr<Suite> const& suite, std::vecto
 }
 
 
-void OstreamTestRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes)
+void DefaultRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes)
 {
   if (!m_config.filter.shouldRun(prefixes, test->name())) {
     m_ostream << std::endl << std::endl << "-- " << test->name() << " -- (skipped)" << std::endl;
@@ -173,12 +173,12 @@ void OstreamTestRunner::runTest(std::unique_ptr<Test> const& test, std::vector<s
 }
 
 
-bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test> const& t)
+bool DefaultRunner::runLoadedTest(std::unique_ptr<Test> const& t)
 {
   bool exceptPass = true;
   bool passed = true;
 
-  OstreamTestLogger otl(m_ostream, m_config);
+  DefaultLogger otl(m_ostream, m_config);
   t->setLogger(&otl);
 
   try {
