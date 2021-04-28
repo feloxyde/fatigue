@@ -1,7 +1,7 @@
 #include "OstreamTestRunner.hpp"
-#include "fatigue/Config.hpp"
-#include "fatigue/Suite.hpp"
-#include "fatigue/TestRunner.hpp"
+#include "Config.hpp"
+#include "Suite.hpp"
+#include "TestRunner.hpp"
 #include <variant>
 
 namespace ftg {

@@ -1,6 +1,4 @@
 #include "Suite.hpp"
-#include "Test.hpp"
-#include "TestDriver.hpp"
 
 namespace ftg {
 

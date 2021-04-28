@@ -1,4 +1,3 @@
-#include "fatigue/TestDriver.hpp"
 #include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
 

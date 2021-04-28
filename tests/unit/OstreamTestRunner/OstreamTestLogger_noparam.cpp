@@ -1,7 +1,7 @@
 #include <cassert>
+#include <fatigue/Checker.hpp>
 #include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
-#include <fatigue/TestDriver.hpp>
 #include <fatigue/TestRunner.hpp>
 #include <sstream>
 
@@ -10,7 +10,7 @@ using namespace ftg;
 int main()
 {
 
-  TestDriver td("name");
+  Checker td("name");
   std::stringstream ss;
   std::stringstream res;
 
@@ -24,13 +24,13 @@ int main()
   assert(ss.str() == res.str());
 
   //passing reporter
-  auto r1 = std::make_unique<CheckReporter>(td, "pass", std::vector<ParamInfo>(), true);
+  auto r1 = std::make_unique<Check>(td, "pass", std::vector<ParamInfo>(), true);
   r1.reset();
   assert(otl.m_checkPassed == 1);
   assert(otl.m_checkFailed == 0);
   assert(ss.str() == res.str());
 
-  auto r4 = std::make_unique<CheckReporter>(td, "warn fail", std::vector<ParamInfo>(), false);
+  auto r4 = std::make_unique<Check>(td, "warn fail", std::vector<ParamInfo>(), false);
   r4->warn();
   r4.reset();
   assert(otl.passed());
@@ -40,7 +40,7 @@ int main()
   assert(ss.str() == res.str());
 
   //failing reporter, default msg
-  auto r2 = std::make_unique<CheckReporter>(td, "fail", std::vector<ParamInfo>(), false);
+  auto r2 = std::make_unique<Check>(td, "fail", std::vector<ParamInfo>(), false);
   r2.reset();
   assert(!otl.passed());
   assert(otl.m_checkPassed == 1);
@@ -49,7 +49,7 @@ int main()
   assert(ss.str() == res.str());
 
   //passing reporter, fatal
-  auto r3 = std::make_unique<CheckReporter>(td, "fatal pass", std::vector<ParamInfo>(), true);
+  auto r3 = std::make_unique<Check>(td, "fatal pass", std::vector<ParamInfo>(), true);
   r3->fatal();
   r3.reset();
   assert(!otl.passed());
@@ -59,7 +59,7 @@ int main()
 
   //failing reporter, fatal
   bool thrown = false;
-  auto r5 = std::make_unique<CheckReporter>(td, "fatal fail", std::vector<ParamInfo>(), false);
+  auto r5 = std::make_unique<Check>(td, "fatal fail", std::vector<ParamInfo>(), false);
   try {
     r5->fatal();
     r5.reset();
@@ -74,7 +74,7 @@ int main()
   assert(ss.str() == res.str());
 
   //failing important
-  auto r6 = std::make_unique<CheckReporter>(td, "important fail", std::vector<ParamInfo>(), false);
+  auto r6 = std::make_unique<Check>(td, "important fail", std::vector<ParamInfo>(), false);
   r6->important();
   r6.reset();
 
@@ -84,7 +84,7 @@ int main()
   res << "!!! (6) [ERROR] expected important fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
-  auto r7 = std::make_unique<CheckReporter>(td, "success", std::vector<ParamInfo>(), true);
+  auto r7 = std::make_unique<Check>(td, "success", std::vector<ParamInfo>(), true);
   r7->fails();
   r7.reset();
 
@@ -95,7 +95,7 @@ int main()
   assert(ss.str() == res.str());
 
   //failing important
-  auto r8 = std::make_unique<CheckReporter>(td, "important fail succeeds", std::vector<ParamInfo>(), false);
+  auto r8 = std::make_unique<Check>(td, "important fail succeeds", std::vector<ParamInfo>(), false);
   r8->important().succeeds();
   r8.reset();
 

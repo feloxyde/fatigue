@@ -1,5 +1,4 @@
 #include "fatigue/OstreamTestRunner.hpp"
-#include "fatigue/TestDriver.hpp"
 #include <fatigue/Test.hpp>
 
 #include <cassert>

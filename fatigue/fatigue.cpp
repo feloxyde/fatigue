@@ -1,6 +1,6 @@
 #include "fatigue.hpp"
-#include "fatigue/OstreamTestRunner.hpp"
-#include "fatigue/TestRunner.hpp"
+#include "OstreamTestRunner.hpp"
+#include "TestRunner.hpp"
 #include <memory>
 
 namespace ftg {

@@ -83,22 +83,22 @@ endif()
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
 set(headers 
+    fatigue/Checker.hpp
     fatigue/Config.hpp
     fatigue/fatigue.hpp
     fatigue/OstreamTestRunner.hpp
     fatigue/Suite.hpp
     fatigue/Test.hpp
-    fatigue/TestDriver.hpp
     fatigue/TestRunner.hpp
     fatigue/utils.hpp
 )
 
 set(sources
+    fatigue/Checker.cpp
     fatigue/Config.cpp
     fatigue/fatigue.cpp
     fatigue/OstreamTestRunner.cpp
     fatigue/Suite.cpp
-    fatigue/TestDriver.cpp
 )
 
 add_library(fatigue ${sources})
