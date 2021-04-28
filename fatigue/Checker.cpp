@@ -1,5 +1,5 @@
 #include "Checker.hpp"
-#include "TestRunner.hpp"
+#include "Runner.hpp"
 #include "utils.hpp"
 #include <concepts>
 #include <cstddef>
@@ -90,7 +90,7 @@ Checker::Checker(std::string const& name) : m_logger(nullptr), m_name(name)
 {
 }
 
-void Checker::setLogger(TestLogger* r)
+void Checker::setLogger(Logger* r)
 {
   m_logger = r;
 }

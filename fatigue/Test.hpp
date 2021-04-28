@@ -2,7 +2,6 @@
 #define FATIGUE_TEST_HPP
 
 #include "Checker.hpp"
-#include "TestRunner.hpp"
 #include "utils.hpp"
 #include <cassert>
 #include <concepts>

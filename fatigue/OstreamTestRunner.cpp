@@ -1,7 +1,7 @@
 #include "OstreamTestRunner.hpp"
 #include "Config.hpp"
+#include "Runner.hpp"
 #include "Suite.hpp"
-#include "TestRunner.hpp"
 #include <variant>
 
 namespace ftg {

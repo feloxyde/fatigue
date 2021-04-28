@@ -1,7 +1,7 @@
 #ifndef FATIGUE_CONFIG_HPP
 #define FATIGUE_CONFIG_HPP
 
-#include "TestRunner.hpp"
+#include "Runner.hpp"
 #include <cxxopts.hpp>
 #include <memory>
 #include <regex>

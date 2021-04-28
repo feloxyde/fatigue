@@ -2,8 +2,8 @@
 #define FATIGUE_OSTREAMTESTRUNNER_HPP
 
 #include "Config.hpp"
+#include "Runner.hpp"
 #include "Suite.hpp"
-#include "TestRunner.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -11,7 +11,7 @@
 
 namespace ftg {
 
-struct OstreamTestLogger : public TestLogger {
+struct OstreamTestLogger : public Logger {
 
   OstreamTestLogger(std::ostream& ostream, Config const& config);
   virtual ~OstreamTestLogger();
@@ -35,7 +35,7 @@ public:
   size_t m_checkFailed;
 };
 
-struct OstreamTestRunner : public TestRunner {
+struct OstreamTestRunner : public Runner {
   OstreamTestRunner(std::ostream& ostream, Config const& config);
   virtual ~OstreamTestRunner();
   virtual unsigned run(TestList const& tests);

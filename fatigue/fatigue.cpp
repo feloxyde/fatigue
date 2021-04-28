@@ -1,6 +1,6 @@
 #include "fatigue.hpp"
 #include "OstreamTestRunner.hpp"
-#include "TestRunner.hpp"
+#include "Runner.hpp"
 #include <memory>
 
 namespace ftg {
@@ -24,7 +24,7 @@ fatigue& fatigue::declare(std::unique_ptr<Test> test)
 
 unsigned fatigue::run() const
 {
-  std::unique_ptr<TestRunner> runner;
+  std::unique_ptr<Runner> runner;
 
   if (config.runner == "default") {
     runner = std::make_unique<OstreamTestRunner>(std::cout, config);

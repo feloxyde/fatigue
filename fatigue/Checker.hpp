@@ -1,6 +1,6 @@
 #ifndef FATIGUE_CHECKER_HPP
 #define FATIGUE_CHECKER_HPP
-#include "TestRunner.hpp"
+#include "Runner.hpp"
 #include "utils.hpp"
 #include <concepts>
 #include <cstddef>
@@ -62,14 +62,14 @@ public:
   Checker(std::string const& name);
 
 public:
-  void setLogger(TestLogger* r);
+  void setLogger(Logger* r);
   std::string const& name() const;
 
 protected:
   bool showTypes() const;
 
 private:
-  TestLogger* m_logger;
+  Logger* m_logger;
   std::string m_name;
 
 private:

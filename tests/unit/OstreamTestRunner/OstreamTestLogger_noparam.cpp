@@ -2,7 +2,6 @@
 #include <fatigue/Checker.hpp>
 #include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
-#include <fatigue/TestRunner.hpp>
 #include <sstream>
 
 using namespace ftg;

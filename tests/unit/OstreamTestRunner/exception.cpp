@@ -2,7 +2,6 @@
 #include <cassert>
 #include <fatigue/OstreamTestRunner.hpp>
 #include <fatigue/Test.hpp>
-#include <fatigue/TestRunner.hpp>
 #include <memory>
 #include <sstream>
 #include <string>
