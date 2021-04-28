@@ -6,7 +6,8 @@
 
 namespace ftg {
 
-OstreamTestLogger::OstreamTestLogger(std::ostream& ostream) :
+OstreamTestLogger::OstreamTestLogger(std::ostream& ostream, Config const& config) :
+    m_config(config),
     m_ostream(ostream),
     m_passed(true),
     m_checkPassed(0),
@@ -49,11 +50,11 @@ void OstreamTestLogger::checkFailed(MessageMode mode,
     m_ostream << "( ";
     size_t i = 0;
     for (auto const& p : params) {
-      if (ftg::config().showParamNames) {
+      if (m_config.showParamNames) {
 	m_ostream << p.name << ": ";
       }
       m_ostream << p.value;
-      if (ftg::config().showParamTypes) {
+      if (m_config.showParamTypes) {
 	m_ostream << " [" << p.type << "]";
       }
       if (i < params.size() - 1) {
@@ -81,7 +82,8 @@ bool OstreamTestLogger::passed() const
   return m_passed;
 }
 
-OstreamTestRunner::OstreamTestRunner(std::ostream& ostream) :
+OstreamTestRunner::OstreamTestRunner(std::ostream& ostream, Config const& config) :
+    m_config(config),
     m_ostream(ostream),
     totalPass(0),
     totalFailed(0),
@@ -150,7 +152,7 @@ void OstreamTestRunner::runSuite(std::unique_ptr<Suite> const& suite, std::vecto
 
 void OstreamTestRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes)
 {
-  if (!ftg::config().filter.shouldRun(prefixes, test->name())) {
+  if (!m_config.filter.shouldRun(prefixes, test->name())) {
     m_ostream << std::endl << std::endl << "-- " << test->name() << " -- (skipped)" << std::endl;
     totalSkipped++;
     return;
@@ -176,7 +178,7 @@ bool OstreamTestRunner::runLoadedTest(std::unique_ptr<Test> const& t)
   bool exceptPass = true;
   bool passed = true;
 
-  OstreamTestLogger otl(m_ostream);
+  OstreamTestLogger otl(m_ostream, m_config);
   t->setLogger(&otl);
 
   try {

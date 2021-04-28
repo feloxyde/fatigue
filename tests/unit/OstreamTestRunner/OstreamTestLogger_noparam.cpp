@@ -13,7 +13,9 @@ int main()
   TestDriver td("name");
   std::stringstream ss;
   std::stringstream res;
-  OstreamTestLogger otl(ss);
+
+  Config conf;
+  OstreamTestLogger otl(ss, conf);
 
   td.setLogger(&otl);
   assert(otl.passed());

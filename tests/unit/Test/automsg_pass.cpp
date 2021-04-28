@@ -45,7 +45,8 @@ int main()
 
   std::stringstream ss;
   TestAutoMsgPass t;
-  OstreamTestLogger otl(ss);
+  Config conf;
+  OstreamTestLogger otl(ss, conf);
   t.setLogger(&otl);
 
   t.run();

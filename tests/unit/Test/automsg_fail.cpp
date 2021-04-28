@@ -127,7 +127,8 @@ int main()
 {
 
   std::stringstream ss;
-  OstreamTestLogger otl(ss);
+  Config conf;
+  OstreamTestLogger otl(ss, conf);
   TestAutoMsgFail t(otl, ss);
   t.setLogger(&otl);
   t.run();
