@@ -2,8 +2,6 @@
 #define FATIGUE_SUITE_HPP
 
 #include "Test.hpp"
-#include "TestDriver.hpp"
-#include "TestRunner.hpp"
 #include <variant>
 
 namespace ftg {

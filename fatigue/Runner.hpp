@@ -17,8 +17,8 @@ class Test;
 
 typedef std::vector<std::variant<std::unique_ptr<Test>, std::unique_ptr<Suite>>> TestList;
 
-struct TestRunner {
-  virtual ~TestRunner(){};
+struct Runner {
+  virtual ~Runner(){};
   virtual unsigned run(TestList const& suites) = 0;
 };
 
@@ -34,8 +34,8 @@ struct ParamInfo {
   std::string type;
 };
 
-struct TestLogger {
-  virtual ~TestLogger(){};
+struct Logger {
+  virtual ~Logger(){};
   virtual void checkFailed(MessageMode mode,
 			   std::string const& description,
 			   std::vector<ParamInfo> const& params,

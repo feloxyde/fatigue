@@ -1,5 +1,4 @@
 #include "fatigue/Suite.hpp"
-#include "fatigue/TestRunner.hpp"
 #include <fatigue/fatigue.hpp>
 #include <memory>
 #include <string>

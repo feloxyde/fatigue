@@ -3,7 +3,6 @@
 
 #include "Config.hpp"
 #include "Suite.hpp"
-#include "fatigue/TestRunner.hpp"
 #include <iterator>
 
 namespace ftg {
