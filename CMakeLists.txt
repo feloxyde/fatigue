@@ -105,9 +105,12 @@ add_library(fatigue ${sources})
 
 
 
-set_target_properties(fatigue PROPERTIES PUBLIC_HEADER "${headers}")
-
-install(TARGETS fatigue PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fatigue)
+#installing headers
+#set_target_properties(fatigue PROPERTIES PUBLIC_HEADER "${headers}")
+install(DIRECTORY fatigue/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fatigue
+        FILES_MATCHING PATTERN "*.hpp")
+#installing lib
+install(TARGETS fatigue)
 
 ########################################################### 
 ########## TESTING ########################################
