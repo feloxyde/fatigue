@@ -325,6 +325,24 @@ Honestly, no idea, will be added and enforced later. Contributions are welcome.
 
 Honestly, no idea, will be added and enforced later. Contributions are welcome.
 
+
+
+# Documentation
+
+## Reading docs
+
+Documentation of the project, including API reference, architecture, tutorials and more can be found at **FIXME add here**.
+
+## Building documentation
+
+If for some reason you need documentation, you will need :
+
+- *Doxygen* and its dependencies, as Python.
+- *dot* a graphviz tool usually found in the graphviz package of your distribution.
+
+Then, simply run ```doxygen Doxyfile``` at the root of directory and an HTML doc will be generated in 
+```build/docgen``` directory, with ```build/docgen/html/index.html``` as entry point. 
+
 # Contributions
 
 Contributions are welcome, please read [Contributing.md](Contributing.md). 
