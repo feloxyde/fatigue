@@ -1,3 +1,6 @@
 [submodule "cmake_llvm_coverage"]
 	path = cmake_llvm_coverage
 	url = ../../feloxyde/cmake_llvm_coverage
+[submodule "doxygen-awesome-css"]
+	path = doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
