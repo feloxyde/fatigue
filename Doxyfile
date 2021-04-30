@@ -13,6 +13,9 @@
 # TAG += value [value, ...]
 # Values that contain spaces should be placed between quotes (\" \").
 
+# (feloxyde) interesting values for which I have a doubt of how they should be configured 
+# are marked as # MAYBE
+ 
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
@@ -38,27 +41,27 @@ PROJECT_NAME           = "fatigue"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         =
+PROJECT_NUMBER         = 0.0.1
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          =
+PROJECT_BRIEF          = Testing to exhaustion !
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
 # pixels and the maximum width should not exceed 200 pixels. Doxygen will copy
 # the logo to the output directory.
 
-PROJECT_LOGO           = logo_docs.svg
+PROJECT_LOGO           = docs/logo_docs.svg
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = gen
+OUTPUT_DIRECTORY       = build/docgen
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -245,6 +248,7 @@ INHERIT_DOCS           = YES
 # page for each member. If set to NO, the documentation of a member will be part
 # of the file/class/namespace that contains it.
 # The default value is: NO.
+# MAYBE
 
 SEPARATE_MEMBER_PAGES  = NO
 
@@ -364,6 +368,7 @@ AUTOLINK_SUPPORT       = YES
 # versus func(std::string) {}). This also make the inheritance and collaboration
 # diagrams that involve STL classes more complete and accurate.
 # The default value is: NO.
+# MAYBE
 
 BUILTIN_STL_SUPPORT    = NO
 
@@ -423,6 +428,7 @@ SUBGROUPING            = YES
 # Note that this feature does not work in combination with
 # SEPARATE_MEMBER_PAGES.
 # The default value is: NO.
+# MAYBE
 
 INLINE_GROUPED_CLASSES = NO
 
@@ -485,13 +491,13 @@ NUM_PROC_THREADS       = 1
 # normally produced when WARNINGS is set to YES.
 # The default value is: NO.
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES, all private members of a class will
 # be included in the documentation.
 # The default value is: NO.
 
-EXTRACT_PRIVATE        = NO
+EXTRACT_PRIVATE        = YES
 
 # If the EXTRACT_PRIV_VIRTUAL tag is set to YES, documented private virtual
 # methods of a class will be included in the documentation.
@@ -509,7 +515,7 @@ EXTRACT_PACKAGE        = NO
 # included in the documentation.
 # The default value is: NO.
 
-EXTRACT_STATIC         = NO
+EXTRACT_STATIC         = YES
 
 # If the EXTRACT_LOCAL_CLASSES tag is set to YES, classes (and structs) defined
 # locally in source files will be included in the documentation. If set to NO,
@@ -600,6 +606,7 @@ CASE_SENSE_NAMES       = YES
 # their full class and namespace scopes in the documentation. If set to YES, the
 # scope will be hidden.
 # The default value is: NO.
+# MAYBE
 
 HIDE_SCOPE_NAMES       = NO
 
@@ -698,8 +705,9 @@ GENERATE_TODOLIST      = YES
 # The GENERATE_TESTLIST tag can be used to enable (YES) or disable (NO) the test
 # list. This list is created by putting \test commands in the documentation.
 # The default value is: YES.
+# MAYBE
 
-GENERATE_TESTLIST      = YES
+GENERATE_TESTLIST      = NO
 
 # The GENERATE_BUGLIST tag can be used to enable (YES) or disable (NO) the bug
 # list. This list is created by putting \bug commands in the documentation.
@@ -749,6 +757,7 @@ SHOW_FILES             = YES
 # page. This will remove the Namespaces entry from the Quick Index and from the
 # Folder Tree View (if specified).
 # The default value is: YES.
+# MAYBE since there is only one single namespace lol, maybe after for extensions ?
 
 SHOW_NAMESPACES        = YES
 
@@ -772,6 +781,7 @@ FILE_VERSION_FILTER    =
 # Note that if you run doxygen from a directory containing a file called
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
+# MAYBE
 
 LAYOUT_FILE            =
 
@@ -864,7 +874,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  =
+INPUT                  = fatigue
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -943,7 +953,7 @@ FILE_PATTERNS          = *.c \
 # be searched for input files as well.
 # The default value is: NO.
 
-RECURSIVE              = NO
+RECURSIVE              = YES
 
 # The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a
@@ -984,6 +994,7 @@ EXCLUDE_SYMBOLS        =
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include
 # command).
+# MAYBE
 
 EXAMPLE_PATH           =
 
@@ -1004,6 +1015,7 @@ EXAMPLE_RECURSIVE      = NO
 # The IMAGE_PATH tag can be used to specify one or more files or directories
 # that contain images that are to be included in the documentation (see the
 # \image command).
+# MAYBE
 
 IMAGE_PATH             =
 
@@ -1060,6 +1072,7 @@ FILTER_SOURCE_PATTERNS =
 # is part of the input, its contents will be placed on the main page
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
+# MAYBE
 
 USE_MDFILE_AS_MAINPAGE =
 
@@ -1073,12 +1086,14 @@ USE_MDFILE_AS_MAINPAGE =
 # Note: To get rid of all source code in the generated output, make sure that
 # also VERBATIM_HEADERS is set to NO.
 # The default value is: NO.
+# MAYBE
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body of functions,
 # classes and enums directly into the documentation.
 # The default value is: NO.
+# MAYBE, in case we choose to have one member per page
 
 INLINE_SOURCES         = NO
 
@@ -1087,17 +1102,19 @@ INLINE_SOURCES         = NO
 # Fortran comments will always remain visible.
 # The default value is: YES.
 
-STRIP_CODE_COMMENTS    = YES
+STRIP_CODE_COMMENTS    = NO
 
 # If the REFERENCED_BY_RELATION tag is set to YES then for each documented
 # entity all documented functions referencing it will be listed.
 # The default value is: NO.
+# MAYBE
 
 REFERENCED_BY_RELATION = NO
 
 # If the REFERENCES_RELATION tag is set to YES then for each documented function
 # all documented entities called/used by that function will be listed.
 # The default value is: NO.
+# MAYBE
 
 REFERENCES_RELATION    = NO
 
@@ -1209,6 +1226,7 @@ HTML_FILE_EXTENSION    = .html
 # default header when upgrading to a newer version of doxygen. For a description
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
+# MAYBE for further customization !
 
 HTML_HEADER            =
 
@@ -1219,6 +1237,7 @@ HTML_HEADER            =
 # section "Doxygen usage" for information on how to generate the default footer
 # that doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
+# MAYBE for further customization ! 
 
 HTML_FOOTER            =
 
@@ -1245,7 +1264,7 @@ HTML_STYLESHEET        =
 # list). For an example see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = ../doxygen-awesome-css/doxygen-awesome.css doxygen_colors.css
+HTML_EXTRA_STYLESHEET  = doxygen-awesome-css/doxygen-awesome.css docs/doxygen_colors.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1265,6 +1284,7 @@ HTML_EXTRA_FILES       =
 # purple, and 360 is red again.
 # Minimum value: 0, maximum value: 359, default value: 220.
 # This tag requires that the tag GENERATE_HTML is set to YES.
+# MAYBE for better color matching
 
 HTML_COLORSTYLE_HUE    = 220
 
@@ -1273,6 +1293,7 @@ HTML_COLORSTYLE_HUE    = 220
 # value of 255 will produce the most vivid colors.
 # Minimum value: 0, maximum value: 255, default value: 100.
 # This tag requires that the tag GENERATE_HTML is set to YES.
+# MAYBE for better color matching
 
 HTML_COLORSTYLE_SAT    = 100
 
@@ -1284,6 +1305,7 @@ HTML_COLORSTYLE_SAT    = 100
 # change the gamma.
 # Minimum value: 40, maximum value: 240, default value: 80.
 # This tag requires that the tag GENERATE_HTML is set to YES.
+# MAYBE for better color matching
 
 HTML_COLORSTYLE_GAMMA  = 80
 
@@ -1294,7 +1316,7 @@ HTML_COLORSTYLE_GAMMA  = 80
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_TIMESTAMP         = NO
+HTML_TIMESTAMP         = YES
 
 # If the HTML_DYNAMIC_MENUS tag is set to YES then the generated HTML
 # documentation will contain a main index with vertical navigation menus that
@@ -1312,6 +1334,7 @@ HTML_DYNAMIC_MENUS     = YES
 # page has loaded.
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
+# MAYBE for better lisibility ?
 
 HTML_DYNAMIC_SECTIONS  = NO
 
@@ -1751,8 +1774,9 @@ EXTRA_SEARCH_MAPPINGS  =
 
 # If the GENERATE_LATEX tag is set to YES, doxygen will generate LaTeX output.
 # The default value is: YES.
+# MAYBE, if we later want to print doc or something like this.
 
-GENERATE_LATEX         = YES
+GENERATE_LATEX         = NO
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
@@ -2316,7 +2340,7 @@ HIDE_UNDOC_RELATIONS   = YES
 # set to NO
 # The default value is: NO.
 
-HAVE_DOT               = NO
+HAVE_DOT               = YES
 
 # The DOT_NUM_THREADS specifies the number of dot invocations doxygen is allowed
 # to run in parallel. When set to 0 doxygen will base this on the number of
@@ -2335,6 +2359,7 @@ DOT_NUM_THREADS        = 0
 # setting DOT_FONTPATH to the directory containing the font.
 # The default value is: Helvetica.
 # This tag requires that the tag HAVE_DOT is set to YES.
+# MAYBE
 
 DOT_FONTNAME           = Helvetica
 
@@ -2381,6 +2406,7 @@ GROUP_GRAPHS           = YES
 # Language.
 # The default value is: NO.
 # This tag requires that the tag HAVE_DOT is set to YES.
+# MAYBE
 
 UML_LOOK               = NO
 
@@ -2407,6 +2433,7 @@ UML_LIMIT_NUM_FIELDS   = 10
 # Possible values are: NO, YES and NONE.
 # The default value is: NO.
 # This tag requires that the tag UML_LOOK is set to YES.
+# MAYBE, if UML is enabled
 
 DOT_UML_DETAILS        = NO
 
@@ -2424,6 +2451,7 @@ DOT_WRAP_THRESHOLD     = 17
 # instances.
 # The default value is: NO.
 # This tag requires that the tag HAVE_DOT is set to YES.
+# MAYBE
 
 TEMPLATE_RELATIONS     = NO
 
@@ -2455,7 +2483,7 @@ INCLUDED_BY_GRAPH      = YES
 # The default value is: NO.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-CALL_GRAPH             = NO
+CALL_GRAPH             = YES
 
 # If the CALLER_GRAPH tag is set to YES then doxygen will generate a caller
 # dependency graph for every global function or class method.
@@ -2467,7 +2495,7 @@ CALL_GRAPH             = NO
 # The default value is: NO.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-CALLER_GRAPH           = NO
+CALLER_GRAPH           = YES
 
 # If the GRAPHICAL_HIERARCHY tag is set to YES then doxygen will graphical
 # hierarchy of all classes instead of a textual one.
