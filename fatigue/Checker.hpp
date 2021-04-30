@@ -1,6 +1,6 @@
-#ifndef FATIGUE_TESTDRIVER_HPP
-#define FATIGUE_TESTDRIVER_HPP
-#include "TestRunner.hpp"
+#ifndef FATIGUE_CHECKER_HPP
+#define FATIGUE_CHECKER_HPP
+#include "Runner.hpp"
 #include "utils.hpp"
 #include <concepts>
 #include <cstddef>
@@ -25,11 +25,11 @@ struct FatalCheckFailure final {
   FatalCheckFailure();
 };
 
-class TestDriver;
+class Checker;
 
-class CheckReporter final {
+class Check final {
 private:
-  TestDriver& m_test;
+  Checker& m_test;
   std::string m_description;
   bool m_res;
   MessageMode m_mode;
@@ -39,41 +39,41 @@ private:
   std::vector<ParamInfo> m_params;
 
 public:
-  CheckReporter(TestDriver& test, std::string const& description, std::vector<ParamInfo> const& params, bool res);
+  Check(Checker& test, std::string const& description, std::vector<ParamInfo> const& params, bool res);
 
-  ~CheckReporter();
+  ~Check();
 
   void warn();
 
   void fatal();
 
-  CheckReporter& important();
+  Check& important();
 
-  CheckReporter& fails();
+  Check& fails();
 
-  CheckReporter& succeeds();
+  Check& succeeds();
 
 private:
   void report();
 };
 
-class TestDriver {
+class Checker {
 public:
-  TestDriver(std::string const& name);
+  Checker(std::string const& name);
 
 public:
-  void setLogger(TestLogger* r);
+  void setLogger(Logger* r);
   std::string const& name() const;
 
 protected:
   bool showTypes() const;
 
 private:
-  TestLogger* m_logger;
+  Logger* m_logger;
   std::string m_name;
 
 private:
-  friend CheckReporter;
+  friend Check;
 };
 
 } // namespace ftg

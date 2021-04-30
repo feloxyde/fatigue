@@ -1,5 +1,5 @@
-#include "TestDriver.hpp"
-#include "TestRunner.hpp"
+#include "Checker.hpp"
+#include "Runner.hpp"
 #include "utils.hpp"
 #include <concepts>
 #include <cstddef>
@@ -20,12 +20,11 @@ namespace ftg {
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
 
-FatalCheckFailure::FatalCheckFailure() {}
+FatalCheckFailure::FatalCheckFailure()
+{
+}
 
-CheckReporter::CheckReporter(TestDriver& test,
-			     std::string const& description,
-			     std::vector<ParamInfo> const& params,
-			     bool res) :
+Check::Check(Checker& test, std::string const& description, std::vector<ParamInfo> const& params, bool res) :
     m_test(test),
     m_description(description),
     m_res(res),
@@ -38,17 +37,17 @@ CheckReporter::CheckReporter(TestDriver& test,
 {
 }
 
-CheckReporter::~CheckReporter()
+Check::~Check()
 {
   report();
 }
 
-void CheckReporter::warn()
+void Check::warn()
 {
   m_mode = MESSAGE_WARN;
 }
 
-void CheckReporter::fatal()
+void Check::fatal()
 {
   m_mode = MESSAGE_FATAL;
   report();
@@ -57,25 +56,25 @@ void CheckReporter::fatal()
   }
 }
 
-CheckReporter& CheckReporter::important()
+Check& Check::important()
 {
   m_important = true;
   return *this;
 }
 
-CheckReporter& CheckReporter::fails()
+Check& Check::fails()
 {
   m_expected = false;
   return *this;
 }
 
-CheckReporter& CheckReporter::succeeds()
+Check& Check::succeeds()
 {
   m_expected = true;
   return *this;
 }
 
-void CheckReporter::report()
+void Check::report()
 {
   if (m_reported == false) {
     m_reported = true;
@@ -87,13 +86,15 @@ void CheckReporter::report()
   }
 }
 
-TestDriver::TestDriver(std::string const& name) : m_logger(nullptr), m_name(name) {}
+Checker::Checker(std::string const& name) : m_logger(nullptr), m_name(name)
+{
+}
 
-void TestDriver::setLogger(TestLogger* r)
+void Checker::setLogger(Logger* r)
 {
   m_logger = r;
 }
-std::string const& TestDriver::name() const
+std::string const& Checker::name() const
 {
   return m_name;
 }

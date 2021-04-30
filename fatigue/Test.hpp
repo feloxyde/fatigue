@@ -1,8 +1,7 @@
 #ifndef FATIGUE_TEST_HPP
 #define FATIGUE_TEST_HPP
 
-#include "TestDriver.hpp"
-#include "TestRunner.hpp"
+#include "Checker.hpp"
 #include "utils.hpp"
 #include <cassert>
 #include <concepts>
@@ -75,7 +74,7 @@ template <typename T> concept LambdaProxy = requires (T const& a){
 };
 // clang-format on
 
-class Test : public TestDriver {
+class Test : public Checker {
 public:
   Test(std::string const& name);
   virtual ~Test();
@@ -88,82 +87,82 @@ public:
 protected:
   // clang-format off
 
-  CheckReporter check_true(bool b);
+  Check check_true(bool b);
 
-  CheckReporter check_true(bool b, std::string const& description);
+  Check check_true(bool b, std::string const& description);
 
-  CheckReporter check_false(bool b);
+  Check check_false(bool b);
 
-  CheckReporter check_false(bool b, std::string const& description);
+  Check check_false(bool b, std::string const& description);
 
   template <Displayable T, Displayable U>
   requires EQComparable<T, U>
-  CheckReporter check_equal(T const& left, U const& right);
+  Check check_equal(T const& left, U const& right);
 
   template <typename T, typename U>
   requires EQComparable<T, U>
-  CheckReporter check_equal(T const& left, U const& right, std::string const& description);
+  Check check_equal(T const& left, U const& right, std::string const& description);
   
   template <Displayable T, Displayable U, Displayable V>
   requires LEComparable<T, U> && GEComparable<T, U> && Addable<U, V> && Subbable<U, V>
-  CheckReporter check_near_equal(T const& left, U const& right, V const& tolerance);
+  Check check_near_equal(T const& left, U const& right, V const& tolerance);
 
   template <typename T, typename U, typename V>
   requires LEComparable<T, U> && GEComparable<T, U> && Addable<U, V> && Subbable<U, V>
-  CheckReporter check_near_equal(T const& left, U const& right, V const& tolerance, std::string const& description);
+  Check check_near_equal(T const& left, U const& right, V const& tolerance, std::string const& description);
 
   template <Displayable T, Displayable U>
   requires NEComparable<T, U>
-  CheckReporter check_not_equal(T const& left, U const& right);
+  Check check_not_equal(T const& left, U const& right);
 
   template <typename T, typename U>
   requires NEComparable<T, U>
-  CheckReporter check_not_equal(T const& left, U const& right, std::string const& description);
+  Check check_not_equal(T const& left, U const& right, std::string const& description);
 
   template <Displayable T, Displayable U>
   requires LTComparable<T, U>
-  CheckReporter check_less_than(T const& left, U const& right);
+  Check check_less_than(T const& left, U const& right);
 
   template <typename T, typename U>
   requires LTComparable<T, U>
-  CheckReporter check_less_than(T const& left, U const& right, std::string const& description);
+  Check check_less_than(T const& left, U const& right, std::string const& description);
 
   template <Displayable T, Displayable U>
   requires LEComparable<T, U>
-  CheckReporter check_less_equal(T const& left, U const& right);
+  Check check_less_equal(T const& left, U const& right);
 
   template <typename T, typename U>
   requires LEComparable<T, U>
-  CheckReporter check_less_equal(T const& left, U const& right, std::string const& description);
+  Check check_less_equal(T const& left, U const& right, std::string const& description);
 
   template <Displayable T, Displayable U>
   requires GTComparable<T, U>
-  CheckReporter check_greater_than(T const& left, U const& right);
+  Check check_greater_than(T const& left, U const& right);
 
   template <typename T, typename U>
   requires GTComparable<T, U>
-  CheckReporter check_greater_than(T const& left, U const& right, std::string const& description);
+  Check check_greater_than(T const& left, U const& right, std::string const& description);
 
   template <Displayable T, Displayable U>
   requires GEComparable<T, U>
-  CheckReporter check_greater_equal(T const& left, U const& right);
+  Check check_greater_equal(T const& left, U const& right);
 
   template <typename T, typename U>
   requires GEComparable<T, U>
-  CheckReporter check_greater_equal(T const& left, U const& right, std::string const& description);  
+  Check check_greater_equal(T const& left, U const& right, std::string const& description);  
 
  
   template <typename Except, LambdaProxy T>
-  CheckReporter check_throw(T const& expr);  
+  Check check_throw(T const& expr);  
 
   template <typename Except, LambdaProxy T>
-  CheckReporter check_throw(std::string const& description, T const& expr);  
+  Check check_throw(std::string const& description, T const& expr);  
   
   template <LambdaProxy T>
-  CheckReporter check_nothrow(T const& expr);
+  Check check_nothrow(T const& expr);
 
   template <LambdaProxy T>
-  CheckReporter check_nothrow(std::string const& description, T const& expr);
+  Check check_nothrow(std::string const& description, T const& expr);
 //clang-format on
 
 private: 
@@ -177,7 +176,7 @@ private:
 
 /** OTHER METHODS IMPLEMENTATION */
 
-inline Test::Test(std::string const& name) : TestDriver(name){}
+inline Test::Test(std::string const& name) : Checker(name){}
 
 inline Test::~Test(){}
 
@@ -201,128 +200,128 @@ std::vector<ParamInfo>  Test::formatBinaryTolerantCheck(T const& left, U const& 
 
 
 /* CHECK IMPLEMENTATIONS */
-inline CheckReporter Test::check_true(bool b)
+inline Check Test::check_true(bool b)
 {
-  return CheckReporter(*this, "check_true", std::vector<ParamInfo>(), b);
+  return Check(*this, "check_true", std::vector<ParamInfo>(), b);
 }
 
-inline CheckReporter Test::check_true(bool b, std::string const& description)
+inline Check Test::check_true(bool b, std::string const& description)
 {
-  return CheckReporter(*this, description, std::vector<ParamInfo>(), b);
+  return Check(*this, description, std::vector<ParamInfo>(), b);
 }
 
-inline CheckReporter Test::check_false(bool b)
+inline Check Test::check_false(bool b)
 {
-  return CheckReporter(*this, "check_false", std::vector<ParamInfo>(), !b);
+  return Check(*this, "check_false", std::vector<ParamInfo>(), !b);
 }
   
-inline CheckReporter Test::check_false(bool b, std::string const& description)
+inline Check Test::check_false(bool b, std::string const& description)
 {
-  return CheckReporter(*this, description, std::vector<ParamInfo>(), !b);
+  return Check(*this, description, std::vector<ParamInfo>(), !b);
 }
 
 template <Displayable T, Displayable U>
 requires EQComparable<T, U>
-CheckReporter Test::check_equal(T const& left, U const& right)
+Check Test::check_equal(T const& left, U const& right)
 {
-  return CheckReporter(*this, "check_equal",  formatBinaryCheck(left, right), left == right);
+  return Check(*this, "check_equal",  formatBinaryCheck(left, right), left == right);
 }
 
 template <typename T, typename U>
 requires EQComparable<T, U>
-CheckReporter Test::check_equal(T const& left, U const& right, std::string const& description)
+Check Test::check_equal(T const& left, U const& right, std::string const& description)
 {
-  return CheckReporter(*this, description,  std::vector<ParamInfo>(), left == right);
+  return Check(*this, description,  std::vector<ParamInfo>(), left == right);
 }
   
 template <Displayable T, Displayable U, Displayable V>
 requires LEComparable<T, U> && GEComparable<T, U>  && Addable<U, V> && Subbable<U, V>
-CheckReporter Test::check_near_equal(T const& left, U const& right, V const& tolerance)
+Check Test::check_near_equal(T const& left, U const& right, V const& tolerance)
 {
-  return CheckReporter(*this, "check_near_equal", formatBinaryTolerantCheck(left, right, tolerance), left <= right + tolerance && left >= right - tolerance);
+  return Check(*this, "check_near_equal", formatBinaryTolerantCheck(left, right, tolerance), left <= right + tolerance && left >= right - tolerance);
 }
 
 template <typename T, typename U, typename V>
 requires LEComparable<T, U> && GEComparable<T, U> && Addable<U, V> && Subbable<U, V>
-CheckReporter Test::check_near_equal(T const& left, U const& right, V const& tolerance, std::string const& description)
+Check Test::check_near_equal(T const& left, U const& right, V const& tolerance, std::string const& description)
 {
-  return CheckReporter(*this, description, std::vector<ParamInfo>(), left <= right + tolerance && left >= right - tolerance);
+  return Check(*this, description, std::vector<ParamInfo>(), left <= right + tolerance && left >= right - tolerance);
 }
 
 template <Displayable T, Displayable U>
 requires NEComparable<T, U>
-CheckReporter Test::check_not_equal(T const& left, U const& right)
+Check Test::check_not_equal(T const& left, U const& right)
 {
-  return CheckReporter(*this, "check_not_equal", formatBinaryCheck(left, right), left != right);
+  return Check(*this, "check_not_equal", formatBinaryCheck(left, right), left != right);
 }
 
 template <typename T, typename U>
 requires NEComparable<T, U>
-CheckReporter Test::check_not_equal(T const& left, U const& right, std::string const& description)
+Check Test::check_not_equal(T const& left, U const& right, std::string const& description)
 {
-  return CheckReporter(*this, description, std::vector<ParamInfo>(), left != right);
+  return Check(*this, description, std::vector<ParamInfo>(), left != right);
 }
 
 template <Displayable T, Displayable U>
 requires LTComparable<T, U>
-CheckReporter Test::check_less_than(T const& left, U const& right)
+Check Test::check_less_than(T const& left, U const& right)
 {
-  return CheckReporter(*this, "check_less_than", formatBinaryCheck(left, right), left < right);
+  return Check(*this, "check_less_than", formatBinaryCheck(left, right), left < right);
 }
 
 template <typename T, typename U>
 requires LTComparable<T, U>
-CheckReporter Test::check_less_than(T const& left, U const& right, std::string const& description)
+Check Test::check_less_than(T const& left, U const& right, std::string const& description)
 {
-  return CheckReporter(*this, description, left < right);
+  return Check(*this, description, left < right);
 }
 
 template <Displayable T, Displayable U>
 requires LEComparable<T, U>
-CheckReporter Test::check_less_equal(T const& left, U const& right)
+Check Test::check_less_equal(T const& left, U const& right)
 {
-  return CheckReporter(*this, "check_less_equal", formatBinaryCheck(left, right), left <= right);
+  return Check(*this, "check_less_equal", formatBinaryCheck(left, right), left <= right);
 }
 
 template <typename T, typename U>
 requires LEComparable<T, U>
-CheckReporter Test::check_less_equal(T const& left, U const& right, std::string const& description)
+Check Test::check_less_equal(T const& left, U const& right, std::string const& description)
 {
-  return CheckReporter(*this, description, left <= right);
+  return Check(*this, description, left <= right);
 }
 
 template <Displayable T, Displayable U>
 requires GTComparable<T, U>
-CheckReporter Test::check_greater_than(T const& left, U const& right)
+Check Test::check_greater_than(T const& left, U const& right)
 {
-  return CheckReporter(*this, "check_greater_than", formatBinaryCheck(left, right), left > right);
+  return Check(*this, "check_greater_than", formatBinaryCheck(left, right), left > right);
 }
 
 template <typename T, typename U>
 requires GTComparable<T, U>
-CheckReporter Test::check_greater_than(T const& left, U const& right, std::string const& description)
+Check Test::check_greater_than(T const& left, U const& right, std::string const& description)
 {
-  return CheckReporter(*this, description, left > right);
+  return Check(*this, description, left > right);
 }
 
 template <Displayable T, Displayable U>
 requires GEComparable<T, U>
-CheckReporter Test::check_greater_equal(T const& left, U const& right)
+Check Test::check_greater_equal(T const& left, U const& right)
 {
-  return CheckReporter(*this, "check_greater_equal", formatBinaryCheck(left, right), left >= right);
+  return Check(*this, "check_greater_equal", formatBinaryCheck(left, right), left >= right);
 }
 
 template <typename T, typename U>
 requires GEComparable<T, U>
-CheckReporter Test::check_greater_equal(T const& left, U const& right, std::string const& description)
+Check Test::check_greater_equal(T const& left, U const& right, std::string const& description)
 {
-  return CheckReporter(*this, description, left >= right);
+  return Check(*this, description, left >= right);
 }
 
 
 
 template <typename Except, LambdaProxy T>
-CheckReporter Test::check_throw(T const& expr)
+Check Test::check_throw(T const& expr)
 {
   bool thrown = false;
   try {
@@ -330,12 +329,12 @@ CheckReporter Test::check_throw(T const& expr)
   } catch (Except &e) {
     thrown = true;
   }
-  return CheckReporter(*this, std::string("check_throw<") + type_to_string<Except>() + std::string(">"), std::vector<ParamInfo>(), thrown);
+  return Check(*this, std::string("check_throw<") + type_to_string<Except>() + std::string(">"), std::vector<ParamInfo>(), thrown);
 }
 
 
 template <typename Except, LambdaProxy T>
-CheckReporter Test::check_throw(std::string const& description, T const& expr)
+Check Test::check_throw(std::string const& description, T const& expr)
 {
   bool thrown = false;
   try {
@@ -343,11 +342,11 @@ CheckReporter Test::check_throw(std::string const& description, T const& expr)
   } catch (Except &e) {
     thrown = true;
   }
-  return CheckReporter(*this, description, std::vector<ParamInfo>(), thrown);
+  return Check(*this, description, std::vector<ParamInfo>(), thrown);
 }
   
 template <LambdaProxy T>
-CheckReporter Test::check_nothrow(T const& expr)
+Check Test::check_nothrow(T const& expr)
 {
   bool nothrown = true;
   try{
@@ -355,12 +354,12 @@ CheckReporter Test::check_nothrow(T const& expr)
   } catch (...){
     nothrown = false;
   }
-  return CheckReporter(*this, "check_nothrow", std::vector<ParamInfo>(), nothrown);
+  return Check(*this, "check_nothrow", std::vector<ParamInfo>(), nothrown);
 }
 
 
 template <LambdaProxy T>
-CheckReporter Test::check_nothrow(std::string const& description, T const& expr)
+Check Test::check_nothrow(std::string const& description, T const& expr)
 {
   bool nothrown = true;
   try{
@@ -368,7 +367,7 @@ CheckReporter Test::check_nothrow(std::string const& description, T const& expr)
   } catch (...){
     nothrown = false;
   }
-  return CheckReporter(*this, description, std::vector<ParamInfo>(), nothrown);
+  return Check(*this, description, std::vector<ParamInfo>(), nothrown);
 }
 
 } // namespace ftg

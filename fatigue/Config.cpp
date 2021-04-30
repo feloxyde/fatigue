@@ -1,6 +1,5 @@
 #include "Config.hpp"
 
-#include "OstreamTestRunner.hpp"
 #include <cxxopts.hpp>
 #include <iostream>
 #include <memory>
