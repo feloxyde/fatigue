@@ -1,0 +1,22 @@
+/** @page Tutorial Tutorial
+
+@section Installing
+
+@section Minimal example
+Let's assume we want to test a really simple code computing average value of a vector of floats. 
+
+~~~{.cpp}
+float avg(std::vector<float> const& v){
+    if(v.empty()){
+        return 0.0;
+    }
+    
+    float sum = 0.0;
+    for(auto const& f : v)  {
+        sum += f;
+    }
+
+    return sum/v.size();
+}
+~~~
+*/
