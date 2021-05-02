@@ -1,5 +1,102 @@
 /** \page Architecture Architecture
 
+This page describes elements of fatigue's architecture and rationales that aren't forcibly easy to get while looking at the code, 
+in order to give a better understanding of how fatigue is built.
+
+@section architecture_overview Architecture overview
+
+Overall, fatigue has three main parts :
+
+- Tests descriptions, describing test cases and grouping them into suite. It is mostly expressed through ```ftg::Test```, ```ftg::Suite```, ```ftg::TestList``` types, and, to a later extent, through ```ftg::Check``` and ```ftg::Checker``` classes.
+- Runners, executing tests and reporting results in a visitor pattern fashion. It is expressed through ```ftg::Runner``` and ```ftg::Logger``` interfaces and classes implementing them.
+- Config, allowing runners to alter their behavior based on CLI options. It is expressed through ```ftg::fatigue``` and ```ftg::Config``` classes and its components.
+
+\image html architecture/architecture_overview.svg "fatigue architecture overview"
+
+@section architecture_reporting Reporting mechanisms
+
+Being able to write clean, flexible checks is important when writing tests. 
+Checks shall give a clean way to report what failed during execution with as much as informations as possible.
+
+Checks have mandatory argument, for example checking that two values are equal requires two values, but we want to allow 
+additional arguments and options, as for example to be able to flag the check as fatal : if it fails the test execution shall not continue. 
+Some ways to achieve this are : 
+
+- using different methods, as ```check_equal``` and ```fatal_check_equal```. This is acceptable for one or two options, but it can lead to heavy code duplication when more are added. It also prevents factorization of behavior that are optional on all checks.
+- using additional, default-valued parameters, as ```check_equal(..., bool fatal = false, bool important=false)```. This is problematic, since it does not allow to select only the last defaulted option when calling the check, if there are more than one option : ```check_equal(..., false, true).```
+- using an string or map with options, as ```check_equal(..., "fatal: true")``` can lead to typos undetected at compile time.
+- using flags as ```check_equal(..., FATAL | IMPORTANT)``` forbids values other than booleans
+- using a data structure may be quite inconvenient to use as well, as it may obfuscate what we are actually checking.
+
+Solution selected for fatigue, to set check options through method chaining as ```check_equal(...).fatal()```.
+
+@subsection architecture_reporting_principle Principle
+
+Checks are using discarded values expression to allow method chaining.
+
+A discarded value expression is an expression which value isn't assigned to anything. For example :
+
+~~~{.cpp}
+int func() {
+    return 1;
+}
+
+//following is a discarded value expression, as return of func isn't assigned to a variable. 
+func();
+//we often encounter discarded value expression when using increment or decrement operators : 
+int i = 0;
+i++; //discarded value, we use it only for value management 
+~~~
+
+According to https://en.cppreference.com/w/cpp/language/lifetime, *temporary object lifetime* section :
+    
+> All temporary objects are destroyed as the last step in evaluating the full-expression that (lexically) contains the point where they were created, and if multiple temporary objects were created, they are destroyed in the order opposite to the order of creation. This is true even if that evaluation ends in throwing an exception. 
+
+It means that we can use destructor of objects to delay commiting check report, allowing to set options after check is performed. 
+
+Here is an illustration of this behavior :
+
+~~~{.cpp}
+class Delay {
+public:
+    Delay(std::string msg) : msg(msg){}
+
+    ~Delay() {
+        std::cout << msg << std::endl;
+    }
+
+    Delay& append(std::string s) 
+    {
+        msg += s; 
+        return *this;    
+    }
+private:
+    std::string msg;
+};
+
+Delay f(std::string s){
+    return Delay(s);
+}
+
+//this will print "123" : 
+f("1").append("2").append("3");
+~~~
+
+@subsection achitecture_reporting_implementation Implementation
+
+Check reporting mechanism in fatigue involve three classes : 
+
+- ```ftg::Check```, which acts as a reporter, handling option settings.
+- ```ftg::Checker```, separating reporting mechanism from ```ftg::Test``` class inheriting from it. 
+- ```ftg::Logger```, which is an interface receiving reports from ```ftg::Check```. 
+
+
+There is a tiny subtility in there for handling early test termination option, ```fatal()```. In C++, it is bad practice to have a deleter throw, as 
+exception involves stack unwinding, and thus deleter call. Therefore, in case of fatal check failing, we don't wait for ```Check``` deleter to be called,
+and instead directly report and throw an exception. That's also the reason why ```ftg::Check::fatal()``` methods does not have method chaining. 
+
+As this deletion-triggered mechanism shall be able to travel through multiple calls, copy constructor is deleted and move constructor is set to prevent the original object from reporting.
+
 
 
 */
