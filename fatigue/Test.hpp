@@ -4,9 +4,7 @@
 
 /** @file */
 
-/** \addtogroup UserApi 
-@{ 
-*/
+
 #ifndef FATIGUE_TEST_HPP
 #define FATIGUE_TEST_HPP
 
@@ -21,7 +19,12 @@
 #include <type_traits>
 #include <vector>
 
+
 namespace ftg {
+
+/** @addtogroup UserApi 
+@{ 
+*/
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
 typedef std::string TestId;
@@ -264,11 +267,11 @@ private:
   std::vector<ParamInfo> formatBinaryTolerantCheck(T const& left, U const& right, V const& tolerance);
 };
 
-} // namespace ftg
-
 /**
-  @}
+@}
 */
+
+} // namespace ftg
 
 
 /** OTHER METHODS IMPLEMENTATION */

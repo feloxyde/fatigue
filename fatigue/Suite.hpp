@@ -4,9 +4,6 @@
 
 /** @file */
 
-/** \addtogroup UserApi 
-@{ 
-*/
 
 #ifndef FATIGUE_SUITE_HPP
 #define FATIGUE_SUITE_HPP
@@ -14,7 +11,13 @@
 #include "Test.hpp"
 #include <variant>
 
+
 namespace ftg {
+
+
+/** \addtogroup UserApi 
+@{ 
+*/
 
 class Suite;
 
@@ -40,12 +43,11 @@ private:
   std::string m_name;
 };
 
-
-} // namespace ftg
-
-
 /**
 @}
 */
+
+} // namespace ftg
+
 
 #endif

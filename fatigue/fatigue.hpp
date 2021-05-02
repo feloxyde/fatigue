@@ -1,9 +1,7 @@
 
 /** @file */
 
-/** \addtogroup UserApi 
-@{ 
-*/
+
 #ifndef FATIGUE_FATIGUE_HPP
 #define FATIGUE_FATIGUE_HPP
 
@@ -12,6 +10,10 @@
 #include <iterator>
 
 namespace ftg {
+
+/** \addtogroup UserApi 
+@{ 
+*/
 
 template<typename T>
 concept TestListBuilder = requires(T a)
@@ -55,10 +57,11 @@ fatigue& fatigue::declare(Builder b)
   return *this;
 }
 
-} // namespace ftg
-
-
 /**
 @}
 */
+
+} // namespace ftg
+
+
 #endif

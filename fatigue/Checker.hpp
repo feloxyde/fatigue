@@ -1,3 +1,5 @@
+/** */
+
 /** @file */
 
 #ifndef FATIGUE_CHECKER_HPP
@@ -89,7 +91,9 @@ private:
   void report();
 };
 
-/** @} */
+/** 
+@} 
+*/
 
 /** @brief Class that is base of Test, providing check reporting mechanisms. 
 

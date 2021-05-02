@@ -1,4 +1,4 @@
-/** @page Tutorial Tutorial
+/** @page Tutorial Tutorial 
 
 @section Installing
 
@@ -156,5 +156,45 @@ int main(int argc, char** argv){
 
 }
 ~~~
+
+@subsection building_test_software Building test software
+
+Now, we can simply compile test software and link it with ```fatigue``` library. In CMake, it looks like this : 
+
+~~~{.cmake}
+add_executable(tests tests.cpp)
+target_link_libraries(tests fatigue)
+~~~
+
+@section tutorial_checks Checks
+
+When writing tests, we use *checks* provided by the ```ftg::Test``` class, allowing us to specify conditions for 
+test success and cleaner failure reporting. All checks are listed in the @ref checks "Checks" page. Let's see the overall anatomy and usage of checks. 
+All checks methods are of the form :
+
+~~~{.cpp}
+check_*(argument [, argument]); //check with default message
+check_*(argument [, argument], message); //check with custom message 
+~~~
+
+When using default message, check will report value, type and name of its arguments. For example, 
+
+~~~{.cpp}
+check_equal(1.0f, 2);  
+~~~
+
+Will report that *l* (left) argument, *float*, with value *1.0*, was not equal to *r* (right) argument, *int*, with value *2*. 
+
+To convert value to string, checks use ```ftg::to_string(T const& val)``` template function. By default, this function tries to 
+use the ```std::ostream``` shift operator ```<<```, but can be specialized to allow more refined display of values. 
+
+In case values are maybe too hard to display, one may eventually use custom message check, which will not report any information regarding its arguments. 
+
+@subsection tutorial_checks_options Options
+
+There are several options that can alter behavior of a check. If we look at the prototype of a check, we can see that it returns ```ftg::Check``` instance. 
+This instance allows use, through method chaining, to give more precision about what is the check. Please refer to the documentation of the class for better understanding. 
+
+Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism.
 
 */

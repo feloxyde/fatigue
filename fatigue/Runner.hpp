@@ -38,7 +38,7 @@ struct ParamInfo {
   std::string type;
 };
 
-/* @brief Interface to define a test Logger, which should take care of reporting checks in a particular test run. */
+/** @brief Interface to define a test Logger, which should take care of reporting checks in a particular test run. */
 struct Logger {
   virtual ~Logger(){};
   virtual void checkFailed(MessageMode mode,
