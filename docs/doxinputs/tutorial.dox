@@ -2,7 +2,10 @@
 
 @section Installing
 
-@section Minimal example
+@section quick_example Quick example
+
+@subsection writing_tests Writing tests
+
 Let's assume we want to test a really simple code computing average value of a vector of floats. 
 
 ~~~{.cpp}
@@ -19,4 +22,139 @@ float avg(std::vector<float> const& v){
     return sum/v.size();
 }
 ~~~
+
+We will want to have three test cases : 
+
+- empty vector 
+- one element 
+- multiple element
+
+Let's start with empty vector test. For this, we will create a ```Empty``` test case by publicly deriving from 
+```ftg::Test``` class : 
+
+~~~{.cpp}
+#include <fatigue/Test.hpp> //inclusion of Test definition
+//also, including our ```avg``` function header and so on. 
+
+class Empty : public ftg::Test { 
+    /* implement test here */
+};
+~~~
+
+We need to define at least three things for the test : 
+- a constructor calling ```Test``` constructor, passing the name of the test.
+- a virtual destructor, which in our case can be empty.
+- a virtual ```void run()``` method, which is the scenario of our test. 
+
+~~~{.cpp}
+class Empty : public ftg::Test { 
+    Empty() : ftg::Test("Empty"){}
+    virtual ~Empty(){};
+
+    virtual void run() {
+        std::vector<float> f; //empty vector
+        check_equal(f.size(), 0); //checking vector is empty
+        check_equal(avg(f), 0.0); //checking our function
+    }
+};
+~~~
+
+We use ```check_*``` methods, provided by class ```ftg::Test```, verify results. Checks are counted and reported. We will discuss them a bit later, and they are listed in @ref checks "Checks" page.
+Let's write two more tests, for the two other cases.
+
+~~~{.cpp}
+class OneElement : public ftg::Test { 
+    OneElement() : ftg::Test("OneElement"){}
+    virtual ~OneElement(){};
+
+    virtual void run() {
+        std::vector<float> f; //empty vector
+        f.push_back(1.0);
+        check_equal(f.size(), 1); //checking vector has one element
+        check_equal(avg(f), 1.0); //checking our function
+    }
+};
+
+class MultipleElements : public ftg::Test { 
+    MultipleElements() : ftg::Test("MultipleElements"){}
+    virtual ~MultipleElements(){};
+
+    virtual void run() {
+        std::vector<float> f; //empty vector
+        f.push_back(1.0);
+        f.push_back(2.0);
+        f.push_back(3.0);
+        f.push_back(4.0);
+        check_equal(f.size(), 4); //checking vector has four elements
+        check_equal(avg(f), 2.5); //checking our function
+    }
+};
+~~~
+
+@subsection writing_suite Writing suite 
+
+Let's do as if we were to have thousands of tests for a lot of different classes and function, and thus group tests 
+for our ```avg``` function together. For that we use a suite. In fatigue, writing a suite ressembles a lot writing a test. 
+
+We implement a suite by publicly deriving from ```ftg::Suite```, and then implement : 
+- A constructor, calling ```ftg::Suite``` constructor and giving it a name.
+- A virtual destructor, which can be empty in our case. 
+- A virtual ```TestList tests()``` method, that will simply return a list of tests in the suite. Note that suites are recursively defined, and thus can contain other suites.
+
+~~~{.cpp}
+#include <fatigue/Suite.hpp>
+#include <memory> //for unique ptrs
+
+class Avg : public ftg::Suite {
+    Avg() : ftg::Suite("Avg") {}
+    virtual ~Avg();
+
+    virtual ftg::TestList tests() {
+        ftg::TestList tl;
+        tl.push_back(std::make_unique<Empty>());
+        tl.push_back(std::make_unique<OneElement>());
+        tl.push_back(std::make_unique<MultipleElements>());
+        return tl;
+    }
+};
+~~~
+
+You can notice that here, we use suites as a namespace for our tests as well, calling our test ```Empty``` instead of ```TestAvgEmpty``` for example. 
+This is not mandatory, and if you prefer full explicit names, that is up to you.  
+
+@subsection writing_test_software Writing test software
+
+Finally, we want to create an executable running our tests. For this, ```fatigue``` class is convenient. We can use it in three steps, preferably inside a ```main``` function.
+
+- Create a ```fatigue``` instance by initializing it with ```main``` invocation args, ```argc``` and ```argv```.
+- Declare a certain number of tests or suites, using ```declare``` method.
+- Run tests using ```run``` method, and return the result as the return code of the program.
+
+~~~{.cpp}
+#include <fatigue/fatigue.hpp>
+
+
+int main(int argc, char** argv){
+
+    auto f = ftg::fatigue(argc, argv);
+    f.declare(std::make_unique<Avg>());
+    return f.run();
+
+}
+~~~
+
+Run method returns the number of tests that failed, and 0 if all tests passed.
+
+Note that ```declare``` method supports method chaining, allowing more flexibility in declaration of tests. 
+
+~~~{.cpp}
+int main(int argc, char** argv){
+
+    return ftg::fatigue(argc, argv)
+           .declare(std::make_unique<Avg>());
+           .run();
+
+}
+~~~
+
 */
