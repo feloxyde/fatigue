@@ -168,6 +168,8 @@ target_link_libraries(tests fatigue)
 
 @section tutorial_checks Checks
 
+@subsection tutorial_checks_basics Basics
+
 When writing tests, we use *checks* provided by the ```ftg::Test``` class, allowing us to specify conditions for 
 test success and cleaner failure reporting. All checks are listed in the @ref checks "Checks" page. Let's see the overall anatomy and usage of checks. 
 All checks methods are of the form :
@@ -195,6 +197,67 @@ In case values are maybe too hard to display, one may eventually use custom mess
 There are several options that can alter behavior of a check. If we look at the prototype of a check, we can see that it returns ```ftg::Check``` instance. 
 This instance allows use, through method chaining, to give more precision about what is the check. Please refer to the documentation of the class for better understanding. 
 
-Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism.
+Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref Architecture "Architecture" page for more information.
+
+@section advanced_testing Advanced testing
+
+
+@section CLI 
+
+
+@section extending Extending fatigue
+
+As Fatigue is an open source software, you can easily adapt its sources to your needs. *I try to provide sufficient documentation to do so as well*. However, that is in most cases what you want to do, since it can create conflicts with future updates. You probably prefer to *extend* fatigue instead of changing its core behavior. This section constains some tips on how to do that.
+
+@subsection tutorial_extending_checks Create custom checks
+
+We may want to extend checking capabilities, as for example adding a check to verify if a value is equal to ten. For this, we have to create a new ```TenTest``` class shall inherit from ```ftg::Test```, and will probably looks as follows : 
+
+~~~{.cpp}
+
+class TenTest : public ftg::Test {
+//here public constructor, virtual dtor and other stuff.
+
+protected: 
+    //our check. Better be it protected scope since we will only access it 
+    //in run() method of tests deriving from TenTest.
+    
+    template<ToStringable T>
+    Check check_equals_ten(T const& value);
+};
+~~~
+
+```ToStringable``` concept ensures that ```T``` is convertible to string using ```ftg::to_string``` template function described earlier in this tutorial.
+
+The method's body will look more or less like this : 
+
+~~~{.cpp}
+
+template<ToStringable T>
+Check check_equals_ten(T const& value)
+{
+std::vector<ParamInfo> params;
+params.emplace_back("value", ftg::to_string(value), type_to_string<T>());
+return raw_check("check_near_equal",
+                 params,
+                 value == 10);
+}
+~~~
+
+Our check returns a ```ftg::Check``` object. Checking mechanisms are detailed in @ref architecture_reporting "Reporting mechanisms" section in @ref Architecture "Architecture" page. This is not mandatory to understand what is going on there to extend fatigue, even if it can help. We can not create a ```Check``` object directly, and instead we call ```raw_check``` method from ```ftg::Checker```, accessible through inheriting from ```ftg::Test```. 
+
+```raw_check``` method takes three arguments, which you can consult in detail on ```ftg::Check``` page : 
+
+- name of the check performed
+- list of arguments of the check, their types and their names.
+- a boolean being the actual result of the check performed.
+
+And we are done, our check is now ready to be used ! 
+
+@subsection tutorial_extending_runners Creating custom runner
+
+@subsection tutorial_extending_cli Adding CLI options 
+
+*more of a trick to add new configs by simply reparsing options, eventually wrapping ```fatigue``` object. WILL NEED AN OPTION TO ADD CUSTOM RUNNERS*
 
 */

@@ -95,8 +95,16 @@ There is a tiny subtility in there for handling early test termination option, `
 exception involves stack unwinding, and thus deleter call. Therefore, in case of fatal check failing, we don't wait for ```Check``` deleter to be called,
 and instead directly report and throw an exception. That's also the reason why ```ftg::Check::fatal()``` methods does not have method chaining. 
 
-As this deletion-triggered mechanism shall be able to travel through multiple calls, copy constructor is deleted and move constructor is set to prevent the original object from reporting.
+Copy constructor of ```ftg::Check``` is deleted and move constructor prevents its input object to report. 
+This allows a ```ftg::Check``` instance to safely travel through multiple function ```return``` without triggering more than one report.
+That property allows code better code factorization between versions of a same check, for example : 
+
+~~~{.cpp}
+
+//FIXME add code here !
 
 
+
+~~~
 
 */
