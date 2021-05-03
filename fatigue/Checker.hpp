@@ -40,16 +40,6 @@ class Checker;
   see Checker class documentation for more info.
 */
 class Check final {
-private:
-  Checker& m_test;
-  std::string m_description;
-  bool m_res;
-  MessageMode m_mode;
-  bool m_expected;
-  bool m_important;
-  bool m_reported;
-  std::vector<ParamInfo> m_params;
-
 public:
   /** @brief Creates a check. 
     
@@ -59,6 +49,8 @@ public:
     @param res result of the check
   */
   Check(Checker& test, std::string const& description, std::vector<ParamInfo> const& params, bool res);
+  Check(Check const&) = delete;
+  Check(Check&& origin);
 
   ~Check();
 
@@ -89,6 +81,16 @@ public:
 private:
   /** @brief reports check result to runner of the test. Used when destroying Check object or when a fatal check fails.*/
   void report();
+
+private:
+  Checker& m_test;
+  std::string m_description;
+  bool m_res;
+  MessageMode m_mode;
+  bool m_expected;
+  bool m_important;
+  bool m_reported;
+  std::vector<ParamInfo> m_params;
 };
 
 /** 
@@ -105,7 +107,6 @@ class Checker {
 public:
   Checker(std::string const& name);
 
-public:
   /** @brief sets logger for the test */
   void setLogger(Logger* r);
   /** @brief returns name of the test */

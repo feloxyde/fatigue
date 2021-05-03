@@ -37,6 +37,20 @@ Check::Check(Checker& test, std::string const& description, std::vector<ParamInf
 {
 }
 
+Check::Check(Check&& origin) :
+    m_test(origin.m_test),
+    m_description(origin.m_description),
+    m_res(origin.m_res),
+    m_mode(MESSAGE_CHECK),
+    m_expected(origin.m_expected),
+    m_important(origin.m_important),
+    m_reported(origin.m_reported),
+    m_params(origin.m_params)
+{
+  //disabling reporting since object has moved
+  origin.m_reported = true;
+}
+
 Check::~Check()
 {
   report();
