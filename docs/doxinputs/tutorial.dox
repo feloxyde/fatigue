@@ -201,9 +201,9 @@ Because of this option mechanism, Check objects shall NEVER be assigned to a var
 
 @section advanced_testing Advanced testing
 
+@section tutorial_cli Command line interface
 
-@section CLI 
-
+@subsection tutorial_runners Runners
 
 @section extending Extending fatigue
 
@@ -255,6 +255,9 @@ Our check returns a ```ftg::Check``` object. Checking mechanisms are detailed in
 And we are done, our check is now ready to be used ! 
 
 @subsection tutorial_extending_runners Creating custom runner
+
+*TO BE ADDED*
+
 
 @subsection tutorial_extending_cli Adding CLI options 
 

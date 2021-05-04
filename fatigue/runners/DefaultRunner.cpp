@@ -19,13 +19,18 @@ DefaultLogger::~DefaultLogger()
 {
 }
 
-void DefaultLogger::checkFailed(MessageMode mode,
-				std::string const& description,
-				std::vector<ParamInfo> const& params,
-				bool expected,
-				bool result,
-				bool important)
+void DefaultLogger::report(MessageMode mode,
+			   std::string const& description,
+			   std::vector<ParamInfo> const& params,
+			   bool expected,
+			   bool result,
+			   bool important)
 {
+  if (expected == result) {
+    m_checkPassed++;
+    return;
+  }
+
   m_checkFailed++;
 
   if (important) {
@@ -70,11 +75,6 @@ void DefaultLogger::checkFailed(MessageMode mode,
   } else if (!expected && result) {
     m_ostream << " to fail, but succeeded." << std::endl;
   }
-}
-
-void DefaultLogger::checkPassed()
-{
-  m_checkPassed++;
 }
 
 bool DefaultLogger::passed() const

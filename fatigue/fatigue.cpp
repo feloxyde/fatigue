@@ -25,10 +25,10 @@ fatigue& fatigue::declare(std::unique_ptr<Test> test)
 
 unsigned fatigue::run() const
 {
-  if(runners.find(config.runner) == runners.end()){
+  if (runners.find(config.runner) == runners.end()) {
     std::cout << "Could not find runner " << config.runner << std::endl;
-    std::cout <<"Available runners are : " << std::endl;
-    for(auto const& r : runners){
+    std::cout << "Available runners are : " << std::endl;
+    for (auto const& r : runners) {
       std::cout << r.first << std::endl;
     }
     return -1;

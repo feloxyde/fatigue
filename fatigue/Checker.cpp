@@ -56,9 +56,10 @@ Check::~Check()
   report();
 }
 
-void Check::warn()
+Check& Check::warn()
 {
   m_mode = MESSAGE_WARN;
+  return *this;
 }
 
 void Check::fatal()
@@ -92,11 +93,7 @@ void Check::report()
 {
   if (m_reported == false) {
     m_reported = true;
-    if ((m_res && !m_expected) || (!m_res && m_expected)) {
-      m_test.m_logger->checkFailed(m_mode, m_description, m_params, m_expected, m_res, m_important);
-    } else {
-      m_test.m_logger->checkPassed();
-    }
+    m_test.m_logger->report(m_mode, m_description, m_params, m_expected, m_res, m_important);
   }
 }
 
@@ -111,6 +108,12 @@ void Checker::setLogger(Logger* r)
 std::string const& Checker::name() const
 {
   return m_name;
+}
+
+
+Check Checker::raw_check(std::string const& description, std::vector<ParamInfo> const& params, bool res)
+{
+  return Check(*this, description, params, res);
 }
 
 } // namespace ftg

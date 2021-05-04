@@ -23,14 +23,12 @@ struct DefaultLogger : public Logger {
   DefaultLogger(std::ostream& ostream, Config const& config);
   virtual ~DefaultLogger();
 
-  virtual void checkFailed(MessageMode mode,
-			   std::string const& description,
-			   std::vector<ParamInfo> const& params,
-			   bool expected,
-			   bool result,
-			   bool important);
-
-  virtual void checkPassed();
+  virtual void report(MessageMode mode,
+		      std::string const& description,
+		      std::vector<ParamInfo> const& params,
+		      bool expected,
+		      bool result,
+		      bool important);
 
   bool passed() const;
 

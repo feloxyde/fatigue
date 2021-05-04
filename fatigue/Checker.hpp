@@ -41,14 +41,7 @@ class Checker;
 */
 class Check final {
 public:
-  /** @brief Creates a check. 
-    
-    @param test the checker
-    @param description a description of the check performed
-    @param params a descriptions of params passed to the test
-    @param res result of the check
-  */
-  Check(Checker& test, std::string const& description, std::vector<ParamInfo> const& params, bool res);
+
   Check(Check const&) = delete;
   Check(Check&& origin);
 
@@ -60,7 +53,7 @@ public:
   */
 
   /** @brief Marks check as a warning, allowing test to pass even if check fails. */
-  void warn();
+  Check& warn();
 
   /** @brief Marks check as fatal, terminating test execution in case it fails. */
   void fatal();
@@ -81,7 +74,8 @@ public:
 private:
   /** @brief reports check result to runner of the test. Used when destroying Check object or when a fatal check fails.*/
   void report();
-
+  Check(Checker& test, std::string const& description, std::vector<ParamInfo> const& params, bool res);
+  
 private:
   Checker& m_test;
   std::string m_description;
@@ -91,6 +85,9 @@ private:
   bool m_important;
   bool m_reported;
   std::vector<ParamInfo> m_params;
+
+private: 
+  friend Checker;
 };
 
 /** 
@@ -112,6 +109,14 @@ public:
   /** @brief returns name of the test */
   std::string const& name() const;
 
+  /** @brief Creates a check. 
+    
+    @param description a description of the check performed
+    @param params a descriptions of params passed to the test
+    @param res result of the check
+  */
+  Check raw_check(std::string const& description, std::vector<ParamInfo> const& params, bool res);
+  
 protected:
   bool showTypes() const;
 

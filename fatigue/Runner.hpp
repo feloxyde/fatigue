@@ -41,14 +41,13 @@ struct ParamInfo {
 /** @brief Interface to define a test Logger, which should take care of reporting checks in a particular test run. */
 struct Logger {
   virtual ~Logger(){};
-  virtual void checkFailed(MessageMode mode,
-			   std::string const& description,
-			   std::vector<ParamInfo> const& params,
-			   bool expected,
-			   bool result,
-			   bool important)
+  virtual void report(MessageMode mode,
+		      std::string const& description,
+		      std::vector<ParamInfo> const& params,
+		      bool expected,
+		      bool result,
+		      bool important)
       = 0;
-  virtual void checkPassed() = 0;
 };
 
 } // namespace ftg
