@@ -8,6 +8,7 @@ namespace ftg {
 fatigue::fatigue(int argc, char** argv) : config()
 {
   config.loadFromCLI(argc, argv);
+  runners.emplace("default", std::make_unique<DefaultRunner>(std::cout, config));
 }
 
 fatigue& fatigue::declare(std::unique_ptr<Suite> suite)
@@ -24,17 +25,17 @@ fatigue& fatigue::declare(std::unique_ptr<Test> test)
 
 unsigned fatigue::run() const
 {
-  std::unique_ptr<Runner> runner;
-
-  if (config.runner == "default") {
-    runner = std::make_unique<DefaultRunner>(std::cout, config);
+  if(runners.find(config.runner) == runners.end()){
+    std::cout << "Could not find runner " << config.runner << std::endl;
+    std::cout <<"Available runners are : " << std::endl;
+    for(auto const& r : runners){
+      std::cout << r.first << std::endl;
+    }
+    return -1;
   } else {
-    std::cout << "runner " << config.runner << "not found !" << std::endl;
-    return -1; //#FIXME should be changed for proper error handling !
+    return runners.at(config.runner)->run(tests);
   }
-
-  return runner->run(tests);
-};
+}
 
 
 } // namespace ftg

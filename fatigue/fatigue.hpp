@@ -45,7 +45,9 @@ struct fatigue {
 
 private:
   TestList tests;
+protected:
   Config config;
+  std::unordered_map<std::string, std::unique_ptr<Runner>> runners;
 };
 
 
