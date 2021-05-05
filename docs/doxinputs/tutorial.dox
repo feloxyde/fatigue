@@ -175,8 +175,12 @@ test success and cleaner failure reporting. All checks are listed in the @ref ch
 All checks methods are of the form :
 
 ~~~{.cpp}
-check_*(argument [, argument]); //check with default message
-check_*(argument [, argument], message); //check with custom message 
+/* check with default message */
+check_*(argument [, argument]); 
+/* check with custom message */
+check_*(argument [, argument], message);  
+/* check with custom message and parameter informations */
+check_*(argument [, argument], message, vector<paramInfo>);
 ~~~
 
 When using default message, check will report value, type and name of its arguments. For example, 
@@ -199,7 +203,12 @@ This instance allows use, through method chaining, to give more precision about 
 
 Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref Architecture "Architecture" page for more information.
 
+
 @section advanced_testing Advanced testing
+
+@section tutorial_fixtures Fixtures
+
+@section tutorial_heavy_tests Heavy resources tests
 
 @section tutorial_cli Command line interface
 
@@ -256,10 +265,18 @@ And we are done, our check is now ready to be used !
 
 @subsection tutorial_extending_runners Creating custom runner
 
-*TO BE ADDED*
+Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier than you think, since fatigue's core isn't thought to be intuitive, but rather flexible and practical to implement.
 
+General thoughts on runners and loggers are described in @ref architecture_run "Test runners and loggers" section of @ref Architecture "Architecture" page. It is recommended for you to read this section to better understand what follows.
 
-@subsection tutorial_extending_cli Adding CLI options 
+As an example, here is the code of an absolutely minimal combined runner and logger, providing no output and exiting straight with an error code in case a test 
+fails. It considers any check not passing as an error.
+
+\include tutorial/TrivialRunner.hpp
+
+Now, we want to see how to use our runner. This will be seen in section @tutorial_extending_cli "Using and adding CLI options".
+
+@subsection tutorial_extending_cli Using and adding CLI options 
 
 *more of a trick to add new configs by simply reparsing options, eventually wrapping ```fatigue``` object. WILL NEED AN OPTION TO ADD CUSTOM RUNNERS*
 

@@ -3,7 +3,11 @@
 This page describes elements of fatigue's architecture and rationales that aren't forcibly easy to get while looking at the code, 
 in order to give a better understanding of how fatigue is built.
 
+
+\tableofcontents 
+
 @section architecture_overview Architecture overview
+
 
 Overall, fatigue has three main parts :
 
@@ -45,7 +49,7 @@ int func() {
 func();
 //we often encounter discarded value expression when using increment or decrement operators : 
 int i = 0;
-i++; //discarded value, we use it only for value management 
+i++; //discarded value, we increment i but don't use its value.
 ~~~
 
 According to https://en.cppreference.com/w/cpp/language/lifetime, *temporary object lifetime* section :
@@ -100,11 +104,88 @@ This allows a ```ftg::Check``` instance to safely travel through multiple functi
 That property allows code better code factorization between versions of a same check, for example : 
 
 ~~~{.cpp}
+Check Test::check_complex_logic(/*args*/)
+{
+  return check_complex_logic(args, "check_complexLogic", extractParamInfoFromArgs(args));
+}
 
-//FIXME add code here !
-
-
-
+Check Test::check_complex_logic(/*args*/, std::string const& description, std::vector<ParamInfo> const& params)
+{
+  return raw_check(/*complex logic using args */,description, params);
+}
 ~~~
 
+@section architecture_run Test runners and loggers
+
+While overall implementation of fatigue is as straightforward as possible, runners and loggers shall respect few constraints regarding handling ```ftg::Test``` class..
+
+For implementing runners, one shall match two interfaces : ```ftg::Runner```, responsible of running tests suites, and ```ftg::Logger```, responsible of logging individual test runs. 
+
+Sequence of calls expected by a test is illustrated by following pseudocode : 
+
+~~~{.cpp}
+
+void Logger::runTest(ftg::Test test){
+    
+    if(!test.load()){
+        /* test failed to load */
+        return;
+    }
+    test.setLogger(*this);
+    try {
+        test.run();
+    } catch (FatalCheckFailure const& e){
+        /* test ended prematurely due to a fatal() check failing */
+    } catch (...) {
+        /* unexpected exception when running test */
+    }
+    test.unload();
+}
+~~~
+
+This code highlights few key points : 
+- A test is loaded before running, and if the call returns ```false```, load is considered as failed and test shall not be run nor unloaded. 
+- A test is unloaded after running, no matter the status of the test.
+- Deciding what is an *error* or not is responsibility of the logger and runner, NOT the responsibility of the test itself. 
+- Logger shall register itself to ```ftg::Checker```, from which ```ftg::test``` inherits, before running. 
+
+A runner's behavior is much simpler. It takes a list of tests and suite, represented as a ```std::variant```, a typical behavior could alike following pseudocode :
+
+~~~{.cpp}
+
+void Runner::runTests(TestList const& tl){
+
+    for(v : tl){
+        if(v.isTest()){
+            Logger l;
+            l.runTest(v.asTest());
+        } else {
+            runTests(v.asSuite().tests());
+        }
+    }
+}
+~~~
+
+Note that ```ftg::Runner``` and ```ftg::Logger``` can be either implemented as a single class, or as different classes, or even more. 
+
+@subsection architecture_run_log_checks Test logging mechanism
+
+During test ```run()``` execution, checks report to the logger through ```ftg::Checker``` class, from which ```ftg::Test``` inherits, as illustrated in following sequence diagram : 
+
+\image html architecture/test_check_sequence.svg "Test check sequence"
+
+Note that here, ```Test``` and ```Checker``` instances are represented as two different objects, however, they are the same : ```Test``` inherits from ```Checker```. differenciation is made to highlight method calls from ```Checker```. 
+
+Transcript of this sequence is as follows  : 
+
+1. A ```check_*``` method from ```Test``` is called, which :
+    1.1. performs some checkings,
+    1.2. self-calls ```raw_check``` method from ```Checker```, returning a ```Check``` object, ```chk```, to report result.
+    1.3. returns ```chk```.
+2. (Some more methods are eventually called on ```chk``` to set reporting options.)
+3. According to mechanisms seen in section@ref architecture_reporting "Reporting mechanisms", ```chk``` is deleted :
+    1.1 accesses it's creator ```Checker``` object which it has a reference to. 
+    1.2 calls ```report``` method from ```Logger``` of the checker with right informations to report. 
 */
+
+@section architecture_main Main class and options

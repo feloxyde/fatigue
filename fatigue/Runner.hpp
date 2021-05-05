@@ -22,7 +22,7 @@ typedef std::vector<std::variant<std::unique_ptr<Test>, std::unique_ptr<Suite>>>
 /** @brief Interface to define a test Runner, which should take care of running a TestList, recursively. */
 struct Runner {
   virtual ~Runner(){};
-  virtual unsigned run(TestList const& suites) = 0;
+  virtual unsigned run(TestList const& tests) = 0;
 };
 
 /** @brief Data structure handling to register name, value and type of a parameter passed to a Check.*/
