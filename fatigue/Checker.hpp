@@ -32,7 +32,7 @@ struct FatalCheckFailure final {
 
 class Checker;
 
-/** \addtogroup UserApi
+/** \addtogroup user_api
 @{
 */
 /** @brief Allows customized behavior when checking in Test class. 
@@ -41,7 +41,6 @@ class Checker;
 */
 class Check final {
 public:
-
   Check(Check const&) = delete;
   Check(Check&& origin);
 
@@ -75,7 +74,7 @@ private:
   /** @brief reports check result to runner of the test. Used when destroying Check object or when a fatal check fails.*/
   void report();
   Check(Checker& test, std::string const& description, std::vector<ParamInfo> const& params, bool res);
-  
+
 private:
   Checker& m_test;
   std::string m_description;
@@ -86,7 +85,7 @@ private:
   bool m_reported;
   std::vector<ParamInfo> m_params;
 
-private: 
+private:
   friend Checker;
 };
 
@@ -116,7 +115,7 @@ public:
     @param res result of the check
   */
   Check raw_check(std::string const& description, std::vector<ParamInfo> const& params, bool res);
-  
+
 protected:
   bool showTypes() const;
 

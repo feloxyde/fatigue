@@ -1,4 +1,4 @@
-/** \page Architecture Architecture
+/** \page architecture Architecture
 
 This page describes elements of fatigue's architecture and rationales that aren't forcibly easy to get while looking at the code, 
 in order to give a better understanding of how fatigue is built.

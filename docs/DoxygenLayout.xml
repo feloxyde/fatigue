@@ -3,10 +3,10 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex> 
     <tab type="mainpage" visible="yes" title="Main Page"/>
-    <tab type="user" url="@ref Tutorial" title="Tutorial"/> 
-    <tab type="user" url="@ref UserApi" title="User Api"/> 
+    <tab type="user" url="@ref tutorial" title="Tutorial"/> 
+    <tab type="user" url="@ref user_api" title="User Api"/> 
     <tab type="user" url="@ref checks" title="Checks"/> 
-    <tab type="user" url="@ref Architecture" title="Architecture"/>
+    <tab type="user" url="@ref architecture" title="Architecture"/>
     <tab type="pages" visible="no" title="" intro=""/>
     <tab type="modules" visible="no" title="" intro=""/>
     <tab type="namespaces" visible="yes" title="">

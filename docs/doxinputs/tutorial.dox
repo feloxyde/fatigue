@@ -1,4 +1,4 @@
-/** @page Tutorial Tutorial 
+/** @page tutorial Tutorial 
 
 @section Installing
 
@@ -201,7 +201,7 @@ In case values are maybe too hard to display, one may eventually use custom mess
 There are several options that can alter behavior of a check. If we look at the prototype of a check, we can see that it returns ```ftg::Check``` instance. 
 This instance allows use, through method chaining, to give more precision about what is the check. Please refer to the documentation of the class for better understanding. 
 
-Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref Architecture "Architecture" page for more information.
+Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page for more information.
 
 
 @section advanced_testing Advanced testing
@@ -253,7 +253,7 @@ return raw_check("check_near_equal",
 }
 ~~~
 
-Our check returns a ```ftg::Check``` object. Checking mechanisms are detailed in @ref architecture_reporting "Reporting mechanisms" section in @ref Architecture "Architecture" page. This is not mandatory to understand what is going on there to extend fatigue, even if it can help. We can not create a ```Check``` object directly, and instead we call ```raw_check``` method from ```ftg::Checker```, accessible through inheriting from ```ftg::Test```. 
+Our check returns a ```ftg::Check``` object. Checking mechanisms are detailed in @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page. This is not mandatory to understand what is going on there to extend fatigue, even if it can help. We can not create a ```Check``` object directly, and instead we call ```raw_check``` method from ```ftg::Checker```, accessible through inheriting from ```ftg::Test```. 
 
 ```raw_check``` method takes three arguments, which you can consult in detail on ```ftg::Check``` page : 
 
@@ -267,14 +267,14 @@ And we are done, our check is now ready to be used !
 
 Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier than you think, since fatigue's core isn't thought to be intuitive, but rather flexible and practical to implement.
 
-General thoughts on runners and loggers are described in @ref architecture_run "Test runners and loggers" section of @ref Architecture "Architecture" page. It is recommended for you to read this section to better understand what follows.
+General thoughts on runners and loggers are described in @ref architecture_run "Test runners and loggers" section of @ref architecture "Architecture" page. It is recommended for you to read this section to better understand what follows.
 
 As an example, here is the code of an absolutely minimal combined runner and logger, providing no output and exiting straight with an error code in case a test 
 fails. It considers any check not passing as an error.
 
 \include tutorial/TrivialRunner.hpp
 
-Now, we want to see how to use our runner. This will be seen in section @tutorial_extending_cli "Using and adding CLI options".
+Now, we want to see how to use our runner. This will be seen in section @ref tutorial_extending_cli "Using and adding CLI options".
 
 @subsection tutorial_extending_cli Using and adding CLI options 
 

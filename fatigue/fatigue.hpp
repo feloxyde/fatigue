@@ -11,7 +11,7 @@
 
 namespace ftg {
 
-/** \addtogroup UserApi 
+/** \addtogroup user_api 
 @{ 
 */
 
