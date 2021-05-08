@@ -278,6 +278,52 @@ Now, we want to see how to use our runner. This will be seen in section @ref tut
 
 @subsection tutorial_extending_cli Using and adding CLI options 
 
-*more of a trick to add new configs by simply reparsing options, eventually wrapping ```fatigue``` object. WILL NEED AN OPTION TO ADD CUSTOM RUNNERS*
+As mentionned before, fatigue allows user to alter behavior of the test software through command lines options. Options are parsed using [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts).
+
+Now, how to add options. In this example, we will add the custom runner we made in section @ref tutorial_extending_runners "Creating custom runner" in the runner pool, as well as an option to select the fastest available runner (that we assume to be our ```TrivialRunner```).
+
+
+First, we write a function taking in a ```cxxopts::Option``` reference.
+
+~~~{.cpp}
+#include <cxxopts>
+
+void customOptions(cxxopts::Options& opts) {
+    //adding options
+    opts.add_options()
+    ("f,fast","selects fastest runner available, overrides any runner selected by -r option", cxxopts::value<bool>()->default_value("false")) 
+}
+~~~
+
+Then, we need to register options to ```ftg::fatigue``` class, through the constructor accepting a vector of ```ftg::options```. As this constructor is protected, we will have to derive from ```ftg::fatigue``` class.
+
+~~~{.cpp}
+
+class fatigue_ex : public ftg::fatigue {
+    fatigue_ex(int argc, char** argv) : ftg::fatigue({customOptions} ,argc, argv){
+        //registering runner in the list of available runners 
+        this->ftg::fatigue::runner.emplace("trivial", std::make_unique<TrivialRunner>());
+
+        //overriding config "runner" field when fast option is set.
+        if(cxxopts["fast"].as<bool>()){
+            this->ftg::fatigue::config.runner = "trivial";
+        }
+    }
+};
+~~~
+
+We can now use ```fatigue_ex``` as a drop-in replacement for  ```fatigue``` :
+
+~~~{.cpp}
+int main(int argc, char** argv){
+
+    return fatigue_ex(argc, argv)
+        .declare(/* tests */)
+        .declare(/* more tests */)
+        .run()
+}
+~~~
+
+And of course, we can use ```-f``` or ```fast``` option in the command line. 
 
 */
