@@ -8,20 +8,7 @@
 
 Let's assume we want to test a really simple code computing average value of a vector of floats. 
 
-~~~{.cpp}
-float avg(std::vector<float> const& v){
-    if(v.empty()){
-        return 0.0;
-    }
-    
-    float sum = 0.0;
-    for(auto const& f : v)  {
-        sum += f;
-    }
-
-    return sum/v.size();
-}
-~~~
+\include quick_example/avg.hpp
 
 We will want to have three test cases : 
 
@@ -30,66 +17,21 @@ We will want to have three test cases :
 - multiple element
 
 Let's start with empty vector test. For this, we will create a ```Empty``` test case by publicly deriving from 
-```ftg::Test``` class : 
-
-~~~{.cpp}
-#include <fatigue/Test.hpp> //inclusion of Test definition
-//also, including our ```avg``` function header and so on. 
-
-class Empty : public ftg::Test { 
-    /* implement test here */
-};
-~~~
+```ftg::Test``` class.
 
 We need to define at least three things for the test : 
 - a constructor calling ```Test``` constructor, passing the name of the test.
 - a virtual destructor, which in our case can be empty.
 - a virtual ```void run()``` method, which is the scenario of our test. 
 
-~~~{.cpp}
-class Empty : public ftg::Test { 
-    Empty() : ftg::Test("Empty"){}
-    virtual ~Empty(){};
-
-    virtual void run() {
-        std::vector<float> f; //empty vector
-        check_equal(f.size(), 0); //checking vector is empty
-        check_equal(avg(f), 0.0); //checking our function
-    }
-};
-~~~
+\include quick_example/TestAvgEmpty.hpp
 
 We use ```check_*``` methods, provided by class ```ftg::Test```, verify results. Checks are counted and reported. We will discuss them a bit later, and they are listed in @ref checks "Checks" page.
 Let's write two more tests, for the two other cases.
 
-~~~{.cpp}
-class OneElement : public ftg::Test { 
-    OneElement() : ftg::Test("OneElement"){}
-    virtual ~OneElement(){};
+\include quick_example/TestAvgOne.hpp
 
-    virtual void run() {
-        std::vector<float> f; //empty vector
-        f.push_back(1.0);
-        check_equal(f.size(), 1); //checking vector has one element
-        check_equal(avg(f), 1.0); //checking our function
-    }
-};
-
-class MultipleElements : public ftg::Test { 
-    MultipleElements() : ftg::Test("MultipleElements"){}
-    virtual ~MultipleElements(){};
-
-    virtual void run() {
-        std::vector<float> f; //empty vector
-        f.push_back(1.0);
-        f.push_back(2.0);
-        f.push_back(3.0);
-        f.push_back(4.0);
-        check_equal(f.size(), 4); //checking vector has four elements
-        check_equal(avg(f), 2.5); //checking our function
-    }
-};
-~~~
+\include quick_example/TestAvgMany.hpp
 
 @subsection writing_suite Writing suite 
 
@@ -101,23 +43,7 @@ We implement a suite by publicly deriving from ```ftg::Suite```, and then implem
 - A virtual destructor, which can be empty in our case. 
 - A virtual ```TestList tests()``` method, that will simply return a list of tests in the suite. Note that suites are recursively defined, and thus can contain other suites.
 
-~~~{.cpp}
-#include <fatigue/Suite.hpp>
-#include <memory> //for unique ptrs
-
-class Avg : public ftg::Suite {
-    Avg() : ftg::Suite("Avg") {}
-    virtual ~Avg();
-
-    virtual ftg::TestList tests() {
-        ftg::TestList tl;
-        tl.push_back(std::make_unique<Empty>());
-        tl.push_back(std::make_unique<OneElement>());
-        tl.push_back(std::make_unique<MultipleElements>());
-        return tl;
-    }
-};
-~~~
+\include quick_example/SuiteAvg.hpp
 
 You can notice that here, we use suites as a namespace for our tests as well, calling our test ```Empty``` instead of ```TestAvgEmpty``` for example. 
 This is not mandatory, and if you prefer full explicit names, that is up to you.  
@@ -130,40 +56,21 @@ Finally, we want to create an executable running our tests. For this, ```fatigue
 - Declare a certain number of tests or suites, using ```declare``` method.
 - Run tests using ```run``` method, and return the result as the return code of the program.
 
-~~~{.cpp}
-#include <fatigue/fatigue.hpp>
-
-
-int main(int argc, char** argv){
-
-    auto f = ftg::fatigue(argc, argv);
-    f.declare(std::make_unique<Avg>());
-    return f.run();
-
-}
-~~~
+\include quick_example/main_avg.cpp
 
 Run method returns the number of tests that failed, and 0 if all tests passed.
 
 Note that ```declare``` method supports method chaining, allowing more flexibility in declaration of tests. 
 
-~~~{.cpp}
-int main(int argc, char** argv){
-
-    return ftg::fatigue(argc, argv)
-           .declare(std::make_unique<Avg>());
-           .run();
-
-}
-~~~
+\include quick_example/main_avg_chaining.cpp
 
 @subsection building_test_software Building test software
 
 Now, we can simply compile test software and link it with ```fatigue``` library. In CMake, it looks like this : 
 
 ~~~{.cmake}
-add_executable(tests tests.cpp)
-target_link_libraries(tests fatigue)
+add_executable(test_tutorial_avg quick_example/main_avg.cpp)
+target_link_libraries(test_fatigue fatigue)
 ~~~
 
 @section tutorial_checks Checks
@@ -203,6 +110,16 @@ This instance allows use, through method chaining, to give more precision about 
 
 Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page for more information.
 
+How checks are displayed depend on the runner chosen, however, it is likely that they will be reported by their index of appearance in the test. For example, 
+
+~~~{.cpp}
+check_true(true);
+check_true(false); //this will be reported as check n°2
+~~~
+
+@section tutorial_cli Command line interface
+
+@subsection tutorial_runners Runners
 
 @section advanced_testing Advanced testing
 
@@ -210,9 +127,7 @@ Because of this option mechanism, Check objects shall NEVER be assigned to a var
 
 @section tutorial_heavy_tests Heavy resources tests
 
-@section tutorial_cli Command line interface
 
-@subsection tutorial_runners Runners
 
 @section extending Extending fatigue
 
@@ -222,36 +137,9 @@ As Fatigue is an open source software, you can easily adapt its sources to your 
 
 We may want to extend checking capabilities, as for example adding a check to verify if a value is equal to ten. For this, we have to create a new ```TenTest``` class shall inherit from ```ftg::Test```, and will probably looks as follows : 
 
-~~~{.cpp}
-
-class TenTest : public ftg::Test {
-//here public constructor, virtual dtor and other stuff.
-
-protected: 
-    //our check. Better be it protected scope since we will only access it 
-    //in run() method of tests deriving from TenTest.
-    
-    template<ToStringable T>
-    Check check_equals_ten(T const& value);
-};
-~~~
+\include extending/TenTest.hpp
 
 ```ToStringable``` concept ensures that ```T``` is convertible to string using ```ftg::to_string``` template function described earlier in this tutorial.
-
-The method's body will look more or less like this : 
-
-~~~{.cpp}
-
-template<ToStringable T>
-Check check_equals_ten(T const& value)
-{
-std::vector<ParamInfo> params;
-params.emplace_back("value", ftg::to_string(value), type_to_string<T>());
-return raw_check("check_near_equal",
-                 params,
-                 value == 10);
-}
-~~~
 
 Our check returns a ```ftg::Check``` object. Checking mechanisms are detailed in @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page. This is not mandatory to understand what is going on there to extend fatigue, even if it can help. We can not create a ```Check``` object directly, and instead we call ```raw_check``` method from ```ftg::Checker```, accessible through inheriting from ```ftg::Test```. 
 
@@ -272,7 +160,7 @@ General thoughts on runners and loggers are described in @ref architecture_run "
 As an example, here is the code of an absolutely minimal combined runner and logger, providing no output and exiting straight with an error code in case a test 
 fails. It considers any check not passing as an error.
 
-\include tutorial/TrivialRunner.hpp
+\include extending/TrivialRunner.hpp
 
 Now, we want to see how to use our runner. This will be seen in section @ref tutorial_extending_cli "Using and adding CLI options".
 
@@ -285,45 +173,16 @@ Now, how to add options. In this example, we will add the custom runner we made 
 
 First, we write a function taking in a ```cxxopts::Option``` reference.
 
-~~~{.cpp}
-#include <cxxopts>
-
-void customOptions(cxxopts::Options& opts) {
-    //adding options
-    opts.add_options()
-    ("f,fast","selects fastest runner available, overrides any runner selected by -r option", cxxopts::value<bool>()->default_value("false")) 
-}
-~~~
+\include extending/customOptions.hpp
 
 Then, we need to register options to ```ftg::fatigue``` class, through the constructor accepting a vector of ```ftg::fatigue::OptionsDeclarer```. As this constructor is protected, we will have to derive from ```ftg::fatigue``` class.
 
-~~~{.cpp}
-
-class fatigue_ex : public ftg::fatigue {
-    fatigue_ex(int argc, char** argv) : ftg::fatigue({customOptions} ,argc, argv){
-        //registering runner in the list of available runners 
-        this->ftg::fatigue::runner.emplace("trivial", std::make_unique<TrivialRunner>());
-
-        //overriding config "runner" field when fast option is set.
-        if(cxxopts["fast"].as<bool>()){
-            this->ftg::fatigue::config.runner = "trivial";
-        }
-    }
-};
-~~~
+\include extending/fatigue_ex.hpp
 
 We can now use ```fatigue_ex``` as a drop-in replacement for  ```fatigue``` :
 
-~~~{.cpp}
-int main(int argc, char** argv){
+\include extending/main_ex.cpp
 
-    return fatigue_ex(argc, argv)
-        .declare(/* tests */)
-        .declare(/* more tests */)
-        .run()
-}
-~~~
-
-And of course, we can use ```-f``` or ```fast``` option in the command line. 
+And of course, we can use ```-f``` or ```--fast``` option in the command line. 
 
 */

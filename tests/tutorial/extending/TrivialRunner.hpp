@@ -15,13 +15,15 @@ class TrivialRunner : public ftg::Logger, public ftg::Runner {
 public:
   /* Method from Logger. 
     Implement in order to receive messages from Checker when running tests
+    note that arg names are commented out to prevent compiler unused variable warning,
+    but for a more elaborated runner, you may want to use them.
   */
-  virtual void report(ftg::MessageMode mode,
-		      std::string const& description,
-		      std::vector<ftg::ParamInfo> const& params,
+  virtual void report(ftg::MessageMode /* mode */,
+		      std::string const& /* description */,
+		      std::vector<ftg::ParamInfo> const& /* params */,
 		      bool expected,
 		      bool result,
-		      bool important)
+		      bool /* important */)
   {
     if (result != expected) {
       /* if result is not what we expect, fail */
@@ -36,7 +38,8 @@ public:
       /* if load failed */
       throw TrivialRunnerFail();
     }
-
+    //setting self as a logger for the test before running it
+    test.setLogger(this);
     try {
       test.run();
     } catch (...) {
@@ -67,9 +70,10 @@ public:
     try {
       runTests(tests);
     } catch (TrivialRunnerFail) {
+      std::cout << "FAIL" << std::endl;
       return 1;
     }
-
+    std::cout << "PASS" << std::endl;
     return 0;
   }
 };

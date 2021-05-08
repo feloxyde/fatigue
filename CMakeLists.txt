@@ -86,7 +86,7 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 
 add_custom_target(sync_external
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/cxxopts/include/cxxopts.hpp ${CMAKE_CURRENT_LIST_DIR}/fatigue/external/cxxopts.hpp
-                   COMMENT "Copying cxxopts header from submodule to external.")
+                   COMMENT "Copying cxxopts header from submodule to fatigue/external.")
 
 set(headers 
     fatigue/Checker.hpp
@@ -102,7 +102,6 @@ set(headers
 set(headers_external
     fatigue/external/cxxopts.hpp
 )
-
 
 set(sources
     fatigue/Checker.cpp
