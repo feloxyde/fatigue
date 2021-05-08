@@ -4,7 +4,7 @@
 #define FATIGUE_CONFIG_HPP
 
 #include "Runner.hpp"
-#include <cxxopts.hpp>
+#include "fatigue/external/cxxopts.hpp"
 #include <memory>
 #include <regex>
 
@@ -33,7 +33,7 @@ struct Config final {
 
   Config();
   ~Config();
-  void loadFromCLI(int argc, char** argv);
+  void loadFromOpts(cxxopts::ParseResult const& res);
 
 public:
   bool showParamNames;

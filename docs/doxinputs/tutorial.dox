@@ -295,7 +295,7 @@ void customOptions(cxxopts::Options& opts) {
 }
 ~~~
 
-Then, we need to register options to ```ftg::fatigue``` class, through the constructor accepting a vector of ```ftg::options```. As this constructor is protected, we will have to derive from ```ftg::fatigue``` class.
+Then, we need to register options to ```ftg::fatigue``` class, through the constructor accepting a vector of ```ftg::fatigue::OptionsDeclarer```. As this constructor is protected, we will have to derive from ```ftg::fatigue``` class.
 
 ~~~{.cpp}
 

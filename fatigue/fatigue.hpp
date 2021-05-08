@@ -7,6 +7,7 @@
 
 #include "Config.hpp"
 #include "Suite.hpp"
+#include "external/cxxopts.hpp"
 #include <iterator>
 
 namespace ftg {
@@ -24,9 +25,14 @@ concept TestListBuilder = requires(T a)
   ->std::same_as<TestList>;
 };
 
-/** @brief fatigue structure, which is the top level class, registering tests and coordinating others. */
-struct fatigue {
 
+/** @brief fatigue structure, which is the top level class, registering tests and coordinating others. */
+class fatigue {
+
+  /** @brief Defines a class of function used to extend ftg::fatigue by declaring more objects. */
+  typedef void (*OptionsDeclarer)(cxxopts::Options&);
+
+public:
   /** @brief Constructor, meant to be called with ```main``` function arguments */
   fatigue(int argc, char** argv);
 
@@ -43,12 +49,17 @@ struct fatigue {
   /** @brief runs tests with current config */
   unsigned run() const;
 
-private:
-  TestList tests;
+protected:
+  /** @brief Constructor available for extension, allowing to set new CLI options through declarer */
+  fatigue(std::vector<OptionsDeclarer> const& newOpts, int argc, char** argv);
 
 protected:
-  std::unordered_map<std::string, std::unique_ptr<Runner>> runners;
-  Config config;
+  std::unordered_map<std::string, std::unique_ptr<Runner>> m_runners;
+  Config m_config;
+  cxxopts::ParseResult m_parsedOpts;
+
+private:
+  TestList tests;
 };
 
 

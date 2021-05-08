@@ -82,6 +82,12 @@ endif()
 #so files can be included as <skuldenka/...>
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
+
+
+add_custom_target(sync_external
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/cxxopts/include/cxxopts.hpp ${CMAKE_CURRENT_LIST_DIR}/fatigue/external/cxxopts.hpp
+                   COMMENT "Copying cxxopts header from submodule to external.")
+
 set(headers 
     fatigue/Checker.hpp
     fatigue/Config.hpp
@@ -93,6 +99,11 @@ set(headers
     fatigue/utils.hpp
 )
 
+set(headers_external
+    fatigue/external/cxxopts.hpp
+)
+
+
 set(sources
     fatigue/Checker.cpp
     fatigue/Config.cpp
@@ -102,7 +113,7 @@ set(sources
 )
 
 add_library(fatigue ${sources})
-
+add_dependencies(fatigue sync_external)
 
 
 #installing headers
