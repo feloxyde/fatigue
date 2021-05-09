@@ -108,6 +108,12 @@ In case values are maybe too hard to display, one may eventually use custom mess
 There are several options that can alter behavior of a check. If we look at the prototype of a check, we can see that it returns ```ftg::Check``` instance. 
 This instance allows use, through method chaining, to give more precision about what is the check. Please refer to the documentation of the class for better understanding. 
 
+For example, a check can have a hit for the logger to emphase it in report, with 
+
+~~~{.cpp}
+check_equal(a, 10).important(); //check is market as important.
+~~~
+
 Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page for more information.
 
 How checks are displayed depend on the runner chosen, however, it is likely that they will be reported by their index of appearance in the test. For example, 
@@ -119,14 +125,84 @@ check_true(false); //this will be reported as check n°2
 
 @section tutorial_cli Command line interface
 
-@subsection tutorial_runners Runners
+Test softwares built with fatigue allow to customize their ouput/run behavior using command lines interface options.
+These options are set using [jarro2783's cxxopts](https://github.com/jarro2783/cxxopts) syntax.
+Detail of options can be displayed using ```-h``` or ```--help``` option. 
+
+@subsection tutorial_cli_runners Runners 
+
+One of the key feature of fatigue is the ability to select different runners with ```-r runnername``` or ```--runner runnername```. Please note that 
+runners are not tied to support all options altering test execution behavior, and thus before using a runner it advised to check its behavior in corresponding documentation.
+
+@subsection tutorial_cli_filtering Select which tests to run
+
+One other convenient ability of fatigue is that some runners allow to select which tests shall run or not. It is done with three options : 
+
+- ```-s "regex"``` or ```--select "regex"``` option runs only tests whose identifier matches with the regex. 
+- ```-e "regex"``` or ```--exclude "regex"``` option runs only tests whose identifier does not matches with the regex.
+
+A test identifier is the name of the test, concatenated with names of the suites containing it, in order. Concatenation is done using a separator, which is ```//``` by default, 
+but can be set to something else using ```-c``` or ```--concat``` option. Regex syntax is the one of C++'s [regex](https://www.cplusplus.com/reference/regex/).
+
+For example, in our previously defined suite for ``avg``` function, test ```One``` identifier would be ```Avg//One```. To select it, one could use option ```--select "//One"```. To exclude it, one could use option ```--e "//One"```.
 
 @section advanced_testing Advanced testing
 
-@section tutorial_fixtures Fixtures
+fatigue assumes that one is the best knowing what is needed to test one's software. Because of this, it only tries to provide a solid base for building your own testing library, according to your own needs. This section gives few hints on how to use fatigue for specific test cases. 
 
-@section tutorial_heavy_tests Heavy resources tests
+@subsection tutorial_specifications Specification testing
 
+A specification test tries to answer totally or partially the question *Is my component matching requirements of a given interface ?*
+
+Such tests can be extremely complicated to make, since they involve handling any type they are given. 
+
+Let's have an example. Imagine we have the following interface : 
+ 
+\include specifications/Concat.hpp
+
+We can see that its specification is fairly hard to express through sole code, and a comment is needed to precise wanted behavior of the interface. We can enforce this behavior in implementing classes through providing specification tests : a test that we can apply to any subclass.
+
+First, we derive ```ftg::Test``` as a template, taking as a parameter a factory of the type we want to test. Let's write two tests like this.
+
+\include specifications/TestEmptyConcat.hpp
+
+\include specifications/TestManyConcat.hpp
+
+Then, we also write a templated suite.
+
+\include specifications/SpecsConcat.hpp 
+
+We can now write two implementations of the ```Concat``` interface, one based on ```std::list```, the other based on ```std::vector```.
+
+\include specifications/ConcreteConcat.hpp
+
+Finally, we simply need to write a Factory and register one instance of ```SpecsConcat``` in fatigue for each of these two ```Concat``` implementations.
+
+\include specifications/main_specs.cpp
+
+@subsection tutorial_fixtures Fixtures
+
+One may want share some fixtures between tests. In most cases, fixtures can simply be set as a member of a ```ftg::Test``` deriving class.
+
+\include fixtures/TestMemberFixture.hpp 
+
+However, in case of heavyweight fixtures, one may want to restrain their lifetime to the sole test run, by overloading ```load``` and ```unload``` methods.
+
+\include fixtures/TestLoadedFixture.hpp 
+
+```load``` and ```unload``` are ```noexcept``` and thus you are responsible for handling cases where something goes wrong. *Note that in a future iteration of fatigue, it should be possible to specify dependencies between tests, which should make loading and unloading of tests much easier.*
+
+Finally, in case of a fixture that has to be shared between a lot of tests, but is extremely costly to create, one can opt for a sharing resources through all tests of a suite.
+
+@subsection tutorial_execution Ruling execution order 
+
+**Preview, will only be actual when parallelism is introduced**
+
+By default, tests can be executed in a completely arbitrary order when parallelism is enabled. However, this can be changed by overriding methods from ```ftg::Test``` or ```ftg::Suite``` classes.
+
+- ```grouped()```, when returning ```true```, tells the runner that tests and suites within the suite shall be executed as close as possible in order. This is convenient in case of heavy shared ressources.
+- ```exclusive()```, when returning ```true```, tells the runner that the suite or test shall not be executed concurrently to another suite or test. Note that in the case of a suite, contained tests and suite are still allowed to run in parallel. Most runners will also enforce a *grouped* behavior if this option is set.
+- ```sequential()```, when returning ```true```, tells the runner that test and suites within the suite shall be executed in order, sequentially. This property is not recursive, which means that a contained suite can still run in parallel. In case of really small tests, it can also lead to better performance than allowing parallelism, depending on the runner. 
 
 
 @section extending Extending fatigue
