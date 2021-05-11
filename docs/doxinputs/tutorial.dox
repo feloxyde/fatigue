@@ -39,7 +39,7 @@ Then, create a build directory, change into it, and have cmake generate release 
 mkdir build
 cd build 
 cmake .. -DCMAKE_BUILD_TYPE=Release
-~~
+~~~
 
 Build target fatigue :
 

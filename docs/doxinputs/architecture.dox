@@ -6,8 +6,26 @@ in order to give a better understanding of how fatigue is built.
 
 \tableofcontents 
 
-@section architecture_overview Architecture overview
+@section architecture_repository Repository organization
 
+- **cmake_llvm_coverage** Git ubmodule for coverage using LLVM.
+- **cxxopts** Git submodule of [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts), for parsing command lines options.
+- **docs** Files related to doc 
+    - **doxinput** Directory containing doxygen pages
+- **doxygen-awesome-css** A git submodule of [jothepro's doxygen-awesome-css](https://jothepro.github.io/doxygen-awesome-css/) giving the neat appearance of the documentation you are currently reading.
+- **fatigue** Fatigue sources. Implementations files ```.cpp``` and headers ```.hpp``` are mixed.
+    - **external** (generated at cmake config time) directory to receive external headers and sources to be shipped with fatigue, as cxxopts.
+    - **runners** directory grouping runners 
+    - **templates** directory grouping test templates
+- **misc** a directory with various things, as logo 
+- **tests** directory holding tests 
+    - **install** Custom build to run tests with an installed fatigue version 
+    - **system** System tests
+    - **tutorial** System tests which are also used as examples in @ref tutorial "Tutorial".
+    - **unit** Unit tests, grouped by component.
+    - **utils** scripts and other testing tools.
+
+@section architecture_overview Architecture overview
 
 Overall, fatigue has three main parts :
 
@@ -16,6 +34,10 @@ Overall, fatigue has three main parts :
 - Config, allowing runners to alter their behavior based on CLI options. It is expressed through ```ftg::fatigue``` and ```ftg::Config``` classes and its components.
 
 \image html architecture/architecture_overview.svg "fatigue architecture overview"
+
+
+
+
 
 @section architecture_reporting Reporting mechanisms
 
@@ -188,4 +210,4 @@ Transcript of this sequence is as follows  :
     1.2 calls ```report``` method from ```Logger``` of the checker with right informations to report. 
 */
 
-@section architecture_main Main class and options
+
