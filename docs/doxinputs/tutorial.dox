@@ -1,6 +1,87 @@
 /** @page tutorial Tutorial 
 
-@section Installing
+@section installation Installation
+
+To use fatigue, you can either use the library as submodule of your project or install it system-wide. 
+
+Depending on your operating system, fatigue may be available through package manager or other builtin installer.
+
+The following instructions on building and installing fatigue are targeted at Linux system, however, they should be possible to adapt to any other system as fatigue does not have heavy requirements. 
+
+@subsection installation_requirements Requirements
+
+- **CMake**
+- **Make** or any other build system handled by CMake, as **Ninja**
+- **Git**, for handling submodules 
+- a C++20-ready compiler.
+- (optional) **Python3** in case you want to run system tests 
+
+Note that fatigue uses [jarro2783's cxxopts](https://github.com/jarro2783/cxxopts) header-only to handle CLI options. The a copy of the header is provided by fatigue through install. 
+
+@subsection installation_build Build
+
+Once dependencies are installed, clone repository. 
+
+~~~
+git clone https://gitlab.com/feloxyde/fatigue
+~~~
+
+Change into project directory and update-init submodules.
+
+~~~
+cd fatigue
+git submodule init --recursive
+~~~
+
+Then, create a build directory, change into it, and have cmake generate release build configuration.
+
+~~~
+mkdir build
+cd build 
+cmake .. -DCMAKE_BUILD_TYPE=Release
+~~
+
+Build target fatigue :
+
+~~~
+cmake --build . fatigue
+~~~
+
+Optionally, build can be tested by building default target and then run tests : 
+
+~~~
+cmake --build .
+cmake --build . --target test
+~~~
+
+@subsection installation_install Install
+
+Once fatigue is built using one of the two ways mentionned before, run install target with according permissions.
+
+~~~
+sudo cmake --build . --target install
+~~~
+
+Fatigue should now be installed on your computer, likely under ```/usr/local/lib``` and ```/usr/local/include```.
+
+Optionally, install can be tested by changing into ```tests/install```, running CMake there, to build and run tests with installed library. 
+
+~~~
+cd ../tests/install
+mkdir build
+cd build 
+cmake ..
+cmake --build .
+cmake --build . --target test
+~~~
+
+@subsection installation_uninstall Uninstall 
+
+To uninstall fatigue, you will have to manually remove files created by installation.
+
+- ```libfatigue.*``` binary, probably found in ```/usr/local/lib```.
+- ```fatigue/``` headers directory, probably found in ```/usr/local/include```.
+
 
 @section quick_example Quick example
 
@@ -242,7 +323,7 @@ Now, we want to see how to use our runner. This will be seen in section @ref tut
 
 @subsection tutorial_extending_cli Using and adding CLI options 
 
-As mentionned before, fatigue allows user to alter behavior of the test software through command lines options. Options are parsed using [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts).
+As mentionned before, fatigue allows user to alter behavior of the test software through command lines options. Options are parsed using [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts). 
 
 Now, how to add options. In this example, we will add the custom runner we made in section @ref tutorial_extending_runners "Creating custom runner" in the runner pool, as well as an option to select the fastest available runner (that we assume to be our ```TrivialRunner```).
 
