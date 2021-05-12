@@ -96,6 +96,11 @@ DefaultRunner::~DefaultRunner()
 }
 
 
+std::unordered_set<std::string> DefaultRunner::supportedOptions() const
+{
+  return {Config::options::shownames, Config::options::showtypes, Config::options::select, Config::options::exclude};
+}
+
 unsigned DefaultRunner::run(TestList const& tests)
 {
   m_ostream << "---------------------------" << std::endl;

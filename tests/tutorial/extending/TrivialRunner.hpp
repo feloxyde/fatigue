@@ -3,6 +3,8 @@
 
 #include "fatigue/Runner.hpp"
 #include <fatigue/fatigue.hpp>
+#include <string>
+#include <unordered_set>
 
 /* The overall idea of this trivial runner is : 
   - run tests. 
@@ -13,6 +15,12 @@ struct TrivialRunnerFail {
 
 class TrivialRunner : public ftg::Logger, public ftg::Runner {
 public:
+  /* Method from Runner. 
+    Implement in order to tell which runner-targeted options are supported by the runner
+    Empty in our case, since we don't support any runner-targed option
+  */
+  virtual std::unordered_set<std::string> supportedOptions() const { return std::unordered_set<std::string>(); }
+
   /* Method from Logger. 
     Implement in order to receive messages from Checker when running tests
     note that arg names are commented out to prevent compiler unused variable warning,

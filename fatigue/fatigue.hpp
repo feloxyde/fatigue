@@ -9,6 +9,7 @@
 #include "Suite.hpp"
 #include "external/cxxopts.hpp"
 #include <iterator>
+#include <ostream>
 
 namespace ftg {
 
@@ -34,7 +35,7 @@ class fatigue {
 
 public:
   /** @brief Constructor, meant to be called with ```main``` function arguments */
-  fatigue(int argc, char** argv);
+  fatigue(int argc, char** argv, std::ostream& out = std::cout);
 
   /** @brief declares a suite */
   fatigue& declare(std::unique_ptr<Suite> suite);
@@ -51,29 +52,33 @@ public:
 
 protected:
   /** @brief Constructor available for extension, allowing to set new CLI options through declarer */
-  fatigue(std::vector<OptionsDeclarer> const& newOpts, int argc, char** argv);
+  fatigue(std::vector<OptionsDeclarer> const& newOpts, int argc, char** argv, std::ostream& out = std::cout);
 
 protected:
   std::unordered_map<std::string, std::unique_ptr<Runner>> m_runners;
   Config m_config;
   cxxopts::ParseResult m_parsedOpts;
+  /** @brief outstream used for output, for runners supporting custom output */
+  std::ostream& m_out;
 
 private:
-  TestList tests;
+  TestList m_tests;
 };
 
+/**
+@}
+*/
+
+/* IMPLEMENTATION */
 
 template<TestListBuilder Builder>
 fatigue& fatigue::declare(Builder b)
 {
   auto testlist = b();
-  tests.insert(tests.end(), std::make_move_iterator(testlist.begin()), std::make_move_iterator(testlist.end()));
+  m_tests.insert(m_tests.end(), std::make_move_iterator(testlist.begin()), std::make_move_iterator(testlist.end()));
   return *this;
 }
 
-/**
-@}
-*/
 
 } // namespace ftg
 

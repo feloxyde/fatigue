@@ -44,20 +44,41 @@ Config::~Config()
 
 void Config::loadFromOpts(cxxopts::ParseResult const& res)
 {
-  showParamNames = res["shownames"].as<bool>();
-  showParamTypes = res["showtypes"].as<bool>();
 
-  runner = res["runner"].as<std::string>();
-
-  if (res["select"].count()) {
-    filter.select = res["select"].as<std::string>();
+  showParamNames = res[options::shownames].as<bool>();
+  if (showParamNames) {
+    m_options.emplace(options::shownames);
   }
 
-  if (res["exclude"].count()) {
-    filter.exclude = res["exclude"].as<std::string>();
+  showParamTypes = res[options::showtypes].as<bool>();
+  if (showParamTypes) {
+    m_options.emplace(options::showtypes);
+  }
+
+  runner = res[options::runner].as<std::string>();
+
+  if (res[options::select].count()) {
+    filter.select = res[options::select].as<std::string>();
+    m_options.emplace(options::select);
+  }
+
+  if (res[options::exclude].count()) {
+    m_options.emplace(options::exclude);
+    filter.exclude = res[options::exclude].as<std::string>();
   }
 
   //listing runners
+}
+
+std::unordered_set<std::string> const& Config::options() const
+{
+  return m_options;
+}
+
+
+void Config::setOption(std::string const& option)
+{
+  m_options.emplace(option);
 }
 
 } // namespace ftg

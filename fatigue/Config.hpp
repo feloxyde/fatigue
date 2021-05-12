@@ -7,6 +7,7 @@
 #include "fatigue/external/cxxopts.hpp"
 #include <memory>
 #include <regex>
+#include <unordered_set>
 
 namespace ftg {
 //fixme need to use regex, check if a regex can be negated, and policy to combine multiple filter ???
@@ -31,16 +32,35 @@ struct Filter final {
 /** @brief Configuration used by fatigue and runners to change their behavior. */
 struct Config final {
 
+  struct options {
+    static constexpr char shownames[] = "shownames";
+    static constexpr char showtypes[] = "showtypes";
+
+    static constexpr char select[] = "select";
+    static constexpr char exclude[] = "exclude";
+
+    static constexpr char runner[] = "runner";
+  };
+
+public:
   Config();
   ~Config();
+
   void loadFromOpts(cxxopts::ParseResult const& res);
+
+  std::unordered_set<std::string> const& options() const;
+  void setOption(std::string const& option);
 
 public:
   bool showParamNames;
   bool showParamTypes;
   std::string runner;
   Filter filter;
+
+private:
+  std::unordered_set<std::string> m_options;
 };
+
 
 } // namespace ftg
 

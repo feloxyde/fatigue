@@ -5,8 +5,10 @@
 
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <string>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -22,6 +24,7 @@ typedef std::vector<std::variant<std::unique_ptr<Test>, std::unique_ptr<Suite>>>
 /** @brief Interface to define a test Runner, which should take care of running a TestList, recursively. */
 struct Runner {
   virtual ~Runner(){};
+  virtual std::unordered_set<std::string> supportedOptions() const = 0;
   virtual unsigned run(TestList const& tests) = 0;
 };
 

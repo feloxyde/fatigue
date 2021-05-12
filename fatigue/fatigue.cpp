@@ -1,25 +1,49 @@
 #include "fatigue.hpp"
 #include "Runner.hpp"
+#include "fatigue/Config.hpp"
 #include "runners/DefaultRunner.hpp"
 #include <memory>
+#include <ostream>
+#include <unordered_set>
 
 namespace ftg {
 
-fatigue::fatigue(int argc, char** argv) : fatigue(std::vector<fatigue::OptionsDeclarer>(), argc, argv)
+fatigue::fatigue(int argc, char** argv, std::ostream& out) :
+    fatigue(std::vector<fatigue::OptionsDeclarer>(), argc, argv, out)
 {
 }
 
 fatigue& fatigue::declare(std::unique_ptr<Suite> suite)
 {
-  tests.push_back(std::move(suite));
+  m_tests.push_back(std::move(suite));
   return *this;
 }
 
 fatigue& fatigue::declare(std::unique_ptr<Test> test)
 {
-  tests.push_back(std::move(test));
+  m_tests.push_back(std::move(test));
   return *this;
 }
+
+/** @brief checks that options set in config are all supported by runner 
+   
+   @returns true if all OK, false otherwise
+*/
+static bool verify_options(std::ostream& out, Config const& conf, Runner const& runner, std::string const& rname)
+{
+  bool ok = true;
+  std::unordered_set<std::string> supportedOpts = runner.supportedOptions();
+
+  for (auto const& opt : conf.options()) {
+    if (supportedOpts.count(opt) < 1) {
+      out << "Error : runner [" << rname << "] : [" << opt << "] option not supported" << std::endl;
+      ok = false;
+    }
+  }
+
+  return ok;
+}
+
 
 unsigned fatigue::run() const
 {
@@ -31,7 +55,12 @@ unsigned fatigue::run() const
     }
     return -1;
   } else {
-    return m_runners.at(m_config.runner)->run(tests);
+    if (!verify_options(m_out, m_config, *(m_runners.at(m_config.runner)), m_config.runner)) {
+      m_out << "Error : unsupported options were sent to runner. Aborting." << std::endl;
+      return -2;
+    }
+
+    return m_runners.at(m_config.runner)->run(m_tests);
   }
 }
 
@@ -49,7 +78,9 @@ static void defaultOptions(cxxopts::Options& opts)
 }
 
 
-fatigue::fatigue(std::vector<fatigue::OptionsDeclarer> const& newOpts, int argc, char** argv) : m_config()
+fatigue::fatigue(std::vector<fatigue::OptionsDeclarer> const& newOpts, int argc, char** argv, std::ostream& out) :
+    m_config(),
+    m_out(out)
 {
   std::vector<fatigue::OptionsDeclarer> opts;
   opts.push_back(defaultOptions);
@@ -65,7 +96,7 @@ fatigue::fatigue(std::vector<fatigue::OptionsDeclarer> const& newOpts, int argc,
 
   m_config.loadFromOpts(m_parsedOpts);
 
-  m_runners.emplace("default", std::make_unique<DefaultRunner>(std::cout, m_config));
+  m_runners.emplace("default", std::make_unique<DefaultRunner>(m_out, m_config));
 }
 
 

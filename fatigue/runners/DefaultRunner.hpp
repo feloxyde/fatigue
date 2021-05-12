@@ -18,6 +18,7 @@ namespace ftg {
   Not immune to segfault, but ensures portability. Prints logs sequentially to a ```std::ostream```.
 
 */
+
 struct DefaultLogger : public Logger {
 
   DefaultLogger(std::ostream& ostream, Config const& config);
@@ -49,6 +50,7 @@ public:
 struct DefaultRunner : public Runner {
   DefaultRunner(std::ostream& ostream, Config const& config);
   virtual ~DefaultRunner();
+  virtual std::unordered_set<std::string> supportedOptions() const;
   virtual unsigned run(TestList const& tests);
 
 
