@@ -44,27 +44,19 @@ int main()
   unsigned f = dr.run(suites);
   assert(f == 1);
 
-  res << "---------------------------" << std::endl;
   res << "------ RUNNING TESTS ------" << std::endl;
-  res << "---------------------------" << std::endl;
   res << std::endl;
+  res << "---- suite1//MockTest1:1" << std::endl;
+  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
   res << std::endl;
-  res << "##### suite1 #####" << std::endl;
-  res << std::endl;
-  res << "-- MockTest1:1 --" << std::endl;
-  res << "-- passed : out of 1 checks, 0 failed. --" << std::endl;
-  res << std::endl;
-  res << "-- MockTest4:0 --" << std::endl;
+  res << "---- suite1//MockTest4:0" << std::endl;
   res << "(1) [FATAL] expected check_true to succeed, but failed." << std::endl;
   res << "Test ended due to fatal check failing." << std::endl;
-  res << "-- failed : out of 1 checks, 1 failed. --" << std::endl;
+  res << "---- failed : out of 1 checks, 1 failed." << std::endl;
   res << std::endl;
-  res << std::endl;
-  res << "---------------------------" << std::endl;
   res << "---------- FAILED ---------" << std::endl;
   res << "ran : 2" << std::endl;
   res << "failed : 1" << std::endl;
-  res << "---------------------------" << std::endl;
   /* HERE TO HELP DEBUG */
   size_t i(0);
   while (i < res.str().size() && i < ss.str().size()) {
