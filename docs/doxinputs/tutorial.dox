@@ -1,5 +1,9 @@
 /** @page tutorial Tutorial 
 
+This page presents basic and advanced usage of fatigue framework. 
+
+\tableofcontents{html}
+
 @section installation Installation
 
 To use fatigue, you can either use the library as submodule of your project or install it system-wide. 

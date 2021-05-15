@@ -4,7 +4,7 @@ This page describes elements of fatigue's architecture and their rationales that
 in order to give a better understanding of how fatigue is built.
 
 
-\tableofcontents 
+\tableofcontents{html} 
 
 @section architecture_repository Repository organization
 

@@ -1,0 +1,46 @@
+/** 
+\mainpage
+
+
+@section fatigue_intro Introduction
+
+Hello there ! Welcome in the documentation of the *fatigue* testing framework. fatigue stands for Framework for Advanced Testing Inducing a Grotesque User Experience. Grotesque, because unlike most testing frameworks, it sacrifices a bit of simplicity to for flexibility and extensibility, having user handle test registration manually. Therefore, you probably want to use it only for what it is used for : extensive unit and integration testing, including component specification testing. 
+
+In summary, fatigue is a testing framework not frame user too much.
+
+\tableofcontents{html}
+
+@section main_contents Contents
+
+\ref tutorial "Tutorial" is an introduction on how to use fatigue. If you are new, you should probably start reading here.
+
+\ref user_api "User Api" documents user-targetted classes. This is complementary to tutorial.
+
+\ref checks "Checks" documents checks availables in the framework. 
+
+\ref architecture "Architecture" is an overview of how fatigue is structured, as well as some explanations of its non-trivial mechanisms. It is meant for people wanting to customize fatigue for their needs, but it can also interesting to look at it if you are a basic user.
+
+Namespaces, classes and files dropdowns gives you access to api and internal documentations of fatigue sources. Please bear in mind that internal documentation is *complementary* with the code, and thus you may have to observe the code a bit to fully understand fatigue's internals.
+
+\ref development "Development" provides guidelines regarding development practices of the project, and is aimed to people wanting to contribute to fatigue.
+
+@section main_license License and use
+
+Note that this section has no legal value, it is only a quick -and possibly inaccurate- summary of licensing through .
+
+External components, provided through git submodules, including, but not limited to, cmake_llvm_coverage, cxxopts and doxygen-awesome-css are under their respective licenses. Therefore, following mentions does not apply to them. 
+
+fatigue, its sources and documentation are under [MIT license](https://mit-license.org/). 
+All graphical resources, as for example SVG and ```.drawio``` files are under [CC-BY license](https://creativecommons.org/licenses/by/4.0/).  
+
+In case you use fatigue to test part of your software, it would be amazing to credit fatigue in some way, as for example to mention it in documentation. It is not mendatory tho. 
+
+@section main_contributors Maintainers and contributors
+
+Currently, fatigue has only one maintainer, Félix Bertoni, [felix.bertoni987@gmail.com](mailto:felix.bertoni987@gmail.com).
+
+@section main_links Useful links
+
+[fatigue's GitLab repository](https://gitlab.com/feloxyde/fatigue)
+
+*/
