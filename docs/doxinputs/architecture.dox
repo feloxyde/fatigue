@@ -210,4 +210,3 @@ Transcript of this sequence is as follows  :
     1.2 calls ```report``` method from ```Logger``` of the checker with right informations to report. 
 */
 
-@section architecture_cli Command line interface

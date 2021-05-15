@@ -342,4 +342,16 @@ We can now use ```fatigue_ex``` as a drop-in replacement for  ```fatigue``` :
 
 And of course, we can use ```-f``` or ```--fast``` option in the command line. 
 
+Note that if you add commands that are targeted to runner, if they are set through is is better to declare them using ```ftg::Config::setOption``` method, so automatic runner compatibility with CLI options will take them in account.
+
+~~~{.cpp}
+//in body of constructor of ftg::fatigue extension 
+
+if(m_parsedOpts.count("myrunneropt") > 0){
+    int myRunnerOpt = m_parsedOpts["myrunneropt"];
+    m_config.setOption("myrunneropt);
+}
+~~~
+
+
 */
