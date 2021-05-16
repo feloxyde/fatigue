@@ -1,92 +1,98 @@
+stages:
+  - test
+  - docs
+  - publish
+
 image: carterjones/manjaro
 
 include:
-    - template: Code-Quality.gitlab-ci.yml
+  - template: Code-Quality.gitlab-ci.yml
 
 code_quality:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
-    - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
   variables:
     REPORT_FORMAT: html
   artifacts:
-   #to be able to DL as artifact
+    #to be able to DL as artifact
     paths: [gl-code-quality-report.html]
 
+before_script:
+  # updating
+  - sudo pacman --noconfirm -Syu
+  # installing dependencies
+  - sudo pacman --noconfirm -S clang make cmake doxygen graphviz
+  # pulling submodules
+  - git submodule update --init --recursive
+
 test:
+  stage: test
+  script:
+    - mkdir build
+    - cd build
+    - cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug
+    - make
+    - make test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
-    - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
-  stage: test
-  before_script: 
-     #installing dependencies 
-     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake
-     #pulling submodule 
-     - git submodule update --init --recursive
-     - mkdir build
-     - cd build
-     #pulling cxxopts from its repos and installing it. 
-     - git clone https://github.com/jarro2783/cxxopts
-     #as it is header only, just copy header lol.
-     - cp cxxopts/include/cxxopts.hpp /usr/include/
-     - cmake ..
-     - make 
-  script: 
-     - make test
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
 
 coverage:
+  stage: test
+  script:
+    - mkdir build
+    - cd build
+    - cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug
+    - make
+    - make test
+    - make coverage_all_txt
+    - echo "coverage" "$(tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1)"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
-    - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
-  stage: test
-  before_script: 
-     #installing dependencies 
-     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake llvm
-     #pulling submodule 
-     - git submodule update --init --recursive
-     - mkdir build
-     - cd build
-     #pulling cxxopts from its repos and installing it. 
-     - git clone https://github.com/jarro2783/cxxopts
-     #as it is header only, just copy header lol.
-     - cp cxxopts/include/cxxopts.hpp /usr/include/
-     - cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug
-     - make 
-     - make test
-     - make coverage_all_txt
-  script: 
-     - echo "coverage" "$(tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1)"
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
 
 install:
+  stage: test
+  before_script:
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=Release
+    - cmake --build . --target fatigue
+    # installing
+    - sudo cmake --build . --target install
+    # preparing tests
+    - cd ../tests/install
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cmake --build .
+  script:
+    - cmake --build . --target test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"'                # Run job1 in pipelines on the master branch (but not in other branch pipelines)
-    - if: '$CI_COMMIT_TAG'                               # Run job1 in pipelines for tags
-  stage: test
-  before_script: 
-     #installing dependencies 
-     - sudo pacman -Syu --noconfirm && sudo pacman --noconfirm -S clang make cmake
-     #pulling submodule 
-     - git submodule update --init --recursive
-     - mkdir build
-     - cd build
-     #pulling cxxopts from its repos and installing it. 
-     - git clone https://github.com/jarro2783/cxxopts
-     #as it is header only, just copy header lol.
-     - cp cxxopts/include/cxxopts.hpp /usr/include/
-     # building
-     - cmake .. -DCMAKE_BUILD_TYPE=Release 
-     - cmake --build . --target fatigue
-     # installing
-     - sudo cmake --build . --target install
-     # preparing tests
-     - cd ../tests/install
-     - mkdir build
-     - cd build
-     - cmake .. 
-     - cmake --build .
-  script: 
-     - cmake --build . --target test
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
+
+doc:
+  stage: docs
+  script:
+    - doxygen Doxyfile
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
+    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
+
+pages:
+  stage: publish
+  script:
+    - doxygen Doxyfile
+    - mkdir public
+    - mv build/docgen/html/ public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
