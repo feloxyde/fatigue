@@ -89,7 +89,7 @@ install:
     - .build_rel_dependencies
     - .rules_all
   stage: test
-  before_script:
+  script:
     - mkdir build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -102,7 +102,6 @@ install:
     - cd build
     - cmake ..
     - cmake --build .
-  script:
     - cmake --build . --target test
 
 doc:
