@@ -8,10 +8,27 @@ image: carterjones/manjaro
 include:
   - template: Code-Quality.gitlab-ci.yml
 
+# PREPARING IMAGE
+.build_dev_dependencies:
+  before_script:
+    - sudo pacman --noconfirm -Syu
+    - sudo pacman --noconfirm -S clang make cmake llvm 
+    - git submodule update --init --recursive
+
+.build_rel_dependencies:
+  before_script:
+    - sudo pacman --noconfirm -Syu
+    - sudo pacman --noconfirm -S make cmake gcc
+    - git submodule update --init --recursive
+.doc_dependencies:
+  before_script:
+    - sudo pacman --noconfirm -Syu
+    - sudo pacman --noconfirm -S doxygen graphviz
+
 code_quality:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the stable branch (but not in other branch pipelines)
     - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
   variables:
     REPORT_FORMAT: html
@@ -19,15 +36,9 @@ code_quality:
     #to be able to DL as artifact
     paths: [gl-code-quality-report.html]
 
-before_script:
-  # updating
-  - sudo pacman --noconfirm -Syu
-  # installing dependencies
-  - sudo pacman --noconfirm -S clang make cmake llvm doxygen graphviz
-  # pulling submodules
-  - git submodule update --init --recursive
 
 test:
+  extends : .build_dev_dependencies
   stage: test
   script:
     - mkdir build
@@ -36,11 +47,12 @@ test:
     - make
     - make test
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
-    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run n pipelines on the stable branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
-coverage:
+coverage: 
+  extends : .build_dev_dependencies
   stage: test
   script:
     - mkdir build
@@ -51,11 +63,12 @@ coverage:
     - make coverage_all_txt
     - echo "coverage" "$(tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1)"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
-    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run in pipelines on the master branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
-install:
+install: 
+  extends : build_rel_dependencies
   stage: test
   before_script:
     - mkdir build
@@ -73,19 +86,21 @@ install:
   script:
     - cmake --build . --target test
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
-    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run in pipelines on the stable branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
 doc:
+  extends : .doc_dependencies
   stage: docs
   script:
     - doxygen Doxyfile
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run job1 in merge request pipelines
-    - if: "$CI_COMMIT_TAG" # Run job1 in pipelines for tags
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
+    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
 pages:
+  extends : .doc_dependencies
   stage: publish
   script:
     - doxygen Doxyfile
@@ -95,4 +110,4 @@ pages:
     paths:
       - public
   rules:
-    - if: '$CI_COMMIT_BRANCH == "stable"' # Run job1 in pipelines on the master branch (but not in other branch pipelines)
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run in pipelines on the stable branch (but not in other branch pipelines)
