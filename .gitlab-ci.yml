@@ -110,7 +110,9 @@ doc:
     - .doc_dependencies
     - .rules_all_but_stable
   stage: docs
-  script:
+  script:    
+    - mkdir build
+    - mkdir build/docgen
     - doxygen Doxyfile
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
@@ -122,6 +124,8 @@ pages:
     - .rules_stable_only
   stage: publish
   script:
+    - mkdir build
+    - mkdir build/docgen
     - doxygen Doxyfile
     - mkdir public
     - mv build/docgen/html/ public/
