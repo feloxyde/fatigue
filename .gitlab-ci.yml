@@ -23,7 +23,7 @@ before_script:
   # updating
   - sudo pacman --noconfirm -Syu
   # installing dependencies
-  - sudo pacman --noconfirm -S clang make cmake doxygen graphviz
+  - sudo pacman --noconfirm -S clang make cmake llvm doxygen graphviz
   # pulling submodules
   - git submodule update --init --recursive
 
