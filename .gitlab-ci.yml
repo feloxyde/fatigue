@@ -48,14 +48,15 @@ include:
 ## JOBS ##
 
 code_quality:
-  extends:
-    - .rules_all
   variables:
     REPORT_FORMAT: html
   artifacts:
     #to be able to DL as artifact
     paths: [gl-code-quality-report.html]
-
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
+    - if: '$CI_COMMIT_BRANCH == "stable"' # Run n pipelines on the stable branch (but not in other branch pipelines)
+    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
 test:
   extends: 
