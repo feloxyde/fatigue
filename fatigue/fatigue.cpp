@@ -2,6 +2,7 @@
 #include "Runner.hpp"
 #include "fatigue/Config.hpp"
 #include "runners/DefaultRunner.hpp"
+#include <cstdlib>
 #include <memory>
 #include <ostream>
 #include <unordered_set>
@@ -69,9 +70,12 @@ static void defaultOptions(cxxopts::Options& opts)
 {
   // clang-format off
  opts.add_options()
-  ("t,showtypes", "show parameter types when displaying checks results", cxxopts::value<bool>()->default_value("false"))
-  ("n,shownames", "show parameter names when displaying checks results", cxxopts::value<bool>()->default_value("false"))
-  ("r,runner","selects which runner to use to conduct tests", cxxopts::value<std::string>()->default_value("default"))
+  ("h,help","displays list of command line options", cxxopts::value<bool>())
+  ("r,runner","selects which runner to use to conduct tests", cxxopts::value<std::string>()->default_value("default"));
+
+ opts.add_options("runner setup")
+  ("t,showtypes", "show parameter types when displaying checks results", cxxopts::value<bool>())
+  ("n,shownames", "show parameter names when displaying checks results", cxxopts::value<bool>())
   ("s,select", "runs tests matching a regular expression", cxxopts::value<std::string>())
   ("e,exclude", "excludes tests matching a regular expression", cxxopts::value<std::string>());
   // clang-format on
@@ -86,13 +90,19 @@ fatigue::fatigue(std::vector<fatigue::OptionsDeclarer> const& newOpts, int argc,
   opts.push_back(defaultOptions);
   opts.insert(opts.end(), newOpts.begin(), newOpts.end());
 
-  cxxopts::Options options("Fatigue built test software", "You are supposed to know this btw.");
+  cxxopts::Options options("this_software",
+			   "This software is a fatigue built test software. You are supposed to know this btw.");
 
   for (auto const& o : opts) {
     o(options);
   }
 
   m_parsedOpts = options.parse(argc, argv);
+
+  if (m_parsedOpts.count("help") > 0) {
+    std::cout << options.help() << std::endl;
+    exit(EXIT_SUCCESS);
+  }
 
   m_config.loadFromOpts(m_parsedOpts);
 

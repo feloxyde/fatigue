@@ -22,3 +22,11 @@ ADD_COVERED_TEST(test_select_ostream
 ADD_COVERED_TEST(test_select_exclude_ostream 
     CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --select 'suite3//.*|suite2.*//.*:0' --exclude '.*3:0.*'" ${test_sys_dir}/test_select_exclude_ostream.expected
     SUITE ts_fatigue_system)
+
+ADD_COVERED_TEST(test_fatigue_help_other_options
+    CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue -n -h -s '.*Test.*'" ${test_sys_dir}/test_fatigue_help_other_options.expected
+    SUITE ts_fatigue_system)
+
+ADD_COVERED_TEST(test_fatigue_help
+    CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --help" ${test_sys_dir}/test_fatigue_help.expected
+    SUITE ts_fatigue_system)
