@@ -1,0 +1,135 @@
+/** \page development Development
+
+This page is addressed to developers who want to contribute to fatigue, and presents coding documentation conventions, as well as tools to build in debug mode. 
+
+Following guidelines are meant to be adapted to capacities of contributors. In case you have such a constraint (disability, time limitations, ...) that makes it hard or impossible for you to follow one of the guidelines, and still want to contribute, you are welcome ! Please state you which points you were constrained on in your merge requests, that way we can skip them at review time and let other people handle them once request is validated.
+
+\tableofcontents{html}
+
+@section development_environement Environment 
+
+In order to build the program for development, you will need : 
+
+- **clang** or **clang++** as compiler to compile with clang coverage
+- **llvm-profdata** to process raw coverage files
+- **llvm-cov** to generate report
+- **llvm-cxxflit** to demangle names, especially templates ones
+
+@subsection environment_debug Debug build 
+
+Building project for debug is quite straightfoward : simply invoke CMake with build type set as ```Debug```. 
+ 
+~~~
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+~~~
+
+@subsection environment_coverage Test coverage analysis
+
+To gather coverage informations, project requires a rebuild with coverage flags enabled. It also **requires** clang to be chosen as compiler. Please note that build type shall be debug as well
+
+~~~
+cmake .. -DENABLE_LLVM_COVERAGE=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug
+~~~
+
+Test registration is performed through ```LLVMCoverage.cmake``` library provided by ```cmake_llvm_coverage``` submodule. A readme file within in the submodule explains how it works.
+
+Once project is rebuilt, run all tests using ```test``` or ```testo``` target. It should create a ```llvmcoverage``` directory in the current build directory, with ```.profraw``` files in it corresponding to each test. 
+
+Finally, there are two coverage targets you can run to get coverage report : 
+```
+make coverage_all_txt
+OR 
+make coverage_all_html
+```
+
+Respectively building a text summary ```coverage_all.txt``` and a detailed html report ```coverage_all.html``` in ```llvmcoverage``` directory. 
+
+
+
+@section develomment_coding_conventions Coding conventions
+
+To keep the code visually coherent and make it easier for maintainers to work on it in the future, please try to stick as much as possible with following style :
+
+Any C/C++ code shall be formatted with the ```.clang-format``` at the root of the directory, which is LLVM style with few tweaks. 
+
+All code has to be encased within ```ftg``` namespace, without any nesting. 
+
+Code shall aim to be expressive and concise. For example, getters and setters for ```T member``` shall be ```T member()``` and ```void member(T)```.
+
+- ```UpperCamelCase``` is used for type-related entities : classes, templates type parameters, concepts, ...
+- ```lowerCamelCase``` is used for everything else, especially value-like entities : variables, members, functions.
+- An ```m_``` prefix is used for private (and eventually protected) members of classes, which allows to name their getter/setters with their non-private name.
+- ```snake_case``` is used for checks in ```ftg::Test``` and derived classes.
+- ```UPPER_UNDERSCORE_CASE``` is used for macros. But there should be no macro in code, unless they are absolutely needed for a relevant feature, as for example portability.
+- C++ Header files have a ```.hpp``` extension and C++ modules files have a ```.cpp``` extension. This differentiates C++ from C files.
+- ```struct``` are used when members are all public, as for example for defining an interface, ```class``` is used otherwise. 
+
+In addition, try to stick to [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
+
+@section development_testing_and_arch Testing and architecture
+
+Sources files, both headers and definitions, shall go into ```fatigue/``` directory. Headers have to be listed in the CMake file as headers of ```fatigue``` library.
+
+A particular care has to be put into decoupling, especially between interface and applicative code, to allow flexibility and refined unit or integration testing. 
+
+As an example, instead of 
+
+~~~cpp
+void runTest(){
+    std::cout << ...;
+}
+~~~
+one shall write
+
+~~~cpp
+void runTest(std::ostream& out){
+    out << ...;
+}
+~~~
+
+Behavior not involving IO shall be enforced with unit and integration testing as much as possible.
+
+Additionally, system level testing is welcome, and is mandatory for behavior involving IO.
+
+Tests shall be registered using CMake utility ```LLVMCoverage.cmake``` defined in submodule ```cmake_llvm_coverage```. 
+Additionally, tests shall refer to sources as global includes ```#include <...>``` to allow post-install testing.
+
+For now, code quality requirements are decided by human review. Automated tools will be added later. 
+If you follow C++ Code Guidelines, it should be OK.
+
+Additionally, when compiling with ```-Wall -Wextra```, no warning shall be triggered. Those flags are activated in all cmake build type, and ```Debug``` enables ```-Werror``` as well.
+
+
+@section development_documentation Documentation 
+
+Code shall be documented. Documentation is meant to be concise, and is **complementary** with code, to help making it easier to maintain.
+
+Documentation incode is written using Doxygen comments ```/** */```. 
+
+Additional documentation shall be put into ```.dox``` files in ```docs/doxinputs``` directory, and added to doxygen layout if needed.
+
+Documentation shall document what is not trivial enough to understand by solely looking at the code with a reasonnable amount of effort. For example documentation of the following function (invented on purpose) : 
+
+~~~{.cpp}
+Docs write_documentation(bool sign);
+~~~
+
+Does not need to precise that the function returning a newly written doc, however, some precisions on how the ```sign``` boolean affects created doc. 
+
+Also, keep in mind that, as fatigue is open source and free software, users do have access to the code. Therefore, trivial-in-code behaviors do not require to be precisely documented. 
+
+Finally, API targetted at end user shall be added to the @ref user_api "user api" group, using identifier ```user_api```. Those API components may eventually accept more documentation.
+
+@section develoment_other Other 
+
+Aside code, prefer text-based file formats over binaries for contributions, as for example SVG for graphics, as they are lighter to handle for git and keep repository light as well for people to download.
+
+You are highly encouraged to inform me at  [felix.bertoni987@gmail.com](mailto:felix.bertoni987@gmail.com) if you fork or intend to contribute to the project, 
+so we can discuss about it. 
+
+Contributions are supposed to be forked from ```dev``` branch and merged back in it when done. All tests and full CI shall be passing to merge.
+
+In case you are not sure about what you've done, or if you want to have feedback during your implementation, simply start a draft merge request.
+
+
+*/

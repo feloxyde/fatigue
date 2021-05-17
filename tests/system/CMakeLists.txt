@@ -3,7 +3,7 @@ ADD_TEST_SUITE(ts_fatigue_system)
 add_executable(test_fatigue test_fatigue.cpp)
 target_link_libraries(test_fatigue fatigue)
 
-set (comp_py ${CMAKE_CURRENT_LIST_DIR}/compare.py)
+set (comp_py ${CMAKE_CURRENT_LIST_DIR}/../utils/compare.py)
 set (test_sys_dir ${CMAKE_CURRENT_LIST_DIR})
 
 

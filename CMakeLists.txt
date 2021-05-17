@@ -82,6 +82,10 @@ endif()
 #so files can be included as <skuldenka/...>
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fatigue/external)
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/cxxopts/include/cxxopts.hpp DESTINATION ${CMAKE_CURRENT_LIST_DIR}/fatigue/external)
+
 set(headers 
     fatigue/Checker.hpp
     fatigue/Config.hpp
@@ -93,6 +97,10 @@ set(headers
     fatigue/utils.hpp
 )
 
+set(headers_external
+    fatigue/external/cxxopts.hpp
+)
+
 set(sources
     fatigue/Checker.cpp
     fatigue/Config.cpp
@@ -102,7 +110,6 @@ set(sources
 )
 
 add_library(fatigue ${sources})
-
 
 
 #installing headers

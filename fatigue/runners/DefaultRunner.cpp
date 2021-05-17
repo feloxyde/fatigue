@@ -19,13 +19,18 @@ DefaultLogger::~DefaultLogger()
 {
 }
 
-void DefaultLogger::checkFailed(MessageMode mode,
-				std::string const& description,
-				std::vector<ParamInfo> const& params,
-				bool expected,
-				bool result,
-				bool important)
+void DefaultLogger::report(MessageMode mode,
+			   std::string const& description,
+			   std::vector<ParamInfo> const& params,
+			   bool expected,
+			   bool result,
+			   bool important)
 {
+  if (expected == result) {
+    m_checkPassed++;
+    return;
+  }
+
   m_checkFailed++;
 
   if (important) {
@@ -72,11 +77,6 @@ void DefaultLogger::checkFailed(MessageMode mode,
   }
 }
 
-void DefaultLogger::checkPassed()
-{
-  m_checkPassed++;
-}
-
 bool DefaultLogger::passed() const
 {
   return m_passed;
@@ -96,17 +96,20 @@ DefaultRunner::~DefaultRunner()
 }
 
 
+std::unordered_set<std::string> DefaultRunner::supportedOptions() const
+{
+  return {Config::options::shownames, Config::options::showtypes, Config::options::select, Config::options::exclude};
+}
+
 unsigned DefaultRunner::run(TestList const& tests)
 {
-  m_ostream << "---------------------------" << std::endl;
   m_ostream << "------ RUNNING TESTS ------" << std::endl;
-  m_ostream << "---------------------------";
 
   //running suites
   std::vector<std::string> prefixes;
   dispatchTestList(tests, prefixes);
 
-  m_ostream << std::endl << std::endl << std::endl << "---------------------------" << std::endl;
+  m_ostream << std::endl;
   if (totalFailed == 0) {
     m_ostream << "---------- PASSED ---------" << std::endl;
   } else {
@@ -119,7 +122,6 @@ unsigned DefaultRunner::run(TestList const& tests)
   if (totalSkipped != 0) {
     m_ostream << "skipped : " << totalSkipped << std::endl;
   }
-  m_ostream << "---------------------------" << std::endl;
 
   return totalFailed;
 }
@@ -140,24 +142,33 @@ void DefaultRunner::dispatchTestList(TestList const& tests, std::vector<std::str
 
 void DefaultRunner::runSuite(std::unique_ptr<Suite> const& suite, std::vector<std::string> const& prefixes)
 {
-
-  m_ostream << std::endl << std::endl << std::endl;
-  m_ostream << "##### " << suite->name() << " #####";
-
   std::vector<std::string> pre = prefixes;
   pre.push_back(suite->name());
   dispatchTestList(suite->tests(), pre);
 }
 
+static std::string
+formatTestName(std::vector<std::string> const& prefixes, std::string const& name, std::string const& separator)
+{
+  std::string str;
+  for (auto const& p : prefixes) {
+    str += p + separator;
+  }
+  str += name;
+
+  return str;
+}
 
 void DefaultRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes)
 {
+  std::string tname = formatTestName(prefixes, test->name(), m_config.filter.separator);
+
+  m_ostream << std::endl << "---- " << tname << std::endl;
   if (!m_config.filter.shouldRun(prefixes, test->name())) {
-    m_ostream << std::endl << std::endl << "-- " << test->name() << " -- (skipped)" << std::endl;
+    m_ostream << "skipped." << std::endl;
     totalSkipped++;
     return;
   }
-  m_ostream << std::endl << std::endl << "-- " << test->name() << " --" << std::endl;
 
 
   if (test->load()) {
@@ -167,7 +178,8 @@ void DefaultRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::
       totalFailed++;
     }
   } else {
-    m_ostream << "-- failed : error during load phase --";
+    m_ostream << "---- failed : "
+	      << "error during load phase." << std::endl;
     totalFailed++;
   }
 }
@@ -194,14 +206,15 @@ bool DefaultRunner::runLoadedTest(std::unique_ptr<Test> const& t)
   }
 
   if (exceptPass && otl.passed()) {
-    m_ostream << "-- passed : ";
+    m_ostream << "---- passed : ";
     passed = true;
   } else {
-    m_ostream << "-- failed : ";
+    m_ostream << "---- failed : ";
     passed = false;
   }
 
-  m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << " failed. --";
+  m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << " failed."
+	    << std::endl;
   return passed;
 }
 

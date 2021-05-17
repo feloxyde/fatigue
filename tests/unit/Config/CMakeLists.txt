@@ -2,7 +2,6 @@
 ADD_TEST_SUITE(ts_fatigue_unit_Config)
 
 set(unit_tests
-    Config.cpp
     Filter.cpp
 )
 

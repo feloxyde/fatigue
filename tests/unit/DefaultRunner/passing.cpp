@@ -67,30 +67,19 @@ int main()
   unsigned f = dr.run(suites);
   assert(f == 0);
 
-  res << "---------------------------" << std::endl;
   res << "------ RUNNING TESTS ------" << std::endl;
-  res << "---------------------------" << std::endl;
   res << std::endl;
+  res << "---- suite1//MockTest1:1" << std::endl;
+  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
   res << std::endl;
-  res << "##### suite1 #####" << std::endl;
+  res << "---- suite1//MockTest4:1" << std::endl;
+  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
   res << std::endl;
-  res << "-- MockTest1:1 --" << std::endl;
-  res << "-- passed : out of 1 checks, 0 failed. --" << std::endl;
+  res << "---- suite2//BoolTest" << std::endl;
+  res << "---- passed : out of 2 checks, 0 failed." << std::endl;
   res << std::endl;
-  res << "-- MockTest4:1 --" << std::endl;
-  res << "-- passed : out of 1 checks, 0 failed. --" << std::endl;
-  res << std::endl;
-  res << std::endl;
-  res << "##### suite2 #####" << std::endl;
-  res << std::endl;
-  res << "-- BoolTest --" << std::endl;
-  res << "-- passed : out of 2 checks, 0 failed. --" << std::endl;
-  res << std::endl;
-  res << std::endl;
-  res << "---------------------------" << std::endl;
   res << "---------- PASSED ---------" << std::endl;
   res << "ran : 3" << std::endl;
-  res << "---------------------------" << std::endl;
   /* HERE TO HELP DEBUG */
   size_t i(0);
   while (i < res.str().size() && i < ss.str().size()) {

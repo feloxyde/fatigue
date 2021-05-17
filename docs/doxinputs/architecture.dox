@@ -1,0 +1,212 @@
+/** \page architecture Architecture
+
+This page describes elements of fatigue's architecture and their rationales that aren't forcibly easy to get while looking at the code, 
+in order to give a better understanding of how fatigue is built.
+
+
+\tableofcontents{html} 
+
+@section architecture_repository Repository organization
+
+- **cmake_llvm_coverage** Git ubmodule for coverage using LLVM.
+- **cxxopts** Git submodule of [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts), for parsing command lines options.
+- **docs** Files related to doc 
+    - **doxinput** Directory containing doxygen pages
+- **doxygen-awesome-css** A git submodule of [jothepro's doxygen-awesome-css](https://jothepro.github.io/doxygen-awesome-css/) giving the neat appearance of the documentation you are currently reading.
+- **fatigue** Fatigue sources. Implementations files ```.cpp``` and headers ```.hpp``` are mixed.
+    - **external** (generated at cmake config time) directory to receive external headers and sources to be shipped with fatigue, as cxxopts.
+    - **runners** directory grouping runners 
+    - **templates** directory grouping test templates
+- **misc** a directory with various things, as logo 
+- **tests** directory holding tests 
+    - **install** Custom build to run tests with an installed fatigue version 
+    - **system** System tests
+    - **tutorial** System tests which are also used as examples in @ref tutorial "Tutorial".
+    - **unit** Unit tests, grouped by component.
+    - **utils** scripts and other testing tools.
+
+@section architecture_overview Architecture overview
+
+Overall, fatigue has three main parts :
+
+- Tests descriptions, describing test cases and grouping them into suite. It is mostly expressed through ```ftg::Test```, ```ftg::Suite```, ```ftg::TestList``` types, and, to a later extent, through ```ftg::Check``` and ```ftg::Checker``` classes.
+- Runners, executing tests and reporting results in a visitor pattern fashion. It is expressed through ```ftg::Runner``` and ```ftg::Logger``` interfaces and classes implementing them.
+- Config, allowing runners to alter their behavior based on CLI options. It is expressed through ```ftg::fatigue``` and ```ftg::Config``` classes and its components.
+
+\image html architecture/architecture_overview.svg "fatigue architecture overview"
+
+
+
+
+
+@section architecture_reporting Reporting mechanisms
+
+Being able to write clean, flexible checks is important when writing tests. 
+Checks shall give a clean way to report what failed during execution with as much as informations as possible.
+
+Checks have mandatory argument, for example checking that two values are equal requires two values, but we want to allow 
+additional arguments and options, as for example to be able to flag the check as fatal : if it fails the test execution shall not continue. 
+Some ways to achieve this are : 
+
+- using different methods, as ```check_equal``` and ```fatal_check_equal```. This is acceptable for one or two options, but it can lead to heavy code duplication when more are added. It also prevents factorization of behavior that are optional on all checks.
+- using additional, default-valued parameters, as ```check_equal(..., bool fatal = false, bool important=false)```. This is problematic, since it does not allow to select only the last defaulted option when calling the check, if there are more than one option : ```check_equal(..., false, true).```
+- using an string or map with options, as ```check_equal(..., "fatal: true")``` can lead to typos undetected at compile time.
+- using flags as ```check_equal(..., FATAL | IMPORTANT)``` forbids values other than booleans
+- using a data structure may be quite inconvenient to use as well, as it may obfuscate what we are actually checking.
+
+Solution selected for fatigue, to set check options through method chaining as ```check_equal(...).fatal()```.
+
+@subsection architecture_reporting_principle Principle
+
+Checks are using discarded values expression to allow method chaining.
+
+A discarded value expression is an expression which value isn't assigned to anything. For example :
+
+~~~{.cpp}
+int func() {
+    return 1;
+}
+
+//following is a discarded value expression, as return of func isn't assigned to a variable. 
+func();
+//we often encounter discarded value expression when using increment or decrement operators : 
+int i = 0;
+i++; //discarded value, we increment i but don't use its value.
+~~~
+
+According to https://en.cppreference.com/w/cpp/language/lifetime, *temporary object lifetime* section :
+    
+> All temporary objects are destroyed as the last step in evaluating the full-expression that (lexically) contains the point where they were created, and if multiple temporary objects were created, they are destroyed in the order opposite to the order of creation. This is true even if that evaluation ends in throwing an exception. 
+
+It means that we can use destructor of objects to delay commiting check report, allowing to set options after check is performed. 
+
+Here is an illustration of this behavior :
+
+~~~{.cpp}
+class Delay {
+public:
+    Delay(std::string msg) : msg(msg){}
+
+    ~Delay() {
+        std::cout << msg << std::endl;
+    }
+
+    Delay& append(std::string s) 
+    {
+        msg += s; 
+        return *this;    
+    }
+private:
+    std::string msg;
+};
+
+Delay f(std::string s){
+    return Delay(s);
+}
+
+//this will print "123" : 
+f("1").append("2").append("3");
+~~~
+
+@subsection achitecture_reporting_implementation Implementation
+
+Check reporting mechanism in fatigue involve three classes : 
+
+- ```ftg::Check```, which acts as a reporter, handling option settings.
+- ```ftg::Checker```, separating reporting mechanism from ```ftg::Test``` class inheriting from it. 
+- ```ftg::Logger```, which is an interface receiving reports from ```ftg::Check```. 
+
+
+There is a tiny subtility in there for handling early test termination option, ```fatal()```. In C++, it is bad practice to have a deleter throw, as 
+exception involves stack unwinding, and thus deleter call. Therefore, in case of fatal check failing, we don't wait for ```Check``` deleter to be called,
+and instead directly report and throw an exception. That's also the reason why ```ftg::Check::fatal()``` methods does not have method chaining. 
+
+Copy constructor of ```ftg::Check``` is deleted and move constructor prevents its input object to report. 
+This allows a ```ftg::Check``` instance to safely travel through multiple function ```return``` without triggering more than one report.
+That property allows code better code factorization between versions of a same check, for example : 
+
+~~~{.cpp}
+Check Test::check_complex_logic(/*args*/)
+{
+  return check_complex_logic(args, "check_complexLogic", extractParamInfoFromArgs(args));
+}
+
+Check Test::check_complex_logic(/*args*/, std::string const& description, std::vector<ParamInfo> const& params)
+{
+  return raw_check(/*complex logic using args */,description, params);
+}
+~~~
+
+@section architecture_run Test runners and loggers
+
+While overall implementation of fatigue is as straightforward as possible, runners and loggers shall respect few constraints regarding handling ```ftg::Test``` class..
+
+For implementing runners, one shall match two interfaces : ```ftg::Runner```, responsible of running tests suites, and ```ftg::Logger```, responsible of logging individual test runs. 
+
+Sequence of calls expected by a test is illustrated by following pseudocode : 
+
+~~~{.cpp}
+
+void Logger::runTest(ftg::Test test){
+    
+    if(!test.load()){
+        /* test failed to load */
+        return;
+    }
+    test.setLogger(*this);
+    try {
+        test.run();
+    } catch (FatalCheckFailure const& e){
+        /* test ended prematurely due to a fatal() check failing */
+    } catch (...) {
+        /* unexpected exception when running test */
+    }
+    test.unload();
+}
+~~~
+
+This code highlights few key points : 
+- A test is loaded before running, and if the call returns ```false```, load is considered as failed and test shall not be run nor unloaded. 
+- A test is unloaded after running, no matter the status of the test.
+- Deciding what is an *error* or not is responsibility of the logger and runner, NOT the responsibility of the test itself. 
+- Logger shall register itself to ```ftg::Checker```, from which ```ftg::test``` inherits, before running. 
+
+A runner's behavior is much simpler. It takes a list of tests and suite, represented as a ```std::variant```, a typical behavior could alike following pseudocode :
+
+~~~{.cpp}
+
+void Runner::runTests(TestList const& tl){
+
+    for(v : tl){
+        if(v.isTest()){
+            Logger l;
+            l.runTest(v.asTest());
+        } else {
+            runTests(v.asSuite().tests());
+        }
+    }
+}
+~~~
+
+Note that ```ftg::Runner``` and ```ftg::Logger``` can be either implemented as a single class, or as different classes, or even more. 
+
+@subsection architecture_run_log_checks Test logging mechanism
+
+During test ```run()``` execution, checks report to the logger through ```ftg::Checker``` class, from which ```ftg::Test``` inherits, as illustrated in following sequence diagram : 
+
+\image html architecture/test_check_sequence.svg "Test check sequence"
+
+Note that here, ```Test``` and ```Checker``` instances are represented as two different objects, however, they are the same : ```Test``` inherits from ```Checker```. differenciation is made to highlight method calls from ```Checker```. 
+
+Transcript of this sequence is as follows  : 
+
+1. A ```check_*``` method from ```Test``` is called, which :
+    1.1. performs some checkings,
+    1.2. self-calls ```raw_check``` method from ```Checker```, returning a ```Check``` object, ```chk```, to report result.
+    1.3. returns ```chk```.
+2. (Some more methods are eventually called on ```chk``` to set reporting options.)
+3. According to mechanisms seen in section@ref architecture_reporting "Reporting mechanisms", ```chk``` is deleted :
+    1.1 accesses it's creator ```Checker``` object which it has a reference to. 
+    1.2 calls ```report``` method from ```Logger``` of the checker with right informations to report. 
+*/
+

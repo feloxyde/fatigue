@@ -23,15 +23,12 @@ int main()
   assert(ss.str() == res.str());
 
   //passing reporter
-  auto r1 = std::make_unique<Check>(td, "pass", std::vector<ParamInfo>(), true);
-  r1.reset();
+  td.raw_check("pass", std::vector<ParamInfo>(), true);
   assert(dr.m_checkPassed == 1);
   assert(dr.m_checkFailed == 0);
   assert(ss.str() == res.str());
 
-  auto r4 = std::make_unique<Check>(td, "warn fail", std::vector<ParamInfo>(), false);
-  r4->warn();
-  r4.reset();
+  td.raw_check("warn fail", std::vector<ParamInfo>(), false).warn();
   assert(dr.passed());
   assert(dr.m_checkPassed == 1);
   assert(dr.m_checkFailed == 1);
@@ -39,8 +36,7 @@ int main()
   assert(ss.str() == res.str());
 
   //failing reporter, default msg
-  auto r2 = std::make_unique<Check>(td, "fail", std::vector<ParamInfo>(), false);
-  r2.reset();
+  td.raw_check("fail", std::vector<ParamInfo>(), false);
   assert(!dr.passed());
   assert(dr.m_checkPassed == 1);
   assert(dr.m_checkFailed == 2);
@@ -48,9 +44,7 @@ int main()
   assert(ss.str() == res.str());
 
   //passing reporter, fatal
-  auto r3 = std::make_unique<Check>(td, "fatal pass", std::vector<ParamInfo>(), true);
-  r3->fatal();
-  r3.reset();
+  td.raw_check("fatal pass", std::vector<ParamInfo>(), true).fatal();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 2);
@@ -58,10 +52,8 @@ int main()
 
   //failing reporter, fatal
   bool thrown = false;
-  auto r5 = std::make_unique<Check>(td, "fatal fail", std::vector<ParamInfo>(), false);
   try {
-    r5->fatal();
-    r5.reset();
+    td.raw_check("fatal fail", std::vector<ParamInfo>(), false).fatal();
   } catch (FatalCheckFailure fe) {
     thrown = true;
   }
@@ -73,20 +65,14 @@ int main()
   assert(ss.str() == res.str());
 
   //failing important
-  auto r6 = std::make_unique<Check>(td, "important fail", std::vector<ParamInfo>(), false);
-  r6->important();
-  r6.reset();
-
+  td.raw_check("important fail", std::vector<ParamInfo>(), false).important();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 4);
   res << "!!! (6) [ERROR] expected important fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
-  auto r7 = std::make_unique<Check>(td, "success", std::vector<ParamInfo>(), true);
-  r7->fails();
-  r7.reset();
-
+  td.raw_check("success", std::vector<ParamInfo>(), true).fails();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 5);
@@ -94,10 +80,7 @@ int main()
   assert(ss.str() == res.str());
 
   //failing important
-  auto r8 = std::make_unique<Check>(td, "important fail succeeds", std::vector<ParamInfo>(), false);
-  r8->important().succeeds();
-  r8.reset();
-
+  td.raw_check("important fail succeeds", std::vector<ParamInfo>(), false).important().succeeds();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 6);
