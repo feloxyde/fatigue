@@ -1,0 +1,14 @@
+This software is a fatigue built test software. You are supposed to know this btw.
+Usage:
+  this_software [OPTION...]
+
+  -h, --help        displays list of command line options
+  -r, --runner arg  selects which runner to use to conduct tests (default: 
+                    default)
+
+ runner setup options:
+  -t, --showtypes    show parameter types when displaying checks results
+  -n, --shownames    show parameter names when displaying checks results
+  -s, --select arg   runs tests matching a regular expression
+  -e, --exclude arg  excludes tests matching a regular expression
+
