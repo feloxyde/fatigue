@@ -14,7 +14,7 @@
 
 namespace ftg {
 
-enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_FATAL, MESSAGE_INFO };
+enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_INFO };
 
 class Suite;
 class Test;

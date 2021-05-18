@@ -54,7 +54,7 @@ int main()
   bool thrown = false;
   try {
     td.raw_check("fatal fail", std::vector<ParamInfo>(), false).fatal();
-  } catch (FatalCheckFailure fe) {
+  } catch (EndTestOnFailure fe) {
     thrown = true;
   }
   assert(thrown);

@@ -2,6 +2,7 @@
 #include "../Config.hpp"
 #include "../Runner.hpp"
 #include "../Suite.hpp"
+#include "fatigue/Checker.hpp"
 #include <variant>
 
 namespace ftg {
@@ -42,9 +43,6 @@ void DefaultLogger::report(MessageMode mode,
   if (mode == MESSAGE_CHECK) {
     m_ostream << "[ERROR] ";
     m_passed = false;
-  } else if (mode == MESSAGE_FATAL) {
-    m_passed = false;
-    m_ostream << "[FATAL] ";
   } else if (mode == MESSAGE_WARN) {
     m_ostream << "[WARN] ";
   }
@@ -196,8 +194,11 @@ bool DefaultRunner::runLoadedTest(std::unique_ptr<Test> const& t)
   try {
     t->run();
     t->unload();
-  } catch (ftg::FatalCheckFailure& e) {
-    m_ostream << "Test ended due to fatal check failing." << std::endl;
+  } catch (ftg::EndTestOnFailure& e) {
+    m_ostream << "Test ended on check failure " << std::endl;
+    t->unload();
+  } catch (ftg::EndTestOnSuccess& e) {
+    m_ostream << "Test ended on check success " << std::endl;
     t->unload();
   } catch (...) {
     m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;

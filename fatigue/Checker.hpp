@@ -25,10 +25,16 @@ namespace ftg {
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
 
-/** @brief Structure used as exception to stop test run on fatal check failing. */
-struct FatalCheckFailure final {
-  FatalCheckFailure();
+/** @brief Structure used as exception to stop test in case a marked check fails. */
+struct EndTestOnFailure final {
+  EndTestOnFailure();
 };
+
+/** @brief Structure used as exception to stop test in case a marked check succeeds */
+struct EndTestOnSuccess final {
+  EndTestOnSuccess();
+};
+
 
 class Checker;
 
@@ -54,8 +60,11 @@ public:
   /** @brief Marks check as a warning, allowing test to pass even if check fails. */
   Check& warn();
 
-  /** @brief Marks check as fatal, terminating test execution in case it fails. */
-  void fatal();
+  /** @brief In case check passes, test is stopped */
+  void endRunOnSuccess();
+
+  /** @brief In case check fails, test is stopped */
+  void endRunOnFailure();
 
   /** @brief Marks check as important, hinting runner to emphasis it in case it fails. */
   Check& important();
