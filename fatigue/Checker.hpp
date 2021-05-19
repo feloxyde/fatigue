@@ -26,13 +26,13 @@ namespace ftg {
 // exception.
 
 /** @brief Structure used as exception to stop test in case a marked check fails. */
-struct EndTestOnFailure final {
-  EndTestOnFailure();
+struct EndRunOnFailure final {
+  EndRunOnFailure();
 };
 
 /** @brief Structure used as exception to stop test in case a marked check succeeds */
-struct EndTestOnSuccess final {
-  EndTestOnSuccess();
+struct EndRunOnSuccess final {
+  EndRunOnSuccess();
 };
 
 
@@ -70,10 +70,10 @@ public:
   Check& important();
 
   /** @brief Marks check as meant to fail, check will fail if condition checked is true */
-  Check& fails();
+  Check& isFalse();
 
   /** @brief Marks check as meant to succeed, check will fail if condition checked is false. This is default behavior */
-  Check& succeeds();
+  Check& isTrue();
 
   /**
   @}

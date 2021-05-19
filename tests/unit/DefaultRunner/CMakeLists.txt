@@ -5,7 +5,7 @@ set(DefaultRunner_tests
     DefaultLogger_noparam.cpp 
     noparam.cpp
     exception.cpp
-    fatal.cpp
+    endRunOnFailure.cpp
     load_failure.cpp
     passing.cpp
 )

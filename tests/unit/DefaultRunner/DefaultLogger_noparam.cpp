@@ -43,25 +43,25 @@ int main()
   res << "(3) [ERROR] expected fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
-  //passing reporter, fatal
-  td.raw_check("fatal pass", std::vector<ParamInfo>(), true).fatal();
+  //passing reporter, endRunOnFailure
+  td.raw_check("endRunOnFailure pass", std::vector<ParamInfo>(), true).endRunOnFailure();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 2);
   assert(ss.str() == res.str());
 
-  //failing reporter, fatal
+  //failing reporter, endRunOnFailure
   bool thrown = false;
   try {
-    td.raw_check("fatal fail", std::vector<ParamInfo>(), false).fatal();
-  } catch (EndTestOnFailure fe) {
+    td.raw_check("endRunOnFailure fail", std::vector<ParamInfo>(), false).endRunOnFailure();
+  } catch (EndRunOnFailure fe) {
     thrown = true;
   }
   assert(thrown);
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 3);
-  res << "(5) [FATAL] expected fatal fail to succeed, but failed." << std::endl;
+  res << "(5) [ERROR] expected endRunOnFailure fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing important
@@ -72,7 +72,7 @@ int main()
   res << "!!! (6) [ERROR] expected important fail to succeed, but failed." << std::endl;
   assert(ss.str() == res.str());
 
-  td.raw_check("success", std::vector<ParamInfo>(), true).fails();
+  td.raw_check("success", std::vector<ParamInfo>(), true).isFalse();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 5);
@@ -80,11 +80,13 @@ int main()
   assert(ss.str() == res.str());
 
   //failing important
-  td.raw_check("important fail succeeds", std::vector<ParamInfo>(), false).important().succeeds();
+  td.raw_check("important fail succeeds", std::vector<ParamInfo>(), false).important().isTrue();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 6);
   res << "!!! (8) [ERROR] expected important fail succeeds to succeed, but failed." << std::endl;
+
+
   assert(ss.str() == res.str());
 
   return 0;

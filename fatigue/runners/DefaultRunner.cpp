@@ -194,11 +194,11 @@ bool DefaultRunner::runLoadedTest(std::unique_ptr<Test> const& t)
   try {
     t->run();
     t->unload();
-  } catch (ftg::EndTestOnFailure& e) {
-    m_ostream << "Test ended on check failure " << std::endl;
+  } catch (ftg::EndRunOnFailure& e) {
+    m_ostream << "Test ended on check failure." << std::endl;
     t->unload();
-  } catch (ftg::EndTestOnSuccess& e) {
-    m_ostream << "Test ended on check success " << std::endl;
+  } catch (ftg::EndRunOnSuccess& e) {
+    m_ostream << "Test ended on check success." << std::endl;
     t->unload();
   } catch (...) {
     m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
