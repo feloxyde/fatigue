@@ -32,7 +32,7 @@ int main()
   assert(dr.passed());
   assert(dr.m_checkPassed == 1);
   assert(dr.m_checkFailed == 1);
-  res << "(2) [WARN] expected warn fail to succeed, but failed." << std::endl;
+  res << "(2) [WARN] warn fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing reporter, default msg
@@ -40,7 +40,7 @@ int main()
   assert(!dr.passed());
   assert(dr.m_checkPassed == 1);
   assert(dr.m_checkFailed == 2);
-  res << "(3) [ERROR] expected fail to succeed, but failed." << std::endl;
+  res << "(3) [ERROR] fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
   //passing reporter, endRunOnFailure
@@ -61,7 +61,7 @@ int main()
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 3);
-  res << "(5) [ERROR] expected endRunOnFailure fail to succeed, but failed." << std::endl;
+  res << "(5) [ERROR] endRunOnFailure fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing important
@@ -69,14 +69,14 @@ int main()
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 4);
-  res << "!!! (6) [ERROR] expected important fail to succeed, but failed." << std::endl;
+  res << "!!! (6) [ERROR] important fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
   td.raw_check("success", std::vector<ParamInfo>(), true).isFalse();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 5);
-  res << "(7) [ERROR] expected success to fail, but succeeded." << std::endl;
+  res << "(7) [ERROR] success -> false : failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing important
@@ -84,7 +84,7 @@ int main()
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 6);
-  res << "!!! (8) [ERROR] expected important fail succeeds to succeed, but failed." << std::endl;
+  res << "!!! (8) [ERROR] important fail succeeds -> true : failed." << std::endl;
 
 
   assert(ss.str() == res.str());

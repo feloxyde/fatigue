@@ -1,7 +1,7 @@
 ------ RUNNING TESTS ------
 
 ---- suite1//MockTest1:0
-(1) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
+(1) [ERROR] check_equal( 10, 20 ) -> true : failed.
 ---- failed : out of 1 checks, 1 failed.
 
 ---- suite1//MockTest4:1

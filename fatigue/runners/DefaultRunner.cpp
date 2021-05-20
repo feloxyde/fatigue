@@ -46,7 +46,7 @@ void DefaultLogger::report(MessageMode mode,
   } else if (mode == MESSAGE_WARN) {
     m_ostream << "[WARN] ";
   }
-  m_ostream << "expected ";
+
   m_ostream << description;
 
   if (params.size() > 0) {
@@ -68,10 +68,14 @@ void DefaultLogger::report(MessageMode mode,
     m_ostream << " )";
   }
 
-  if (expected && !result) {
-    m_ostream << " to succeed, but failed." << std::endl;
-  } else if (!expected && result) {
-    m_ostream << " to fail, but succeeded." << std::endl;
+  if (expected) {
+    m_ostream << " -> true";
+  } else {
+    m_ostream << " -> false";
+  }
+
+  if (expected != result) {
+    m_ostream << " : failed." << std::endl;
   }
 }
 
