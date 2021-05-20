@@ -3,10 +3,11 @@ ADD_TEST_SUITE(ts_fatigue_unit_DefaultRunner)
 
 set(DefaultRunner_tests
     DefaultLogger_noparam.cpp 
-    noparam.cpp
-    exception.cpp
     endRunOnFailure.cpp
+    endRunOnSuccess.cpp
+    exception.cpp
     load_failure.cpp
+    noparam.cpp
     passing.cpp
 )
 
