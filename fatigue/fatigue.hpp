@@ -63,6 +63,13 @@ protected:
 
 private:
   TestList m_tests;
+
+public:
+  struct ExitCodes {
+    static int constexpr unsupportedOption = -2;
+    static int constexpr runnerNotFound = -1;
+    static int constexpr success = 0;
+  };
 };
 
 /**
