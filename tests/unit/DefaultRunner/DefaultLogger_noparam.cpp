@@ -32,7 +32,7 @@ int main()
   assert(dr.passed());
   assert(dr.m_checkPassed == 1);
   assert(dr.m_checkFailed == 1);
-  res << "(2) [WARN] expected warn fail to succeed, but failed." << std::endl;
+  res << "(2) [WARN] warn fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing reporter, default msg
@@ -40,28 +40,28 @@ int main()
   assert(!dr.passed());
   assert(dr.m_checkPassed == 1);
   assert(dr.m_checkFailed == 2);
-  res << "(3) [ERROR] expected fail to succeed, but failed." << std::endl;
+  res << "(3) [ERROR] fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
-  //passing reporter, fatal
-  td.raw_check("fatal pass", std::vector<ParamInfo>(), true).fatal();
+  //passing reporter, endRunOnFailure
+  td.raw_check("endRunOnFailure pass", std::vector<ParamInfo>(), true).endRunOnFailure();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 2);
   assert(ss.str() == res.str());
 
-  //failing reporter, fatal
+  //failing reporter, endRunOnFailure
   bool thrown = false;
   try {
-    td.raw_check("fatal fail", std::vector<ParamInfo>(), false).fatal();
-  } catch (FatalCheckFailure fe) {
+    td.raw_check("endRunOnFailure fail", std::vector<ParamInfo>(), false).endRunOnFailure();
+  } catch (EndRunOnFailure fe) {
     thrown = true;
   }
   assert(thrown);
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 3);
-  res << "(5) [FATAL] expected fatal fail to succeed, but failed." << std::endl;
+  res << "(5) [ERROR] endRunOnFailure fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing important
@@ -69,22 +69,24 @@ int main()
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 4);
-  res << "!!! (6) [ERROR] expected important fail to succeed, but failed." << std::endl;
+  res << "!!! (6) [ERROR] important fail -> true : failed." << std::endl;
   assert(ss.str() == res.str());
 
-  td.raw_check("success", std::vector<ParamInfo>(), true).fails();
+  td.raw_check("success", std::vector<ParamInfo>(), true).isFalse();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 5);
-  res << "(7) [ERROR] expected success to fail, but succeeded." << std::endl;
+  res << "(7) [ERROR] success -> false : failed." << std::endl;
   assert(ss.str() == res.str());
 
   //failing important
-  td.raw_check("important fail succeeds", std::vector<ParamInfo>(), false).important().succeeds();
+  td.raw_check("important fail succeeds", std::vector<ParamInfo>(), false).important().isTrue();
   assert(!dr.passed());
   assert(dr.m_checkPassed == 2);
   assert(dr.m_checkFailed == 6);
-  res << "!!! (8) [ERROR] expected important fail succeeds to succeed, but failed." << std::endl;
+  res << "!!! (8) [ERROR] important fail succeeds -> true : failed." << std::endl;
+
+
   assert(ss.str() == res.str());
 
   return 0;

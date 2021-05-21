@@ -13,7 +13,7 @@ struct MockTest : public ftg::Test {
   MockTest() : Test(std::string("MockTest") + std::to_string(num) + ":" + std::to_string(pass)) {}
   virtual ~MockTest() {}
 
-  virtual void run() { check_true(pass).fatal(); }
+  virtual void run() { check_true(!pass).endRunOnSuccess(); }
 };
 
 struct Suite1 : ftg::Suite {
@@ -47,12 +47,12 @@ int main()
   res << "------ RUNNING TESTS ------" << std::endl;
   res << std::endl;
   res << "---- suite1//MockTest1:1" << std::endl;
-  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
+  res << "(1) [ERROR] check_true -> true : failed." << std::endl;
+  res << "---- failed : out of 1 checks, 1 failed." << std::endl;
   res << std::endl;
   res << "---- suite1//MockTest4:0" << std::endl;
-  res << "(1) [FATAL] expected check_true to succeed, but failed." << std::endl;
-  res << "Test ended due to fatal check failing." << std::endl;
-  res << "---- failed : out of 1 checks, 1 failed." << std::endl;
+  res << "Test ended on check success." << std::endl;
+  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
   res << std::endl;
   res << "---------- FAILED ---------" << std::endl;
   res << "ran : 2" << std::endl;

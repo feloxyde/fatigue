@@ -2,6 +2,7 @@
 #include "../Config.hpp"
 #include "../Runner.hpp"
 #include "../Suite.hpp"
+#include "fatigue/Checker.hpp"
 #include <variant>
 
 namespace ftg {
@@ -42,13 +43,10 @@ void DefaultLogger::report(MessageMode mode,
   if (mode == MESSAGE_CHECK) {
     m_ostream << "[ERROR] ";
     m_passed = false;
-  } else if (mode == MESSAGE_FATAL) {
-    m_passed = false;
-    m_ostream << "[FATAL] ";
   } else if (mode == MESSAGE_WARN) {
     m_ostream << "[WARN] ";
   }
-  m_ostream << "expected ";
+
   m_ostream << description;
 
   if (params.size() > 0) {
@@ -70,10 +68,14 @@ void DefaultLogger::report(MessageMode mode,
     m_ostream << " )";
   }
 
-  if (expected && !result) {
-    m_ostream << " to succeed, but failed." << std::endl;
-  } else if (!expected && result) {
-    m_ostream << " to fail, but succeeded." << std::endl;
+  if (expected) {
+    m_ostream << " -> true";
+  } else {
+    m_ostream << " -> false";
+  }
+
+  if (expected != result) {
+    m_ostream << " : failed." << std::endl;
   }
 }
 
@@ -196,8 +198,11 @@ bool DefaultRunner::runLoadedTest(std::unique_ptr<Test> const& t)
   try {
     t->run();
     t->unload();
-  } catch (ftg::FatalCheckFailure& e) {
-    m_ostream << "Test ended due to fatal check failing." << std::endl;
+  } catch (ftg::EndRunOnFailure& e) {
+    m_ostream << "Test ended on check failure." << std::endl;
+    t->unload();
+  } catch (ftg::EndRunOnSuccess& e) {
+    m_ostream << "Test ended on check success." << std::endl;
     t->unload();
   } catch (...) {
     m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;

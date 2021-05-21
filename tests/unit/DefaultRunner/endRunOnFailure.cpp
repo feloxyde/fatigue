@@ -1,5 +1,5 @@
-#include "fatigue/Suite.hpp"
 #include <cassert>
+#include <fatigue/Suite.hpp>
 #include <fatigue/Test.hpp>
 #include <fatigue/runners/DefaultRunner.hpp>
 #include <memory>
@@ -12,7 +12,8 @@ template<int num, bool pass>
 struct MockTest : public ftg::Test {
   MockTest() : Test(std::string("MockTest") + std::to_string(num) + ":" + std::to_string(pass)) {}
   virtual ~MockTest() {}
-  virtual void run() { check_true(pass); }
+
+  virtual void run() { check_true(pass).endRunOnFailure(); }
 };
 
 struct Suite1 : ftg::Suite {
@@ -22,23 +23,9 @@ struct Suite1 : ftg::Suite {
   virtual TestList tests() const
   {
     TestList tl;
-    tl.push_back(std::make_unique<MockTest<1, false>>());
-    tl.push_back(std::make_unique<MockTest<4, true>>());
+    tl.push_back(std::make_unique<MockTest<1, true>>());
+    tl.push_back(std::make_unique<MockTest<4, false>>());
 
-    return tl;
-  }
-};
-
-struct Suite2 : ftg::Suite {
-  Suite2() : Suite("suite2") {}
-  virtual ~Suite2() {}
-
-  virtual TestList tests() const
-  {
-    TestList tl;
-    tl.push_back(std::make_unique<MockTest<10, true>>());
-    tl.push_back(std::make_unique<MockTest<13, true>>());
-    tl.push_back(std::make_unique<MockTest<14, true>>());
     return tl;
   }
 };
@@ -59,17 +46,18 @@ int main()
 
   res << "------ RUNNING TESTS ------" << std::endl;
   res << std::endl;
-  res << "---- suite1//MockTest1:0" << std::endl;
-  res << "(1) [ERROR] check_true -> true : failed." << std::endl;
-  res << "---- failed : out of 1 checks, 1 failed." << std::endl;
-  res << std::endl;
-  res << "---- suite1//MockTest4:1" << std::endl;
+  res << "---- suite1//MockTest1:1" << std::endl;
   res << "---- passed : out of 1 checks, 0 failed." << std::endl;
+  res << std::endl;
+  res << "---- suite1//MockTest4:0" << std::endl;
+  res << "(1) [ERROR] check_true -> true : failed." << std::endl;
+  res << "Test ended on check failure." << std::endl;
+  res << "---- failed : out of 1 checks, 1 failed." << std::endl;
   res << std::endl;
   res << "---------- FAILED ---------" << std::endl;
   res << "ran : 2" << std::endl;
   res << "failed : 1" << std::endl;
-  /*HERE TO HELP DEBUG */
+  /* HERE TO HELP DEBUG */
   size_t i(0);
   while (i < res.str().size() && i < ss.str().size()) {
     if (res.str()[i] != ss.str()[i]) {
@@ -79,7 +67,6 @@ int main()
     }
     i++;
   }
-
 
   std::cout << res.str() << std::endl;
   std::cout << ss.str() << std::endl;

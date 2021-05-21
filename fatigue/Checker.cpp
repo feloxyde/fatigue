@@ -20,7 +20,11 @@ namespace ftg {
 //#FIXME count checks when they pass/fail, and report number in case of uncaught
 // exception.
 
-FatalCheckFailure::FatalCheckFailure()
+EndRunOnFailure::EndRunOnFailure()
+{
+}
+
+EndRunOnSuccess::EndRunOnSuccess()
 {
 }
 
@@ -62,12 +66,21 @@ Check& Check::warn()
   return *this;
 }
 
-void Check::fatal()
+/** @brief In case check passes, test is stopped */
+void Check::endRunOnSuccess()
 {
-  m_mode = MESSAGE_FATAL;
-  report();
+  if (m_res == m_expected) {
+    report();
+    throw EndRunOnSuccess();
+  }
+}
+
+/** @brief In case check fails, test is stopped */
+void Check::endRunOnFailure()
+{
   if (m_res != m_expected) {
-    throw FatalCheckFailure();
+    report();
+    throw EndRunOnFailure();
   }
 }
 
@@ -77,13 +90,13 @@ Check& Check::important()
   return *this;
 }
 
-Check& Check::fails()
+Check& Check::isFalse()
 {
   m_expected = false;
   return *this;
 }
 
-Check& Check::succeeds()
+Check& Check::isTrue()
 {
   m_expected = true;
   return *this;

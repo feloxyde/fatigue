@@ -10,7 +10,7 @@ skipped.
 skipped.
 
 ---- suite2:0//MockTest2:0
-(1) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
+(1) [ERROR] check_equal( 10, 20 ) -> true : failed.
 ---- failed : out of 1 checks, 1 failed.
 
 ---- suite2:0//MockTest3:0
@@ -20,7 +20,7 @@ skipped.
 skipped.
 
 ---- suite2:10//MockTest12:0
-(1) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
+(1) [ERROR] check_equal( 10, 20 ) -> true : failed.
 ---- failed : out of 1 checks, 1 failed.
 
 ---- suite2:10//MockTest13:0
@@ -30,7 +30,7 @@ skipped.
 skipped.
 
 ---- suite2:20//MockTest22:0
-(1) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
+(1) [ERROR] check_equal( 10, 20 ) -> true : failed.
 ---- failed : out of 1 checks, 1 failed.
 
 ---- suite2:20//MockTest23:0
