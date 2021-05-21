@@ -54,11 +54,11 @@ unsigned fatigue::run() const
     for (auto const& r : m_runners) {
       std::cout << r.first << std::endl;
     }
-    return -1;
+    return ExitCodes::runnerNotFound;
   } else {
     if (!verify_options(m_out, m_config, *(m_runners.at(m_config.runner)), m_config.runner)) {
       m_out << "Error : unsupported options were sent to runner. Aborting." << std::endl;
-      return -2;
+      return ExitCodes::unsupportedOption;
     }
 
     return m_runners.at(m_config.runner)->run(m_tests);
@@ -101,7 +101,7 @@ fatigue::fatigue(std::vector<fatigue::OptionsDeclarer> const& newOpts, int argc,
 
   if (m_parsedOpts.count("help") > 0) {
     std::cout << options.help() << std::endl;
-    exit(EXIT_SUCCESS);
+    exit(ExitCodes::success);
   }
 
   m_config.loadFromOpts(m_parsedOpts);
