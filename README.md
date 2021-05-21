@@ -31,7 +31,7 @@ Additionally, ```virtual void load() noexcept``` and ```virtual void unload() no
 virtual void run() {
     check_equal(10, 20);
     check_true(false);
-    check_near_equal(9, 9, 0.3, "some custom message");
+    check_near_equal(9, 9, 0.3, "some custom description");
     /* and a lot more to discover*/
 }
 ```
@@ -75,17 +75,18 @@ check_true(false, "custom check");
 Will produce output as : 
 
 ```
-(2) [ERROR] expected check_equal( 10, 20 ) to succeed, but failed.
-(3) [ERROR] expected custom check to succeed, but failed.
+(2) [ERROR] check_equal( 10, 20 ) -> true : failed.
+(3) [ERROR] custom check -> true : failed.
 ```
-Some runners allows to display additional informations through cli switches, as names (```-n```) or types (```-t```) of checks arguments . 
+Some runners allows to display additional informations through cli switches, as names (```-n```) or types (```-t```) of checks arguments.
 
 ```
 (2) [ERROR] expected check_equal( l: 10 [int), r: 20 [double] ) to succeed, but failed.
 ```
 
-# Planned features
+Please see documentation for a deeper insight.
 
+# Planned features
 
 The project is still in progress, and features will be added depending on my time and needs. This is an overview of some planned features, 
 Please see issue list at [https://gitlab.com/feloxyde/fatigue/](https://gitlab.com/feloxyde/fatigue/])for more informations.

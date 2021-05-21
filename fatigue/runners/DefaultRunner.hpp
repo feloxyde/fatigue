@@ -18,7 +18,6 @@ namespace ftg {
   Not immune to segfault, but ensures portability. Prints logs sequentially to a ```std::ostream```.
 
 */
-
 struct DefaultLogger : public Logger {
 
   DefaultLogger(std::ostream& ostream, Config const& config);
