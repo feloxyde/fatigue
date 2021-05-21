@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef FATIGUE_UTILS_HPP
 #define FATIGUE_UTILS_HPP
 
