@@ -1,5 +1,9 @@
 #!/bin/python3
 
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
+
 from sys import argv
 from subprocess import Popen, PIPE
 

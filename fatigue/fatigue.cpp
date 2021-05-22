@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #include "fatigue.hpp"
 #include "Runner.hpp"
 #include "fatigue/Config.hpp"

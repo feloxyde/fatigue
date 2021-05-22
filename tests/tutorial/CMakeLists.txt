@@ -1,3 +1,7 @@
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
+
 ADD_TEST_SUITE(ts_fatigue_tutorial)
 
 set (comp_py ${CMAKE_CURRENT_LIST_DIR}/../utils/compare.py)

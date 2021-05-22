@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #include "../quick_example/SuiteAvg.hpp"
 #include "TenTest.hpp"
 #include "fatigue_ex.hpp"

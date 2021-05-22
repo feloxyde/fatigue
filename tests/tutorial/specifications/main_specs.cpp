@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #include "ConcreteConcat.hpp"
 #include "SpecsConcat.hpp"
 #include <fatigue/fatigue.hpp>

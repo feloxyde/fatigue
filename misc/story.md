@@ -1,3 +1,7 @@
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
 # Fatigue's story
 
 This is the (boring) story behind the project.

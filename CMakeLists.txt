@@ -1,4 +1,6 @@
-
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
 
 cmake_minimum_required(VERSION 3.18.0)
 

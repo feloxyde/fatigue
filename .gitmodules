@@ -1,3 +1,7 @@
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
+
 [submodule "cmake_llvm_coverage"]
 	path = cmake_llvm_coverage
 	url = ../../feloxyde/cmake_llvm_coverage

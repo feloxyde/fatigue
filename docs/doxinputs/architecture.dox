@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 /** \page architecture Architecture
 
 This page describes elements of fatigue's architecture and their rationales that aren't forcibly easy to get while looking at the code, 

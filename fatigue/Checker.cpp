@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #include "Checker.hpp"
 #include "Runner.hpp"
 #include "utils.hpp"

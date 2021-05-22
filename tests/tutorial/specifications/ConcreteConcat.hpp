@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #ifndef FATIGUE_TUTORIAL_CONCRETECONCAT_HPP
 #define FATIGUE_TUTORIAL_CONCRETECONCAT_HPP
 
