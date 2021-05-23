@@ -1,3 +1,9 @@
+<!--
+Copyright 2021 Felix Bertoni
+
+SPDX-License-Identifier: MIT
+-->
+
 # Contributing to fatigue
 
 There are several ways in which you can contribute to fatigue. 

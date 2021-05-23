@@ -1,6 +1,11 @@
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
+
 stages:
   - test
   - docs
+  - relcheck
   - publish
 
 image: carterjones/manjaro
@@ -13,7 +18,7 @@ include:
 .build_dev_dependencies:
   before_script:
     - sudo pacman --noconfirm -Syu
-    - sudo pacman --noconfirm -S clang make cmake llvm 
+    - sudo pacman --noconfirm -S clang make cmake llvm
     - git submodule update --init --recursive
 
 .build_rel_dependencies:
@@ -27,8 +32,7 @@ include:
     - sudo pacman --noconfirm -Syu
     - sudo pacman --noconfirm -S doxygen graphviz
 
-
-## RULES ## 
+## RULES ##
 
 .rules_all:
   rules:
@@ -59,7 +63,7 @@ code_quality:
     - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
 test:
-  extends: 
+  extends:
     - .build_dev_dependencies
     - .rules_all
   stage: test
@@ -70,9 +74,8 @@ test:
     - make
     - make test
 
-
-coverage: 
-  extends: 
+coverage:
+  extends:
     - .build_dev_dependencies
     - .rules_all
   stage: test
@@ -85,8 +88,8 @@ coverage:
     - make coverage_all_txt
     - echo "coverage" "$(tail llvmcoverage/coverage_all.txt -n 1 | grep -o "[0-9]*.[0-9]*%" | head -n 1)"
 
-install: 
-  extends: 
+install:
+  extends:
     - .build_rel_dependencies
     - .rules_all
   stage: test
@@ -106,20 +109,28 @@ install:
     - cmake --build . --target test
 
 doc:
-  extends: 
+  extends:
     - .doc_dependencies
     - .rules_all_but_stable
   stage: docs
-  script:    
+  script:
     - mkdir build
     - mkdir build/docgen
     - doxygen Doxyfile
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
-    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
+
+licenses:
+  extends:
+    - .rules_stable_only
+  stage: relcheck
+  before_script:
+    - sudo pacman -Syu --noconfirm
+    - sudo pacman -S --noconfirm pip
+    - sudo pip3 install fsfe-reuse
+  script:
+    - 'reuse lint | grep "Congratulations! Your project is compliant with version 3.0 of the REUSE Specification"'
 
 pages:
-  extends: 
+  extends:
     - .doc_dependencies
     - .rules_stable_only
   stage: publish
@@ -132,5 +143,3 @@ pages:
   artifacts:
     paths:
       - public
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "stable"' # Run in pipelines on the stable branch (but not in other branch pipelines)

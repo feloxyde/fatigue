@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 /** \page development Development
 
 This page is addressed to developers who want to contribute to fatigue, and presents coding documentation conventions, as well as tools to build in debug mode. 
@@ -122,14 +126,14 @@ Finally, API targetted at end user shall be added to the @ref user_api "user api
 
 @section develoment_other Other 
 
-Aside code, prefer text-based file formats over binaries for contributions, as for example SVG for graphics, as they are lighter to handle for git and keep repository light as well for people to download.
+Aside code, prefer text-based file formats over binaries for contributions, as for example SVG for graphics, as they are lighter to handle for git and keep repository light as well for people to download. Any format 
+used shall be possible to edit with reasonnable ease through use of a free software tool.
 
-You are highly encouraged to inform me at  [felix.bertoni987@gmail.com](mailto:felix.bertoni987@gmail.com) if you fork or intend to contribute to the project, 
+You are highly encouraged to inform me at [felix.bertoni987@gmail.com](mailto:felix.bertoni987@gmail.com) if you fork or intend to contribute to the project, 
 so we can discuss about it. 
 
-Contributions are supposed to be forked from ```dev``` branch and merged back in it when done. All tests and full CI shall be passing to merge.
+Contributions are supposed to be forked from ```dev``` branch and merged back in it when done. All tests and full CI shall be passing before any code is eligible to merge.
 
-In case you are not sure about what you've done, or if you want to have feedback during your implementation, simply start a draft merge request.
-
+In case you are not sure about what you've done, or if you want to have feedback during while implementing, simply start a draft merge request.
 
 */

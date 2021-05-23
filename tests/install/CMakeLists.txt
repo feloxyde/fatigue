@@ -1,3 +1,7 @@
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
+
 #THIS FILE checks for installation of lib fatigue by rebuilding all tests without building fatigue.
 
 cmake_minimum_required(VERSION 3.1.0)

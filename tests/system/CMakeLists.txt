@@ -1,3 +1,7 @@
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
+
 ADD_TEST_SUITE(ts_fatigue_system)
 
 add_executable(test_fatigue test_fatigue.cpp)

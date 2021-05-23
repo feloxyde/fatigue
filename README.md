@@ -1,3 +1,9 @@
+<!--
+Copyright 2021 Felix Bertoni
+
+SPDX-License-Identifier: MIT
+-->
+
 # fatigue 
 
 *Framework for Advanced Testing Inducing a Grotestque User Experience.* 

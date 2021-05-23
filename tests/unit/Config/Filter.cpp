@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #include <cassert>
 #include <fatigue/Config.hpp>
 #include <initializer_list>
