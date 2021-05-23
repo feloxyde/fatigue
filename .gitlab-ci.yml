@@ -117,21 +117,17 @@ doc:
     - mkdir build
     - mkdir build/docgen
     - doxygen Doxyfile
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
-    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
 licenses:
   extends:
     - .rules_stable_only
   stage: relcheck
   before_script:
+    - sudo pacman -Syu --noconfirm
+    - sudo pacman -S --noconfirm pip
     - sudo pip3 install fsfe-reuse
   script:
     - 'reuse lint | grep "Congratulations! Your project is compliant with version 3.0 of the REUSE Specification"'
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run in merge request pipelines
-    - if: "$CI_COMMIT_TAG" # Run in pipelines for tags
 
 pages:
   extends:
@@ -147,5 +143,3 @@ pages:
   artifacts:
     paths:
       - public
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "stable"' # Run in pipelines on the stable branch (but not in other branch pipelines)
