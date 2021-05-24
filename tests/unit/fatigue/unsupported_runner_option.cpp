@@ -15,8 +15,7 @@ public:
     return std::unordered_set<std::string>({"select"});
   }
 
-
-  virtual void report(ftg::MessageMode, std::string const&, std::vector<ftg::ParamInfo> const&, bool, bool, bool) {}
+  virtual void report(Logger::Message const&) {}
 
   virtual unsigned run(ftg::TestList const&) { return 1; }
 };

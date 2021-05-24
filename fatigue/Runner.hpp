@@ -18,7 +18,6 @@
 
 namespace ftg {
 
-enum MessageMode { MESSAGE_CHECK, MESSAGE_WARN, MESSAGE_INFO };
 
 class Suite;
 class Test;
@@ -43,18 +42,35 @@ struct ParamInfo {
   std::string name;
   std::string value;
   std::string type;
+
+  bool operator==(ParamInfo const& other) const = default;
 };
+
 
 /** @brief Interface to define a test Logger, which should take care of reporting checks in a particular test run. */
 struct Logger {
+  struct Message {
+    enum Mode { MESSAGE_CHECK, MESSAGE_WARN };
+
+    Message(Mode mode,
+	    std::string const& description,
+	    std::vector<ParamInfo> const& params,
+	    bool expected,
+	    bool result,
+	    bool important);
+
+    Mode mode;
+    std::string description;
+    std::vector<ParamInfo> params;
+    bool expected;
+    bool result;
+    bool important;
+
+    bool operator==(Message const& other) const = default;
+  };
+
   virtual ~Logger(){};
-  virtual void report(MessageMode mode,
-		      std::string const& description,
-		      std::vector<ParamInfo> const& params,
-		      bool expected,
-		      bool result,
-		      bool important)
-      = 0;
+  virtual void report(Message const& message) = 0;
 };
 
 } // namespace ftg

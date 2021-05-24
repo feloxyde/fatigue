@@ -17,47 +17,22 @@
 
 namespace ftg {
 
-/** @brief Default test logger.
-
-  Not immune to segfault, but ensures portability. Prints logs sequentially to a ```std::ostream```.
-
-*/
-struct DefaultLogger : public Logger {
-
-  DefaultLogger(std::ostream& ostream, Config const& config);
-  virtual ~DefaultLogger();
-
-  virtual void report(MessageMode mode,
-		      std::string const& description,
-		      std::vector<ParamInfo> const& params,
-		      bool expected,
-		      bool result,
-		      bool important);
-
-  bool passed() const;
-
-public:
-  Config const& m_config;
-  std::ostream& m_ostream;
-  bool m_passed;
-  size_t m_checkPassed;
-  size_t m_checkFailed;
-};
-
 
 /** @brief Default test runner.
 
   Not immune to segfault, but ensures portability. Runs tests and suites sequentially and prints logs to a ```std::ostream```.
 
 */
-struct DefaultRunner : public Runner {
+class DefaultRunner : public Runner, public Logger {
+public:
   DefaultRunner(std::ostream& ostream, Config const& config);
   virtual ~DefaultRunner();
   virtual std::unordered_set<std::string> supportedOptions() const;
   virtual unsigned run(TestList const& tests);
 
+  virtual void report(Logger::Message const& message);
 
-private:
+protected:
   /** @brief Selects whether to run suite or test for each element of testlist. */
   void dispatchTestList(TestList const& tests, std::vector<std::string> const& prefixes);
 
@@ -72,9 +47,14 @@ private:
 private:
   Config const& m_config;
   std::ostream& m_ostream;
-  size_t totalPass;
-  size_t totalFailed;
-  size_t totalSkipped;
+  size_t m_totalPass;
+  size_t m_totalFailed;
+  size_t m_totalSkipped;
+  struct {
+    size_t checkPassed;
+    size_t checkFailed;
+    bool passed;
+  } m_currentRun;
 };
 
 } // namespace ftg

@@ -56,7 +56,7 @@ int main()
   res << "---- passed : out of 1 checks, 0 failed." << std::endl;
   res << std::endl;
   res << "---- suite1//MockTest4:0" << std::endl;
-  res << "---- failed : error during load phase." << std::endl;
+  res << "---- failed : unable to complete load phase." << std::endl;
   res << std::endl;
   res << "---------- FAILED ---------" << std::endl;
   res << "ran : 2" << std::endl;

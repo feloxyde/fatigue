@@ -160,14 +160,21 @@ void Logger::runTest(ftg::Test test){
     test.setLogger(*this);
     try {
         test.run();
-    } catch (FatalCheckFailure const& e){
+        test.unload();
+    } catch (SomeExceptionBasedExit const& e){
         /* test ended prematurely due to a fatal() check failing */
+        test.unload();
+    } catch (/*someother expected exception... */){
+        test.unload();
     } catch (...) {
         /* unexpected exception when running test */
+        test.unload();
     }
-    test.unload();
+    
 }
 ~~~
+
+This is enforced by through use of ```ftg::Checker::run``` method, which takes several lambdas, each corresponding to a possible exit for a test.
 
 This code highlights few key points : 
 - A test is loaded before running, and if the call returns ```false```, load is considered as failed and test shall not be run nor unloaded. 

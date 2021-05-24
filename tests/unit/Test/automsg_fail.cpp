@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "fatigue/runners/DefaultRunner.hpp"
+#include "../../utils/MockRunner.hpp"
+#include "fatigue/Runner.hpp"
 #include <fatigue/Test.hpp>
 
 #include <cassert>
@@ -11,119 +12,107 @@
 using namespace ftg;
 
 struct TestAutoMsgFail : public Test {
-  TestAutoMsgFail(DefaultLogger const& logger, std::stringstream const& ss) :
-      Test("TestAutoMsgFail"),
-      dl(logger),
-      ss(ss)
-  {
-  }
+  TestAutoMsgFail(MockLogger& expected) : Test("TestAutoMsgFail"), expected(expected) {}
 
   virtual void run()
   {
-    std::stringstream res;
-
     check_equal(10, 9);
+    std::string left = "l";
+    std::string right = "r";
+    std::string tolerance = "tolerance";
+    std::string intT = "int";
 
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 1);
-    res << "(1) [ERROR] check_equal( 10, 9 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    std::vector<ParamInfo> params;
+    params.emplace_back(left, "10", intT);
+    params.emplace_back(right, "9", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_equal", params, true, false, false));
 
     check_near_equal(20, 12, 2);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 2);
-    res << "(2) [ERROR] check_near_equal( 20, 12, 2 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "20", intT);
+    params.emplace_back(right, "12", intT);
+    params.emplace_back(tolerance, "2", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_near_equal", params, true, false, false));
 
     check_near_equal(7, 10, 2);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 3);
-    res << "(3) [ERROR] check_near_equal( 7, 10, 2 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "7", intT);
+    params.emplace_back(right, "10", intT);
+    params.emplace_back(tolerance, "2", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_near_equal", params, true, false, false));
 
     check_not_equal(12, 12);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 4);
-    res << "(4) [ERROR] check_not_equal( 12, 12 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "12", intT);
+    params.emplace_back(right, "12", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_not_equal", params, true, false, false));
+
 
     check_less_than(12, 10);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 5);
-    res << "(5) [ERROR] check_less_than( 12, 10 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "12", intT);
+    params.emplace_back(right, "10", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_less_than", params, true, false, false));
 
     check_less_than(12, 12);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 6);
-    res << "(6) [ERROR] check_less_than( 12, 12 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "12", intT);
+    params.emplace_back(right, "12", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_less_than", params, true, false, false));
+
 
     check_less_equal(12, 10);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 7);
-    res << "(7) [ERROR] check_less_equal( 12, 10 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "12", intT);
+    params.emplace_back(right, "10", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_less_equal", params, true, false, false));
+
 
     check_greater_than(8, 9);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 8);
-    res << "(8) [ERROR] check_greater_than( 8, 9 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "8", intT);
+    params.emplace_back(right, "9", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_greater_than", params, true, false, false));
+
 
     check_greater_than(10, 10);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 9);
-    res << "(9) [ERROR] check_greater_than( 10, 10 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "10", intT);
+    params.emplace_back(right, "10", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_greater_than", params, true, false, false));
+
 
     check_greater_equal(7, 8);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 10);
-    res << "(10) [ERROR] check_greater_equal( 7, 8 ) -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    params.emplace_back(left, "7", intT);
+    params.emplace_back(right, "8", intT);
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_greater_equal", params, true, false, false));
+
 
     check_throw<int>([]() {});
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 11);
-    res << "(11) [ERROR] check_throw<int> -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK,
+				    std::string("check_throw<") + intT + std::string(">"),
+				    params,
+				    true,
+				    false,
+				    false));
+
 
     check_nothrow([]() { throw 1; });
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 12);
-    res << "(12) [ERROR] check_nothrow -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_nothrow", params, true, false, false));
 
     check_true(false);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 13);
-    res << "(13) [ERROR] check_true -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_true", params, true, false, false));
 
     check_false(true);
-    assert(!dl.passed());
-    assert(dl.m_checkPassed == 0);
-    assert(dl.m_checkFailed == 14);
-    res << "(14) [ERROR] check_false -> true : failed." << std::endl;
-    assert(ss.str() == res.str());
+    params.clear();
+    expected.report(Logger::Message(Logger::Message::MESSAGE_CHECK, "check_false", params, true, false, false));
   }
 
-  DefaultLogger const& dl;
-  std::stringstream const& ss;
+  MockLogger& expected;
 };
 
 int main()
@@ -131,10 +120,28 @@ int main()
 
   std::stringstream ss;
   Config conf;
-  DefaultLogger dl(ss, conf);
-  TestAutoMsgFail t(dl, ss);
-  t.setLogger(&dl);
-  t.run();
+  MockLogger res;
+  MockLogger expected;
+  bool cleanExit = false;
+  TestAutoMsgFail t(expected);
+  Checker::run(
+      t,
+      res,
+      [&cleanExit]() { cleanExit = true; },
+      []() {},
+      []() {},
+      []() {},
+      []() {});
+
+  assert(cleanExit);
+
+  std::string cmp = compareMockLoggers(res, expected);
+  if (cmp == "") {
+    return 0;
+  } else {
+    std::cout << cmp;
+    return 1;
+  }
 
   return 0;
 }
