@@ -174,22 +174,22 @@ void DefaultRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::
           },
           //case of check failure direct exit 
           [this](){  
-            this->m_ostream << "Test ended on check failure." << std::endl;
+            this->m_ostream << "Test ended on check " << m_currentRun.checkFailed + m_currentRun.checkPassed << " failure." << std::endl;
           },
           //case of check success direct exit
 	        [this](){
-            this->m_ostream << "Test ended on check success." << std::endl;
+            this->m_ostream << "Test ended on check " << m_currentRun.checkFailed + m_currentRun.checkPassed << " success." << std::endl;
           },
 	        //case of uncaught exception is thrown 
           [this](){
-            this->m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
+            this->m_ostream << "[EXCEPTION] unexpected exception thrown after check " << m_currentRun.checkFailed + m_currentRun.checkPassed << ", test ending." << std::endl;
             this->m_currentRun.passed = false;
           }
   );
   // clang-format on
 
   if (loadFailure) {
-    m_ostream << "---- failed : unable to complete load phase." << std::endl;
+    m_ostream << "---- failed : unable to load." << std::endl;
     return;
   }
 
@@ -201,7 +201,7 @@ void DefaultRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::
     m_totalFailed++;
   }
 
-  m_ostream << "out of " << m_currentRun.checkPassed + m_currentRun.checkFailed << " checks, "
-	    << m_currentRun.checkFailed << " failed." << std::endl;
+  m_ostream << m_currentRun.checkPassed + m_currentRun.checkFailed << " checks, " << m_currentRun.checkFailed
+	    << " failed." << std::endl;
 }
 } // namespace ftg

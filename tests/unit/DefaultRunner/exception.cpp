@@ -57,11 +57,11 @@ int main()
   res << "------ RUNNING TESTS ------" << std::endl;
   res << std::endl;
   res << "---- suite1//MockTest1:1" << std::endl;
-  res << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
-  res << "---- failed : out of 1 checks, 0 failed." << std::endl;
+  res << "[EXCEPTION] unexpected exception thrown after check 1, test ending." << std::endl;
+  res << "---- failed : 1 checks, 0 failed." << std::endl;
   res << std::endl;
   res << "---- suite1//MockTest4:0" << std::endl;
-  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
+  res << "---- passed : 1 checks, 0 failed." << std::endl;
   res << std::endl;
   res << "---------- FAILED ---------" << std::endl;
   res << "ran : 2" << std::endl;

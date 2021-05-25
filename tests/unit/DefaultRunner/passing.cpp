@@ -74,13 +74,13 @@ int main()
   res << "------ RUNNING TESTS ------" << std::endl;
   res << std::endl;
   res << "---- suite1//MockTest1:1" << std::endl;
-  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
+  res << "---- passed : 1 checks, 0 failed." << std::endl;
   res << std::endl;
   res << "---- suite1//MockTest4:1" << std::endl;
-  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
+  res << "---- passed : 1 checks, 0 failed." << std::endl;
   res << std::endl;
   res << "---- suite2//BoolTest" << std::endl;
-  res << "---- passed : out of 2 checks, 0 failed." << std::endl;
+  res << "---- passed : 2 checks, 0 failed." << std::endl;
   res << std::endl;
   res << "---------- PASSED ---------" << std::endl;
   res << "ran : 3" << std::endl;
