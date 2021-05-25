@@ -28,7 +28,10 @@ DefaultRunner::~DefaultRunner()
 
 std::unordered_set<std::string> DefaultRunner::supportedOptions() const
 {
-  return {Config::options::shownames, Config::options::showtypes, Config::options::select, Config::options::exclude};
+  return {Config::RunnerOptions::shownames,
+	  Config::RunnerOptions::showtypes,
+	  Config::RunnerOptions::select,
+	  Config::RunnerOptions::exclude};
 }
 
 unsigned DefaultRunner::run(TestList const& tests)

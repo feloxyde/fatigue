@@ -36,7 +36,7 @@ struct Filter final {
 /** @brief Configuration used by fatigue and runners to change their behavior. */
 struct Config final {
 
-  struct options {
+  struct RunnerOptions {
     static constexpr char shownames[] = "shownames";
     static constexpr char showtypes[] = "showtypes";
 

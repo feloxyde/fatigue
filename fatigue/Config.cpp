@@ -49,26 +49,26 @@ Config::~Config()
 void Config::loadFromOpts(cxxopts::ParseResult const& res)
 {
 
-  showParamNames = res[options::shownames].as<bool>();
+  showParamNames = res[RunnerOptions::shownames].as<bool>();
   if (showParamNames) {
-    m_options.emplace(options::shownames);
+    m_options.emplace(RunnerOptions::shownames);
   }
 
-  showParamTypes = res[options::showtypes].as<bool>();
+  showParamTypes = res[RunnerOptions::showtypes].as<bool>();
   if (showParamTypes) {
-    m_options.emplace(options::showtypes);
+    m_options.emplace(RunnerOptions::showtypes);
   }
 
-  runner = res[options::runner].as<std::string>();
+  runner = res[RunnerOptions::runner].as<std::string>();
 
-  if (res[options::select].count()) {
-    filter.select = res[options::select].as<std::string>();
-    m_options.emplace(options::select);
+  if (res[RunnerOptions::select].count()) {
+    filter.select = res[RunnerOptions::select].as<std::string>();
+    m_options.emplace(RunnerOptions::select);
   }
 
-  if (res[options::exclude].count()) {
-    m_options.emplace(options::exclude);
-    filter.exclude = res[options::exclude].as<std::string>();
+  if (res[RunnerOptions::exclude].count()) {
+    m_options.emplace(RunnerOptions::exclude);
+    filter.exclude = res[RunnerOptions::exclude].as<std::string>();
   }
 
   //listing runners
