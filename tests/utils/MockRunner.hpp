@@ -1,3 +1,6 @@
+#ifndef FATIGUE_TESTS_UTILS_MOCKRUNNER_HPP
+#define FATIGUE_TESTS_UTILS_MOCKRUNNER_HPP
+
 #include "fatigue/runners/DefaultRunner.hpp"
 #include <fatigue/Runner.hpp>
 
@@ -40,7 +43,7 @@ struct MockLogger : public Logger {
   std::vector<Logger::Message> log;
 };
 
-std::ostream& operator<<(std::ostream& out, Logger::Message const& message)
+inline std::ostream& operator<<(std::ostream& out, Logger::Message const& message)
 {
   if (message.mode == ftg::Logger::Message::MESSAGE_CHECK) {
     out << "[CHECK]";
@@ -70,7 +73,7 @@ std::ostream& operator<<(std::ostream& out, Logger::Message const& message)
   return out;
 }
 
-std::ostream& operator<<(std::ostream& out, MockLogger const& logger)
+inline std::ostream& operator<<(std::ostream& out, MockLogger const& logger)
 {
   for (auto const& m : logger.log) {
     out << m;
@@ -79,7 +82,7 @@ std::ostream& operator<<(std::ostream& out, MockLogger const& logger)
 }
 
 /* return empty string if pass, error string otherwise */
-std::string compareMockLoggers(MockLogger const& result, MockLogger const& expected)
+inline std::string compareMockLoggers(MockLogger const& result, MockLogger const& expected)
 {
   std::stringstream out;
 
@@ -108,3 +111,5 @@ std::string compareMockLoggers(MockLogger const& result, MockLogger const& expec
 
   return out.str();
 }
+
+#endif

@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "fatigue/Suite.hpp"
+#include "../../utils/compareStrings.hpp"
 #include <cassert>
+#include <fatigue/Suite.hpp>
 #include <fatigue/Test.hpp>
 #include <fatigue/runners/DefaultRunner.hpp>
 #include <memory>
@@ -43,39 +44,26 @@ int main()
   suites.push_back(std::make_unique<Suite1>());
 
   std::stringstream ss;
-  std::stringstream res;
+  std::stringstream expected;
 
   Config conf;
   DefaultRunner dr(ss, conf);
   unsigned f = dr.run(suites);
   assert(f == 1);
 
-  res << "------ RUNNING TESTS ------" << std::endl;
-  res << std::endl;
-  res << "---- suite1//MockTest1:1" << std::endl;
-  res << "---- passed : 1 checks, 0 failed." << std::endl;
-  res << std::endl;
-  res << "---- suite1//MockTest4:0" << std::endl;
-  res << "---- failed : unable to load." << std::endl;
-  res << std::endl;
-  res << "---------- FAILED ---------" << std::endl;
-  res << "ran : 2" << std::endl;
-  res << "failed : 1" << std::endl;
-  /* HERE TO HELP DEBUG */
-  size_t i(0);
-  while (i < res.str().size() && i < ss.str().size()) {
-    if (res.str()[i] != ss.str()[i]) {
-      std::cout << "wong char at " << i << std::endl;
-      std::cout << "found" << res.str()[i] << " vs " << ss.str()[i] << std::endl;
-      break;
-    }
-    i++;
-  }
+  expected << "------ RUNNING TESTS ------" << std::endl;
+  expected << std::endl;
+  expected << "---- suite1//MockTest1:1" << std::endl;
+  expected << "---- passed : 1 checks, 0 failed." << std::endl;
+  expected << std::endl;
+  expected << "---- suite1//MockTest4:0" << std::endl;
+  expected << "---- failed : unable to load." << std::endl;
+  expected << std::endl;
+  expected << "---------- FAILED ---------" << std::endl;
+  expected << "ran : 2" << std::endl;
+  expected << "failed : 1" << std::endl;
 
-  std::cout << res.str() << std::endl;
-  std::cout << ss.str() << std::endl;
-
-  assert(res.str() == ss.str());
+  assert(compareStrings(ss.str(), expected.str()));
 
   return 0;
 }

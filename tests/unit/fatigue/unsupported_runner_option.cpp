@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+#include "../../utils/compareStrings.hpp"
 #include <cassert>
 #include <fatigue/Test.hpp>
 #include <fatigue/fatigue.hpp>
@@ -51,7 +52,7 @@ int main()
       << "] option not supported" << std::endl;
   exp << "Error : unsupported options were sent to runner. Aborting." << std::endl;
 
-  assert(exp.str() == out.str());
+  assert(compareStrings(out.str(), exp.str()));
 
   return 0;
 }
