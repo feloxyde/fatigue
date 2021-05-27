@@ -318,7 +318,7 @@ And we are done, our check is now ready to be used !
 
 @subsection tutorial_extending_runners Creating custom runner
 
-Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier than you think, since fatigue's core isn't thought to be intuitive, but rather flexible and practical to implement.
+Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier than you think, since fatigue's core isn't thought to be intuitive, but rather flexible and practical to implement.*
 
 General thoughts on runners and loggers are described in @ref architecture_run "Test runners and loggers" section of @ref architecture "Architecture" page. It is recommended for you to read this section to better understand what follows.
 

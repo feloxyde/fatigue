@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-﻿---
+---
 BasedOnStyle: LLVM
 AlignOperands: "true"
 AllowAllArgumentsOnNextLine: "false"
@@ -51,3 +51,5 @@ SpacesInSquareBrackets: "false"
 Standard: Cpp11
 UseTab: ForContinuationAndIndentation
 ColumnLimit: 120
+---
+

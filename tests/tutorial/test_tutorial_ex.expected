@@ -1,16 +1,16 @@
 ------ RUNNING TESTS ------
 
 ---- Avg//Empty
----- passed : out of 1 checks, 0 failed.
+---- passed : 1 checks, 0 failed.
 
 ---- Avg//One
----- passed : out of 1 checks, 0 failed.
+---- passed : 1 checks, 0 failed.
 
 ---- Avg//Many
----- passed : out of 1 checks, 0 failed.
+---- passed : 1 checks, 0 failed.
 
 ---- EqTen
----- passed : out of 1 checks, 0 failed.
+---- passed : 1 checks, 0 failed.
 
 ---------- PASSED ---------
 ran : 4

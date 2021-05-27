@@ -5,7 +5,7 @@
 ADD_TEST_SUITE(ts_fatigue_unit_DefaultRunner)
 
 set(DefaultRunner_tests
-    DefaultLogger_noparam.cpp 
+    #DefaultLogger_noparam.cpp.rework
     endRunOnFailure.cpp
     endRunOnSuccess.cpp
     exception.cpp

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+#include "../../utils/compareStrings.hpp"
 #include "fatigue/Suite.hpp"
 #include <cassert>
 #include <fatigue/Test.hpp>
@@ -64,41 +65,28 @@ int main()
   suites.push_back(std::make_unique<Suite2>());
 
   std::stringstream ss;
-  std::stringstream res;
+  std::stringstream expected;
 
   Config conf;
   DefaultRunner dr(ss, conf);
   unsigned f = dr.run(suites);
   assert(f == 0);
 
-  res << "------ RUNNING TESTS ------" << std::endl;
-  res << std::endl;
-  res << "---- suite1//MockTest1:1" << std::endl;
-  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
-  res << std::endl;
-  res << "---- suite1//MockTest4:1" << std::endl;
-  res << "---- passed : out of 1 checks, 0 failed." << std::endl;
-  res << std::endl;
-  res << "---- suite2//BoolTest" << std::endl;
-  res << "---- passed : out of 2 checks, 0 failed." << std::endl;
-  res << std::endl;
-  res << "---------- PASSED ---------" << std::endl;
-  res << "ran : 3" << std::endl;
-  /* HERE TO HELP DEBUG */
-  size_t i(0);
-  while (i < res.str().size() && i < ss.str().size()) {
-    if (res.str()[i] != ss.str()[i]) {
-      std::cout << "wong char at " << i << std::endl;
-      std::cout << "found" << res.str()[i] << " vs " << ss.str()[i] << std::endl;
-      break;
-    }
-    i++;
-  }
+  expected << "------ RUNNING TESTS ------" << std::endl;
+  expected << std::endl;
+  expected << "---- suite1//MockTest1:1" << std::endl;
+  expected << "---- passed : 1 checks, 0 failed." << std::endl;
+  expected << std::endl;
+  expected << "---- suite1//MockTest4:1" << std::endl;
+  expected << "---- passed : 1 checks, 0 failed." << std::endl;
+  expected << std::endl;
+  expected << "---- suite2//BoolTest" << std::endl;
+  expected << "---- passed : 2 checks, 0 failed." << std::endl;
+  expected << std::endl;
+  expected << "---------- PASSED ---------" << std::endl;
+  expected << "ran : 3" << std::endl;
 
-  std::cout << res.str() << std::endl;
-  std::cout << ss.str() << std::endl;
-
-  assert(res.str() == ss.str());
+  assert(compareStrings(ss.str(), expected.str()));
 
   return 0;
 }

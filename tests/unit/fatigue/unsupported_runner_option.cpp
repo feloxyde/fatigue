@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+#include "../../utils/compareStrings.hpp"
 #include <cassert>
 #include <fatigue/Test.hpp>
 #include <fatigue/fatigue.hpp>
@@ -15,8 +16,7 @@ public:
     return std::unordered_set<std::string>({"select"});
   }
 
-
-  virtual void report(ftg::MessageMode, std::string const&, std::vector<ftg::ParamInfo> const&, bool, bool, bool) {}
+  virtual void report(Logger::Message const&) {}
 
   virtual unsigned run(ftg::TestList const&) { return 1; }
 };
@@ -52,7 +52,7 @@ int main()
       << "] option not supported" << std::endl;
   exp << "Error : unsupported options were sent to runner. Aborting." << std::endl;
 
-  assert(exp.str() == out.str());
+  assert(compareStrings(out.str(), exp.str()));
 
   return 0;
 }

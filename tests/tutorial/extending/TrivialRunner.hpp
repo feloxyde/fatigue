@@ -30,14 +30,9 @@ public:
     note that arg names are commented out to prevent compiler unused variable warning,
     but for a more elaborated runner, you may want to use them.
   */
-  virtual void report(ftg::MessageMode /* mode */,
-		      std::string const& /* description */,
-		      std::vector<ftg::ParamInfo> const& /* params */,
-		      bool expected,
-		      bool result,
-		      bool /* important */)
+  virtual void report(Logger::Message const& message)
   {
-    if (result != expected) {
+    if (message.result != message.expected) {
       /* if result is not what we expect, fail */
       throw TrivialRunnerFail();
     }
@@ -46,20 +41,21 @@ public:
   /* helper method. Rules loading, running and unloading test */
   void runTest(ftg::Test& test)
   {
-    if (!test.load()) {
-      /* if load failed */
-      throw TrivialRunnerFail();
-    }
-    //setting self as a logger for the test before running it
-    test.setLogger(this);
-    try {
-      test.run();
-    } catch (...) {
-      /* whatever exception, we throw to stop and return error */
-      test.unload();
-      throw TrivialRunnerFail();
-    }
-    test.unload();
+    //this method handles a test run, and ensures all exit cases are handled
+    // clang-format off
+    ftg::Checker::run(test, *this,
+      /* on a clean exit */
+	    [](){},
+      /* on load failure */
+	    [](){throw TrivialRunnerFail();},
+      /* on check failure exit */
+	    [](){},
+      /* on check success exit */
+	    [](){},
+      /* on unhandled exception exit */
+	    [](){throw TrivialRunnerFail();}
+    );
+    // clang-format on
   }
 
   /* helper method, used to run individual tests from TestList */

@@ -11,89 +11,13 @@
 
 namespace ftg {
 
-DefaultLogger::DefaultLogger(std::ostream& ostream, Config const& config) :
-    m_config(config),
-    m_ostream(ostream),
-    m_passed(true),
-    m_checkPassed(0),
-    m_checkFailed(0)
-{
-}
-
-DefaultLogger::~DefaultLogger()
-{
-}
-
-void DefaultLogger::report(MessageMode mode,
-			   std::string const& description,
-			   std::vector<ParamInfo> const& params,
-			   bool expected,
-			   bool result,
-			   bool important)
-{
-  if (expected == result) {
-    m_checkPassed++;
-    return;
-  }
-
-  m_checkFailed++;
-
-  if (important) {
-    m_ostream << "!!! ";
-  }
-
-  m_ostream << "(" << m_checkFailed + m_checkPassed << ") ";
-
-  if (mode == MESSAGE_CHECK) {
-    m_ostream << "[ERROR] ";
-    m_passed = false;
-  } else if (mode == MESSAGE_WARN) {
-    m_ostream << "[WARN] ";
-  }
-
-  m_ostream << description;
-
-  if (params.size() > 0) {
-    m_ostream << "( ";
-    size_t i = 0;
-    for (auto const& p : params) {
-      if (m_config.showParamNames) {
-	m_ostream << p.name << ": ";
-      }
-      m_ostream << p.value;
-      if (m_config.showParamTypes) {
-	m_ostream << " [" << p.type << "]";
-      }
-      if (i < params.size() - 1) {
-	m_ostream << ", ";
-      }
-      i++;
-    }
-    m_ostream << " )";
-  }
-
-  if (expected) {
-    m_ostream << " -> true";
-  } else {
-    m_ostream << " -> false";
-  }
-
-  if (expected != result) {
-    m_ostream << " : failed." << std::endl;
-  }
-}
-
-bool DefaultLogger::passed() const
-{
-  return m_passed;
-}
 
 DefaultRunner::DefaultRunner(std::ostream& ostream, Config const& config) :
     m_config(config),
     m_ostream(ostream),
-    totalPass(0),
-    totalFailed(0),
-    totalSkipped(0)
+    m_totalPass(0),
+    m_totalFailed(0),
+    m_totalSkipped(0)
 {
 }
 
@@ -104,7 +28,10 @@ DefaultRunner::~DefaultRunner()
 
 std::unordered_set<std::string> DefaultRunner::supportedOptions() const
 {
-  return {Config::options::shownames, Config::options::showtypes, Config::options::select, Config::options::exclude};
+  return {Config::RunnerOptions::shownames,
+	  Config::RunnerOptions::showtypes,
+	  Config::RunnerOptions::select,
+	  Config::RunnerOptions::exclude};
 }
 
 unsigned DefaultRunner::run(TestList const& tests)
@@ -116,22 +43,76 @@ unsigned DefaultRunner::run(TestList const& tests)
   dispatchTestList(tests, prefixes);
 
   m_ostream << std::endl;
-  if (totalFailed == 0) {
+  if (m_totalFailed == 0) {
     m_ostream << "---------- PASSED ---------" << std::endl;
   } else {
     m_ostream << "---------- FAILED ---------" << std::endl;
   }
-  m_ostream << "ran : " << totalPass + totalFailed << std::endl;
-  if (totalFailed != 0) {
-    m_ostream << "failed : " << totalFailed << std::endl;
+  m_ostream << "ran : " << m_totalPass + m_totalFailed << std::endl;
+  if (m_totalFailed != 0) {
+    m_ostream << "failed : " << m_totalFailed << std::endl;
   }
-  if (totalSkipped != 0) {
-    m_ostream << "skipped : " << totalSkipped << std::endl;
+  if (m_totalSkipped != 0) {
+    m_ostream << "skipped : " << m_totalSkipped << std::endl;
   }
 
-  return totalFailed;
+  return m_totalFailed;
 }
 
+
+void DefaultRunner::report(Logger::Message const& message)
+{
+  if (message.expected == message.result) {
+    m_currentRun.checkPassed++;
+    return;
+  }
+
+  m_currentRun.checkFailed++;
+
+  if (message.important) {
+    m_ostream << "!!! ";
+  }
+
+  m_ostream << "(" << m_currentRun.checkFailed + m_currentRun.checkPassed << ") ";
+
+  if (message.mode == Logger::Message::MESSAGE_CHECK) {
+    m_ostream << "[ERROR] ";
+    m_currentRun.passed = false;
+  } else if (message.mode == Logger::Message::MESSAGE_WARN) {
+    m_ostream << "[WARN] ";
+  }
+
+  m_ostream << message.description;
+
+  if (message.params.size() > 0) {
+    m_ostream << "( ";
+    size_t i = 0;
+    for (auto const& p : message.params) {
+      if (m_config.showParamNames) {
+	m_ostream << p.name << ": ";
+      }
+      m_ostream << p.value;
+      if (m_config.showParamTypes) {
+	m_ostream << " [" << p.type << "]";
+      }
+      if (i < message.params.size() - 1) {
+	m_ostream << ", ";
+      }
+      i++;
+    }
+    m_ostream << " )";
+  }
+
+  if (message.expected) {
+    m_ostream << " -> true";
+  } else {
+    m_ostream << " -> false";
+  }
+
+  if (message.expected != message.result) {
+    m_ostream << " : failed." << std::endl;
+  }
+}
 
 void DefaultRunner::dispatchTestList(TestList const& tests, std::vector<std::string> const& prefixes)
 {
@@ -165,6 +146,7 @@ formatTestName(std::vector<std::string> const& prefixes, std::string const& name
   return str;
 }
 
+
 void DefaultRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::string> const& prefixes)
 {
   std::string tname = formatTestName(prefixes, test->name(), m_config.filter.separator);
@@ -172,59 +154,54 @@ void DefaultRunner::runTest(std::unique_ptr<Test> const& test, std::vector<std::
   m_ostream << std::endl << "---- " << tname << std::endl;
   if (!m_config.filter.shouldRun(prefixes, test->name())) {
     m_ostream << "skipped." << std::endl;
-    totalSkipped++;
+    m_totalSkipped++;
     return;
   }
 
+  m_currentRun.checkPassed = 0;
+  m_currentRun.checkFailed = 0;
+  m_currentRun.passed = true;
+  bool loadFailure = false;
+  // clang-format off
+  Checker::run(*test, *this, 
+          //case of clean exit
+          [](){},
+          //case of load failure
+	        [this, &loadFailure](){
+            this->m_totalFailed++;
+            this->m_currentRun.passed = false;
+            loadFailure = true;
+          },
+          //case of check failure direct exit 
+          [this](){  
+            this->m_ostream << "Test ended on check " << m_currentRun.checkFailed + m_currentRun.checkPassed << " failure." << std::endl;
+          },
+          //case of check success direct exit
+	        [this](){
+            this->m_ostream << "Test ended on check " << m_currentRun.checkFailed + m_currentRun.checkPassed << " success." << std::endl;
+          },
+	        //case of uncaught exception is thrown 
+          [this](){
+            this->m_ostream << "[EXCEPTION] unexpected exception thrown after check " << m_currentRun.checkFailed + m_currentRun.checkPassed << ", test ending." << std::endl;
+            this->m_currentRun.passed = false;
+          }
+  );
+  // clang-format on
 
-  if (test->load()) {
-    if (runLoadedTest(test)) {
-      totalPass++;
-    } else {
-      totalFailed++;
-    }
-  } else {
-    m_ostream << "---- failed : "
-	      << "error during load phase." << std::endl;
-    totalFailed++;
-  }
-}
-
-
-bool DefaultRunner::runLoadedTest(std::unique_ptr<Test> const& t)
-{
-  bool exceptPass = true;
-  bool passed = true;
-
-  DefaultLogger otl(m_ostream, m_config);
-  t->setLogger(&otl);
-
-  try {
-    t->run();
-    t->unload();
-  } catch (ftg::EndRunOnFailure& e) {
-    m_ostream << "Test ended on check failure." << std::endl;
-    t->unload();
-  } catch (ftg::EndRunOnSuccess& e) {
-    m_ostream << "Test ended on check success." << std::endl;
-    t->unload();
-  } catch (...) {
-    m_ostream << "[EXCEPTION] uncaught exception detected, test ending." << std::endl;
-    exceptPass = false;
-    t->unload();
+  if (loadFailure) {
+    m_ostream << "---- failed : unable to load." << std::endl;
+    return;
   }
 
-  if (exceptPass && otl.passed()) {
+  if (m_currentRun.passed) {
     m_ostream << "---- passed : ";
-    passed = true;
+    m_totalPass++;
   } else {
     m_ostream << "---- failed : ";
-    passed = false;
+    m_totalFailed++;
   }
 
-  m_ostream << "out of " << otl.m_checkPassed + otl.m_checkFailed << " checks, " << otl.m_checkFailed << " failed."
-	    << std::endl;
-  return passed;
+  m_ostream << m_currentRun.checkPassed + m_currentRun.checkFailed << " checks, " << m_currentRun.checkFailed
+	    << " failed." << std::endl;
 }
-
 } // namespace ftg

@@ -8,7 +8,6 @@
 
 /** @file */
 
-
 #ifndef FATIGUE_TEST_HPP
 #define FATIGUE_TEST_HPP
 
@@ -23,16 +22,15 @@
 #include <type_traits>
 #include <vector>
 
-
 namespace ftg {
 
 /** @addtogroup user_api
-@{ 
+@{
 */
 
 // clang-format off
 template <typename T> concept OutStreamable = requires(std::ostream &a, T const& b) {
-  { a << b } ->std::same_as<std::ostream &>;
+  { a << b } ->std::same_as<std::ostream&>;
 };
 
 /** @brief used to by checks to convert argument values into string. 
@@ -40,10 +38,10 @@ template <typename T> concept OutStreamable = requires(std::ostream &a, T const&
     By default, it will try to use ```std::stringstream::operator<<( const& T)```,
     however template can be specialized if you want to use a custom conversion. 
 */
-template <typename T> std::string to_string(T const &value);
+template <typename T> std::string to_string(T const& value);
 
 /** @brief  Specialization of ftg::to_string using ```std::stringstream::operator<<( const& T)```. */
-template <OutStreamable T> std::string to_string(T const &value)
+template <OutStreamable T> std::string to_string(T const& value)
 {
   std::stringstream ss;
   ss << value;
@@ -91,21 +89,25 @@ template <typename T> concept LambdaProxy = requires (T const& a){
 };
 // clang-format on
 
-/** @brief Test class, meant to be derived from to implement test, providing checks. */
+/** @brief Test class, meant to be derived from to implement test, providing
+ * checks. */
 class Test : public Checker {
 public:
   /** @brief Constructor of a test */
   Test(std::string const& name);
   virtual ~Test();
 
-public:
-  /** @brief Method meant to be overriden, which is the test execution scenario. */
+protected:
+  /** @brief Method meant to be overriden, which is the test execution scenario.
+   */
   virtual void run() = 0;
 
-  /** @brief Method meant to be optionally overriden, which is run before execution of scenario. */
+  /** @brief Method meant to be optionally overriden, which is run before
+   * execution of scenario. */
   virtual bool load() noexcept { return true; }
 
-  /** @brief Method meant to be optionally overriden, which is run after execution of scenario. */
+  /** @brief Method meant to be optionally overriden, which is run after
+   * execution of scenario. */
   virtual void unload() noexcept {}
 
 protected:
@@ -257,7 +259,6 @@ protected:
   @}
   */
 
-
 private:
   /** @brief Used for parameters report formatting */
   template<ToStringable T, ToStringable U>
@@ -274,11 +275,9 @@ private:
 
 } // namespace ftg
 
-
 /** OTHER METHODS IMPLEMENTATION */
 
 namespace ftg {
-
 
 inline Test::Test(std::string const& name) : Checker(name)
 {
@@ -306,7 +305,6 @@ std::vector<ParamInfo> Test::formatBinaryTolerantCheck(T const& left, U const& r
   params.emplace_back("tolerance", ftg::to_string(tolerance), type_to_string<V>());
   return params;
 }
-
 
 /* CHECK IMPLEMENTATIONS */
 inline Check Test::check_true(bool b)
@@ -439,7 +437,6 @@ requires GEComparable<T, U> Check Test::check_greater_equal(T const& left,
   return raw_check(description, params, left >= right);
 }
 
-
 template<typename Except, LambdaProxy T>
 Check Test::check_throw(T const& expr)
 {
@@ -448,7 +445,6 @@ Check Test::check_throw(T const& expr)
 			     std::string("check_throw<") + type_to_string<Except>() + std::string(">"),
 			     std::vector<ParamInfo>());
 }
-
 
 template<typename Except, LambdaProxy T>
 Check Test::check_throw(T const& expr, std::string const& description, std::vector<ParamInfo> const& params)
@@ -467,7 +463,6 @@ Check Test::check_nothrow(T const& expr)
 {
   return check_nothrow(expr, "check_nothrow", std::vector<ParamInfo>());
 }
-
 
 template<LambdaProxy T>
 Check Test::check_nothrow(T const& expr, std::string const& description, std::vector<ParamInfo> const& params)

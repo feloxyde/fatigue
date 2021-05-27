@@ -34,12 +34,12 @@ EndRunOnSuccess::EndRunOnSuccess()
 
 Check::Check(Checker& test, std::string const& description, std::vector<ParamInfo> const& params, bool res) :
     m_test(test),
+    m_reported(false),
     m_description(description),
     m_res(res),
-    m_mode(MESSAGE_CHECK),
+    m_mode(Logger::Message::Mode::MESSAGE_CHECK),
     m_expected(true),
     m_important(false),
-    m_reported(false),
     m_params(params)
 
 {
@@ -47,12 +47,12 @@ Check::Check(Checker& test, std::string const& description, std::vector<ParamInf
 
 Check::Check(Check&& origin) :
     m_test(origin.m_test),
+    m_reported(origin.m_reported),
     m_description(origin.m_description),
     m_res(origin.m_res),
-    m_mode(MESSAGE_CHECK),
+    m_mode(origin.m_mode),
     m_expected(origin.m_expected),
     m_important(origin.m_important),
-    m_reported(origin.m_reported),
     m_params(origin.m_params)
 {
   //disabling reporting since object has moved
@@ -66,7 +66,7 @@ Check::~Check()
 
 Check& Check::warn()
 {
-  m_mode = MESSAGE_WARN;
+  m_mode = Logger::Message::Mode::MESSAGE_WARN;
   return *this;
 }
 
@@ -110,7 +110,7 @@ void Check::report()
 {
   if (m_reported == false) {
     m_reported = true;
-    m_test.m_logger->report(m_mode, m_description, m_params, m_expected, m_res, m_important);
+    m_test.m_logger->report(Logger::Message(m_mode, m_description, m_params, m_expected, m_res, m_important));
   }
 }
 

@@ -18,17 +18,54 @@ stdout, stderr = p.communicate()
 
 #with open("expected.txt", "w+") as f:
 #    f.write(stdout.decode())
-print(stdout.decode())
 
 with open(argv[2], 'r') as f:
-    file_content = f.read() # Read whole file in the file_content string
+    expected = f.read().splitlines() # Read whole file in the file_content string
+    
+result = stdout.decode().splitlines()
 
-print(file_content)
+diff = False
+line = 1
+details = ""
+rfinished = False
+efinished = False
+while rfinished and efinished :
+    resLine = ""
+    expLine = ""
+    if len(result) < line -1 :
+        resLine = result[line-1]
+    else :
+        rfinished = True
+    if len(expected) < line -1 :
+        expLine = result[line-1]
+    else : 
+        efinished = True
 
-if(file_content == stdout.decode()):
-    print("PASSED")
-    exit(0)
-else :
-    print("FAILED")
+    if resLine != expLine or rfinished != efinished :
+        details += "\nlines " + str(line) + " are different : \n"
+        if not rfinished :
+            details += "result   : " + resLine + "\n"
+        else :
+            details += "result string ended\n"
+        if not efinished : 
+            details += "expected : " + expLine + "\n"
+        else :
+            details += "expected string ended\n"
+
+    line += 1
+
+if diff : 
+    print("the two strings are different :")
+    print("### RESULT ###")
+    print(result)
+    print("##############")
+    print("\n")
+    print("### EXPECTED ###")
+    print(expected)
+    print("################")
+    print("\n")
+    print(details)
     exit(1)
+else :
+    exit(0)
 

@@ -3,16 +3,19 @@
 // SPDX-License-Identifier: MIT
 
 #include <fatigue/Test.hpp>
-#include <fatigue/runners/DefaultRunner.hpp>
+
+#include "../../utils/MockRunner.hpp"
 
 #include <cassert>
 #include <sstream>
 
 using namespace ftg;
 
+
 struct TestAutoMsgPass : public Test {
   TestAutoMsgPass() : Test("TestAutoMsgPass") {}
 
+protected:
   virtual void run()
   {
     check_equal(10, 10);
@@ -43,19 +46,31 @@ struct TestAutoMsgPass : public Test {
   }
 };
 
+class TestRunner : public DefaultRunner {
+  TestRunner();
+  virtual ~TestRunner();
+};
+
+
 int main()
 {
 
   std::stringstream ss;
   TestAutoMsgPass t;
   Config conf;
-  DefaultLogger dl(ss, conf);
-  t.setLogger(&dl);
-
-  t.run();
-  assert(dl.passed());
-  assert(dl.m_checkPassed == 15);
-  assert(dl.m_checkFailed == 0);
+  MockLogger logger;
+  bool cleanExit = false;
+  Checker::run(
+      t,
+      logger,
+      [&cleanExit]() { cleanExit = true; },
+      []() {},
+      []() {},
+      []() {},
+      []() {});
+  assert(cleanExit);
+  assert(logger.countCheckPassed() == 15);
+  assert(logger.countCheckFailed() == 0);
   assert(ss.str().empty());
 
   return 0;
