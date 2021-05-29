@@ -94,4 +94,19 @@ add_subdirectory(tests)
 
 get_property(unit_binaries GLOBAL PROPERTY ts_fatigue_unit_BINARIES_LIST)
 
-ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries} COVERING ${headers} ${sources})
+ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries} COVERING ${headers} ${sources}) 
+
+
+
+########################################################### 
+########## QUALITY ########################################
+###########################################################
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/quality/codechecker)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/quality/reports)
+
+
+add_custom_target(codechecker_sensitive 
+                COMMAND codechecker analyze ${CMAKE_BINARY_DIR}/compile_commands.json --enable sensitive --disable google-runtime-references --ignore ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt --output ${CMAKE_BINARY_DIR}/quality/codechecker/sentitive || true
+                COMMAND codechecker parse --export html --output ${CMAKE_BINARY_DIR}/quality/reports/codechecker_sensitive ${CMAKE_BINARY_DIR}/quality/codechecker/sentitive)
+
