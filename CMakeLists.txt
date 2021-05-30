@@ -110,3 +110,7 @@ add_custom_target(codechecker_sensitive
                 COMMAND codechecker analyze ${CMAKE_BINARY_DIR}/compile_commands.json --enable sensitive --disable google-runtime-references --ignore ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt --output ${CMAKE_BINARY_DIR}/quality/codechecker/sentitive || true
                 COMMAND codechecker parse --export html --output ${CMAKE_BINARY_DIR}/quality/reports/codechecker_sensitive ${CMAKE_BINARY_DIR}/quality/codechecker/sentitive)
 
+add_custom_target(codechecker_extreme
+                COMMAND codechecker analyze ${CMAKE_BINARY_DIR}/compile_commands.json --enable extreme --disable google-runtime-references --ignore ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt --output ${CMAKE_BINARY_DIR}/quality/codechecker/extreme || true
+                COMMAND codechecker parse --export html --output ${CMAKE_BINARY_DIR}/quality/reports/codechecker_extreme ${CMAKE_BINARY_DIR}/quality/codechecker/extreme)
+
