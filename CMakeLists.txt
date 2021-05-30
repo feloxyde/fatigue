@@ -111,6 +111,8 @@ set(QUALITY_CODECHECKER_DIR ${QUALITY_DIR}/codechecker)
 set(QUALITY_CODECHECKER_SKIPFILE ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt)
 file(MAKE_DIRECTORY ${QUALITY_CODECHECKER_DIR})
 
+add_custom_target(quality_all)
+
 add_custom_target(quality_codechecker_sensitive 
                 COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable sensitive --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/sentitive || true
                 COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive ${QUALITY_CODECHECKER_DIR}/sentitive)
@@ -142,3 +144,12 @@ add_custom_target(quality_cppcheck_bug_hunting
                 COMMAND cppcheck --project=${COMPILE_COMMANDS} --bug-hunting --enable=all --inconclusive --xml --output-file=${QUALITY_CPPCHECK_DIR}/bug_hunting.xml
                 COMMAND cppcheck-htmlreport --title=AllEnabledReport --file=${QUALITY_CPPCHECK_DIR}/bug_hunting.xml --report-dir=${QUALITY_REPORT_DIR}/cppcheck_bug_hunting)
 
+add_dependencies(quality_all
+                quality_codechecker_sensitive
+                quality_codechecker_sensitive_ctu
+                quality_codechecker_extreme
+                quality_codechecker_extreme_ctu
+                quality_cppcheck_default
+                quality_cppcheck_all
+                quality_cppcheck_bug_hunting 
+)
