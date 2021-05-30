@@ -75,7 +75,7 @@ set(sources
     fatigue/Suite.cpp
 )
 
-add_library(fatigue ${sources})
+add_library(fatigue ${sources} ${headers})
 
 
 #installing headers
@@ -96,21 +96,49 @@ get_property(unit_binaries GLOBAL PROPERTY ts_fatigue_unit_BINARIES_LIST)
 
 ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries} COVERING ${headers} ${sources}) 
 
-
-
 ########################################################### 
 ########## QUALITY ########################################
 ###########################################################
 
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/quality/codechecker)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/quality/reports)
+set(QUALITY_DIR ${CMAKE_BINARY_DIR}/quality)
+set(QUALITY_REPORT_DIR ${QUALITY_DIR}/reports)
+set(COMPILE_COMMANDS ${CMAKE_BINARY_DIR}/compile_commands.json)
+
+file(MAKE_DIRECTORY ${QUALITY_REPORT_DIR})
 
 
-add_custom_target(codechecker_sensitive 
-                COMMAND codechecker analyze ${CMAKE_BINARY_DIR}/compile_commands.json --enable sensitive --disable google-runtime-references --ignore ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt --output ${CMAKE_BINARY_DIR}/quality/codechecker/sentitive || true
-                COMMAND codechecker parse --export html --output ${CMAKE_BINARY_DIR}/quality/reports/codechecker_sensitive ${CMAKE_BINARY_DIR}/quality/codechecker/sentitive)
+set(QUALITY_CODECHECKER_DIR ${QUALITY_DIR}/codechecker)
+set(QUALITY_CODECHECKER_SKIPFILE ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt)
+file(MAKE_DIRECTORY ${QUALITY_CODECHECKER_DIR})
 
-add_custom_target(codechecker_extreme
-                COMMAND codechecker analyze ${CMAKE_BINARY_DIR}/compile_commands.json --enable extreme --disable google-runtime-references --ignore ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt --output ${CMAKE_BINARY_DIR}/quality/codechecker/extreme || true
-                COMMAND codechecker parse --export html --output ${CMAKE_BINARY_DIR}/quality/reports/codechecker_extreme ${CMAKE_BINARY_DIR}/quality/codechecker/extreme)
+add_custom_target(quality_codechecker_sensitive 
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable sensitive --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/sentitive || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive ${QUALITY_CODECHECKER_DIR}/sentitive)
+
+add_custom_target(quality_codechecker_sensitive_ctu
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable sensitive --ctu --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/sentitive_ctu || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive_ctu ${QUALITY_CODECHECKER_DIR}/sentitive_ctu)
+
+add_custom_target(quality_codechecker_extreme
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable extreme --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/extreme || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme ${QUALITY_CODECHECKER_DIR}/extreme)
+
+add_custom_target(quality_codechecker_extreme_ctu
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable extreme --ctu --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/extreme_ctu || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme_ctu ${QUALITY_CODECHECKER_DIR}/extreme_ctu)
+
+set(QUALITY_CPPCHECK_DIR ${QUALITY_DIR}/cppcheck)
+file(MAKE_DIRECTORY ${QUALITY_CPPCHECK_DIR})
+
+add_custom_target(quality_cppcheck_default
+                COMMAND cppcheck --project=${COMPILE_COMMANDS} --xml --output-file=${QUALITY_CPPCHECK_DIR}/default.xml
+                COMMAND cppcheck-htmlreport --title=DefaultReport --file=${QUALITY_CPPCHECK_DIR}/default.xml --report-dir=${QUALITY_REPORT_DIR}/cppcheck_default)
+
+add_custom_target(quality_cppcheck_all
+                COMMAND cppcheck --project=${COMPILE_COMMANDS} --enable=all --xml --output-file=${QUALITY_CPPCHECK_DIR}/all.xml
+                COMMAND cppcheck-htmlreport --title=AllEnabledReport --file=${QUALITY_CPPCHECK_DIR}/all.xml --report-dir=${QUALITY_REPORT_DIR}/cppcheck_all)
+
+add_custom_target(quality_cppcheck_bug_hunting
+                COMMAND cppcheck --project=${COMPILE_COMMANDS} --bug-hunting --enable=all --inconclusive --xml --output-file=${QUALITY_CPPCHECK_DIR}/bug_hunting.xml
+                COMMAND cppcheck-htmlreport --title=AllEnabledReport --file=${QUALITY_CPPCHECK_DIR}/bug_hunting.xml --report-dir=${QUALITY_REPORT_DIR}/cppcheck_bug_hunting)
 
