@@ -94,7 +94,7 @@ add_subdirectory(tests)
 
 get_property(unit_binaries GLOBAL PROPERTY ts_fatigue_unit_BINARIES_LIST)
 
-ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries} COVERING ${headers} ${sources}) 
+ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries}) 
 
 ########################################################### 
 ########## QUALITY ########################################
