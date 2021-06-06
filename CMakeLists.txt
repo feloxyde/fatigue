@@ -65,7 +65,13 @@ add_subdirectory(tests)
 
 get_property(unit_binaries GLOBAL PROPERTY ts_fatigue_unit_BINARIES_LIST)
 
-ADD_COVERAGE_REPORT(coverage_all COVERING ${headers} ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries}) 
+file(GLOB_RECURSE sources LIST_DIRECTORIES false RELATIVE ${CMAKE_SOURCE_DIR} fatigue/*.[ch]pp )
+list(FILTER sources EXCLUDE REGEX fatigue/external/*)
+
+
+ADD_COVERAGE_REPORT(coverage_all COVERING ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries}) 
+
+message("sources :  ${sources}")
 
 ########################################################### 
 ########## QUALITY ########################################
