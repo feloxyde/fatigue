@@ -48,8 +48,6 @@ make coverage_all_html
 
 Respectively building a text summary ```coverage_all.txt``` and a detailed html report ```coverage_all.html``` in ```llvmcoverage``` directory. 
 
-
-
 @section develomment_coding_conventions Coding conventions
 
 To keep the code visually coherent and make it easier for maintainers to work on it in the future, please try to stick as much as possible with following style :
