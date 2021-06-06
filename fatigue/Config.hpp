@@ -8,7 +8,7 @@
 #define FATIGUE_CONFIG_HPP
 
 #include "Runner.hpp"
-#include "fatigue/external/cxxopts.hpp"
+#include "external/cxxopts.hpp"
 #include <memory>
 #include <regex>
 #include <unordered_set>

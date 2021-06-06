@@ -10,11 +10,13 @@ This page presents basic and advanced usage of fatigue framework.
 
 @section installation Installation
 
-To use fatigue, you can either use the library as submodule of your project or install it system-wide. 
+As fatigue is using C++20 features and dynamic polymorphism, it is recommended to use it through submodules in your project to prevent any ABI compatibility issue. fatigue does not depends on an external library other than C++ standard library, CMake, and a C++20-ready compiler, and thus including it in your project shouldn't be harder than setting an additional target, as for example using ```add_subdirectory``` in your CMake project.
+
+Otherwise, you can install fatigue system-wide as the rest of this chapter describes. 
 
 Depending on your operating system, fatigue may be available through package manager or other builtin installer.
 
-The following instructions on building and installing fatigue are targeted at Linux system, however, they should be possible to adapt to any other system as fatigue does not have heavy requirements. 
+The following instructions on building and installing fatigue are targeted at Linux systems, however, they should be possible to adapt to any other system as fatigue does not have heavy dependencies. 
 
 @subsection installation_requirements Requirements
 

@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.18.0)
+cmake_minimum_required(VERSION 3.20.0)
 
 #project declaration
-project(fatigue)
+project(fatigue_toplevel)
 
 
 include(ProcessorCount)
@@ -13,9 +13,6 @@ ProcessorCount(N_PROC)
 if(N_PROC EQUAL 0)
      set(N_PROC 1)
 endif()
-
-
-include(GNUInstallDirs)
 
 #testing enabled, comment to disable
 enable_testing()
@@ -51,39 +48,13 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fatigue/external)
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/cxxopts/include/cxxopts.hpp DESTINATION ${CMAKE_CURRENT_LIST_DIR}/fatigue/external)
 
-set(headers 
-    fatigue/Checker.hpp
-    fatigue/Config.hpp
-    fatigue/fatigue.hpp
-    fatigue/Runner.hpp
-    fatigue/runners/DefaultRunner.hpp
-    fatigue/Suite.hpp
-    fatigue/Test.hpp
-    fatigue/utils.hpp
-)
-
-set(headers_external
-    fatigue/external/cxxopts.hpp
-)
-
-set(sources
-    fatigue/Checker.cpp
-    fatigue/Config.cpp
-    fatigue/fatigue.cpp
-    fatigue/Runner.cpp
-    fatigue/runners/DefaultRunner.cpp
-    fatigue/Suite.cpp
-)
-
-add_library(fatigue ${sources} ${headers})
-
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/fatigue)
 
 #installing headers
 #set_target_properties(fatigue PROPERTIES PUBLIC_HEADER "${headers}")
-install(DIRECTORY fatigue/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fatigue
-        FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY fatigue/ DESTINATION ${CMAKE_INSTALL_PREFIX}/fatigue/fatigue)
+install(FILES fatigue-config.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/fatigue)
 #installing lib
-install(TARGETS fatigue)
 
 ########################################################### 
 ########## TESTING ########################################

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "fatigue.hpp"
+#include "Config.hpp"
 #include "Runner.hpp"
-#include "fatigue/Config.hpp"
 #include "runners/DefaultRunner.hpp"
 #include <cstdlib>
 #include <memory>
