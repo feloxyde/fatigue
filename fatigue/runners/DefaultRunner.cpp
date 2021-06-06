@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 #include "DefaultRunner.hpp"
+#include "../Checker.hpp"
 #include "../Config.hpp"
 #include "../Runner.hpp"
 #include "../Suite.hpp"
-#include "fatigue/Checker.hpp"
 #include <variant>
 
 namespace ftg {

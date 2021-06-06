@@ -10,11 +10,13 @@ This page presents basic and advanced usage of fatigue framework.
 
 @section installation Installation
 
-To use fatigue, you can either use the library as submodule of your project or install it system-wide. 
+You can either include CMake directly as a submodule of your projects, or install it system-wide. Depending on your operating system, fatigue may be available through package manager or other builtin installer.
 
-Depending on your operating system, fatigue may be available through package manager or other builtin installer.
+If you intend to use fatigue as a submodule, simply skip this section and go straight to @ref quick_example "Quick example". 
 
-The following instructions on building and installing fatigue are targeted at Linux system, however, they should be possible to adapt to any other system as fatigue does not have heavy requirements. 
+The following instructions on building and installing fatigue are targeted at Linux systems, however, they should be possible to adapt to any other system as fatigue does not have heavy dependencies.
+
+Please note that as fatigue uses templates and C++20 features, it is not installed as a binary but as a subproject you can include in your own cmake configs. 
 
 @subsection installation_requirements Requirements
 
@@ -70,7 +72,7 @@ Once fatigue is built using one of the two ways mentionned before, run install t
 sudo cmake --build . --target install
 ~~~
 
-Fatigue should now be installed on your computer, likely under ```/usr/local/lib``` and ```/usr/local/include```.
+Fatigue should now be installed on your computer, under ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory, which is likely ```/usr/local/``` under Linux systems.
 
 Optionally, install can be tested by changing into ```tests/install```, running CMake there, to build and run tests with installed library. 
 
@@ -85,13 +87,29 @@ cmake --build . --target test
 
 @subsection installation_uninstall Uninstall 
 
-To uninstall fatigue, you will have to manually remove files created by installation.
-
-- ```libfatigue.*``` binary, probably found in ```/usr/local/lib```.
-- ```fatigue/``` headers directory, probably found in ```/usr/local/include```.
-
+To uninstall fatigue, you will have to manually remove ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory created at installation, which is likely ```/usr/local/``` under Linux systems.
 
 @section quick_example Quick example
+
+@subsection importing_fatigue Importing fatigue in your project 
+
+If you include the project directly as a submodule, what you want probably is in ```fatigue/``` directory, the one directly containing ```fatigue.hpp``` file. This one contains a single target, ```fatigue```, which is the testing library. Assuming you included fatigue as a git submodule, you want to do :
+
+```cmake
+add_subdirectory(fatigue/fatigue)
+```
+
+If you want to import fatigue from a system_wide install, you can simply ```find_package(fatigue)```. 
+
+```cmake
+#adds fatigue as a subdirectory, making fatigue target available for linkage
+#it also sets FATIGUE_INCLUDE_DIR variable to be the path where headers of the library are
+find_package(fatigue REQUIRED)
+
+#you can either set include directory as a global one (shown here), or per target.
+include_directories(${FATIGUE_INCLUDE_DIR})
+
+```
 
 @subsection writing_tests Writing tests
 
