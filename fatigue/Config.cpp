@@ -51,23 +51,23 @@ void Config::loadFromOpts(cxxopts::ParseResult const& res)
 
   showParamNames = res[RunnerOptions::shownames].as<bool>();
   if (showParamNames) {
-    m_options.emplace(RunnerOptions::shownames);
+    m_runnerOptions.emplace(RunnerOptions::shownames);
   }
 
   showParamTypes = res[RunnerOptions::showtypes].as<bool>();
   if (showParamTypes) {
-    m_options.emplace(RunnerOptions::showtypes);
+    m_runnerOptions.emplace(RunnerOptions::showtypes);
   }
 
   runner = res[RunnerOptions::runner].as<std::string>();
 
   if (res[RunnerOptions::select].count()) {
     filter.select = res[RunnerOptions::select].as<std::string>();
-    m_options.emplace(RunnerOptions::select);
+    foundRunnerOption(RunnerOptions::select);
   }
 
   if (res[RunnerOptions::exclude].count()) {
-    m_options.emplace(RunnerOptions::exclude);
+    foundRunnerOption(RunnerOptions::exclude);
     filter.exclude = res[RunnerOptions::exclude].as<std::string>();
   }
 
@@ -76,13 +76,13 @@ void Config::loadFromOpts(cxxopts::ParseResult const& res)
 
 std::unordered_set<std::string> const& Config::options() const
 {
-  return m_options;
+  return m_runnerOptions;
 }
 
 
-void Config::setOption(std::string const& option)
+void Config::foundRunnerOption(std::string const& option)
 {
-  m_options.emplace(option);
+  m_runnerOptions.emplace(option);
 }
 
 } // namespace ftg

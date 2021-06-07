@@ -10,8 +10,6 @@ from subprocess import Popen, PIPE
 if len(argv) != 3 :
     exit(1)
 
-print(argv)
-
 cmd = argv[1] 
 p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
 stdout, stderr = p.communicate()
@@ -24,24 +22,28 @@ with open(argv[2], 'r') as f:
     
 result = stdout.decode().splitlines()
 
+print(result)
+print("#####")
+print(expected)
+
 diff = False
 line = 1
 details = ""
 rfinished = False
 efinished = False
-while rfinished and efinished :
+while not rfinished and not efinished :
     resLine = ""
     expLine = ""
-    if len(result) < line -1 :
+    if line -1 < len(result) :
         resLine = result[line-1]
     else :
         rfinished = True
-    if len(expected) < line -1 :
-        expLine = result[line-1]
+    if  line -1 < len(expected) :
+        expLine = expected[line-1]
     else : 
         efinished = True
-
     if resLine != expLine or rfinished != efinished :
+        diff = True
         details += "\nlines " + str(line) + " are different : \n"
         if not rfinished :
             details += "result   : " + resLine + "\n"
@@ -57,11 +59,13 @@ while rfinished and efinished :
 if diff : 
     print("the two strings are different :")
     print("### RESULT ###")
-    print(result)
+    for r in result :
+        print(r)   
     print("##############")
     print("\n")
     print("### EXPECTED ###")
-    print(expected)
+    for e in expected :
+        print(expected)
     print("################")
     print("\n")
     print(details)

@@ -22,7 +22,7 @@ struct MockTest : public ftg::Test {
   virtual void run()
   {
     check_true(true);
-    check_true(false).warn();
+    check_true(false).warn().isTrue();
     check_true(true).isFalse();
     check_false(true).important();
   }

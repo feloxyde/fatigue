@@ -15,6 +15,10 @@ ADD_COVERED_TEST(test_fatigue_cmdline
     CMD ${comp_py} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${test_sys_dir}/test_fatigue_cmdline.expected
     SUITE ts_fatigue_system)
     
+ADD_COVERED_TEST(test_fatigue_shownames_showtypes
+    CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue -n -t" ${test_sys_dir}/test_fatigue_shownames_showtypes.expected
+    SUITE ts_fatigue_system)
+
 ADD_COVERED_TEST(test_exclude_ostream 
     CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --exclude 'suite3//.*|suite2.*//.*:0'" ${test_sys_dir}/test_exclude_ostream.expected
     SUITE ts_fatigue_system)

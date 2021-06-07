@@ -4,6 +4,7 @@
 
 ADD_TEST_SUITE(ts_fatigue_unit)
 
+add_subdirectory(Checker)
 add_subdirectory(Config)
 add_subdirectory(DefaultRunner)
 add_subdirectory(Test)

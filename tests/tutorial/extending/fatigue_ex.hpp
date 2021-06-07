@@ -19,6 +19,9 @@ public:
     //overriding config "runner" field when fast option is set.
     if (m_parsedOpts["fast"].as<bool>()) {
       this->ftg::fatigue::m_config.runner = "trivial";
+
+      //in case the option is targeted at runner, as exclude, we would have added to options as :
+      // foundRunnerOption("fast")
     }
   }
 };
