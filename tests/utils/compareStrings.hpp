@@ -20,8 +20,8 @@ inline bool compareStrings(std::string const& res, std::string const& expected)
   bool efinished = false;
   while (!rfinished && !efinished) {
     std::string resLine, expLine;
-    rfinished = static_cast<bool>(std::getline(rstream, resLine));
-    efinished = static_cast<bool>(std::getline(estream, expLine));
+    rfinished = !static_cast<bool>(std::getline(rstream, resLine));
+    efinished = !static_cast<bool>(std::getline(estream, expLine));
     if (resLine != expLine || rfinished != efinished) {
       diff = true;
       details << std::endl << "lines " << line << " are different : " << std::endl;
