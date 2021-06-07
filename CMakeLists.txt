@@ -42,7 +42,7 @@ endif()
 
 #setting the root directory for includes as the root of the project, 
 #so files can be included as <skuldenka/...>
-include_directories(${CMAKE_CURRENT_LIST_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_LIST_DIR})
 
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fatigue/external)
