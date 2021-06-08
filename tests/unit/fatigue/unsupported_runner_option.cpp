@@ -43,7 +43,7 @@ int main()
   std::stringstream exp;
   fatigue_test f(argc, argv, out);
   int res = f.run();
-  assert(res == -2);
+  assert(res == ftg::fatigue::ExitCodes::unsupportedOption);
 
   exp << "Error : runner ["
       << "test"
