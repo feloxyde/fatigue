@@ -53,7 +53,7 @@ public:
   void loadFromOpts(cxxopts::ParseResult const& res);
 
   std::unordered_set<std::string> const& options() const;
-  void setOption(std::string const& option);
+  void foundRunnerOption(std::string const& option);
 
 public:
   bool showParamNames;
@@ -62,7 +62,7 @@ public:
   Filter filter;
 
 private:
-  std::unordered_set<std::string> m_options;
+  std::unordered_set<std::string> m_runnerOptions;
 };
 
 

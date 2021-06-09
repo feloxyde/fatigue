@@ -30,7 +30,7 @@ inline std::string demangle(const char* name)
 
 #else
 // does nothing if not g++
-std::string demangle(const char* name)
+inline std::string demangle(const char* name)
 {
   return name;
 }

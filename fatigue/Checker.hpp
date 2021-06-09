@@ -155,11 +155,11 @@ protected:
 
   /** @brief Method meant to be optionally overriden, which is run before
    * execution of scenario. */
-  virtual bool load() noexcept { return true; }
+  virtual bool load() noexcept = 0;
 
   /** @brief Method meant to be optionally overriden, which is run after
    * execution of scenario. */
-  virtual void unload() noexcept {}
+  virtual void unload() noexcept = 0;
 
 
   /** @brief Creates a check.

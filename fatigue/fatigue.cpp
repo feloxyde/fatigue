@@ -53,10 +53,10 @@ static bool verify_options(std::ostream& out, Config const& conf, Runner const& 
 unsigned fatigue::run() const
 {
   if (m_runners.find(m_config.runner) == m_runners.end()) {
-    std::cout << "Could not find runner " << m_config.runner << std::endl;
-    std::cout << "Available runners are : " << std::endl;
+    m_out << "Could not find runner " << m_config.runner << std::endl;
+    m_out << "Available runners are :" << std::endl;
     for (auto const& r : m_runners) {
-      std::cout << r.first << std::endl;
+      m_out << r.first << std::endl;
     }
     return ExitCodes::runnerNotFound;
   } else {

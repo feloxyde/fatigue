@@ -10,6 +10,8 @@ set(DefaultRunner_tests
     endRunOnSuccess.cpp
     exception.cpp
     load_failure.cpp
+    modalities.cpp
+    names_and_types.cpp
     noparam.cpp
     passing.cpp
 )

@@ -71,8 +71,6 @@ list(FILTER sources EXCLUDE REGEX fatigue/external/*)
 
 ADD_COVERAGE_REPORT(coverage_all COVERING ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries}) 
 
-message("sources :  ${sources}")
-
 ########################################################### 
 ########## QUALITY ########################################
 ###########################################################
