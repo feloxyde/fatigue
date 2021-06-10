@@ -16,7 +16,7 @@ If you intend to use fatigue as a submodule, simply skip this section and go str
 
 The following instructions on building and installing fatigue are targeted at Linux systems, however, they should be possible to adapt to any other system as fatigue does not have heavy dependencies.
 
-Please note that as fatigue uses templates and C++20 features, it is not installed as a binary but as a subproject you can include in your own cmake configs. 
+Please note that as fatigue uses templates and C++20 features, it is not installed as a binary but as a subproject you can include in your own cmake configs. This way it keeps away binary compatibilities issues. 
 
 @subsection installation_requirements Requirements
 
@@ -72,9 +72,9 @@ Once fatigue is built using one of the two ways mentionned before, run install t
 sudo cmake --build . --target install
 ~~~
 
-Fatigue should now be installed on your computer, under ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory, which is likely ```/usr/local/``` under Linux systems.
+Fatigue should now be installed on your computer, under ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory, which is likely ```/usr/local/fatigue``` under Linux systems.
 
-Optionally, install can be tested by changing into ```tests/install```, running CMake there, to build and run tests with installed library. 
+Optionally, install can be tested by changing into ```tests/install``` and running CMake there to build and run tests with installed library. 
 
 ~~~
 cd ../tests/install
@@ -87,7 +87,7 @@ cmake --build . --target test
 
 @subsection installation_uninstall Uninstall 
 
-To uninstall fatigue, you will have to manually remove ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory created at installation, which is likely ```/usr/local/``` under Linux systems.
+To uninstall fatigue, you will have to manually remove ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory created at installation, which is likely ```/usr/local/fatigue``` under Linux systems.
 
 @section quick_example Quick example
 
@@ -108,7 +108,6 @@ find_package(fatigue REQUIRED)
 
 #you can either set include directory as a global one (shown here), or per target.
 include_directories(${FATIGUE_INCLUDE_DIR})
-
 ```
 
 @subsection writing_tests Writing tests
@@ -123,7 +122,7 @@ We will want to have three test cases :
 - one element 
 - multiple element
 
-Let's start with empty vector test. For this, we will create a ```Empty``` test case by publicly deriving from 
+Let's start with empty vector test. For this, we will create an ```Empty``` test case by publicly deriving from 
 ```ftg::Test``` class.
 
 We need to define at least three things for the test : 
@@ -145,15 +144,16 @@ Let's write two more tests, for the two other cases.
 Let's do as if we were to have thousands of tests for a lot of different classes and function, and thus group tests 
 for our ```avg``` function together. For that we use a suite. In fatigue, writing a suite ressembles a lot writing a test. 
 
-We implement a suite by publicly deriving from ```ftg::Suite```, and then implement : 
+We implement a suite by publicly deriving from ```ftg::Suite```, and giving it : 
 - A constructor, calling ```ftg::Suite``` constructor and giving it a name.
 - A virtual destructor, which can be empty in our case. 
 - A virtual ```TestList tests()``` method, that will simply return a list of tests in the suite. Note that suites are recursively defined, and thus can contain other suites.
 
 \include quick_example/SuiteAvg.hpp
 
-You can notice that here, we use suites as a namespace for our tests as well, calling our test ```Empty``` instead of ```TestAvgEmpty``` for example. 
-This is not mandatory, and if you prefer full explicit names, that is up to you.  
+You can notice that here, we use suites as a namespace for our tests, calling our test ```Empty``` instead of ```TestAvgEmpty```. 
+This is not mandatory, and if you prefer full explicit names, that is up to you. Keep in mind that most runners will concatenate test name with suite name,
+and thus display the ```Empty``` test from ```Avg``` suite as```Avg//Empty``` or anything close by.
 
 @subsection writing_test_software Writing test software
 
@@ -165,7 +165,7 @@ Finally, we want to create an executable running our tests. For this, ```fatigue
 
 \include quick_example/main_avg.cpp
 
-Run method returns the number of tests that failed, and 0 if all tests passed.
+```run``` method returns 0 if all tests passed and a different value if some tests failed. It depends on the runner used, but it will usually be the number of failed tests.
 
 Note that ```declare``` method supports method chaining, allowing more flexibility in declaration of tests. 
 
@@ -190,11 +190,11 @@ All checks methods are of the form :
 
 ~~~{.cpp}
 /* check with default message */
-check_*(argument [, argument]); 
+check_*(argument [, argument]*); 
 /* check with custom message */
-check_*(argument [, argument], message);  
+check_*(argument [, argument]*, message);  
 /* check with custom message and parameter informations */
-check_*(argument [, argument], message, vector<paramInfo>);
+check_*(argument [, argument]*, message, vector<paramInfo>);
 ~~~
 
 When using default message, check will report value, type and name of its arguments. For example, 
@@ -205,10 +205,10 @@ check_equal(1.0f, 2);
 
 Will report that *l* (left) argument, *float*, with value *1.0*, was not equal to *r* (right) argument, *int*, with value *2*. 
 
-To convert value to string, checks use ```ftg::to_string(T const& val)``` template function. By default, this function tries to 
+To convert values to strings, checks use ```ftg::to_string(T const& val)``` template function. By default, this function tries to 
 use the ```std::ostream``` shift operator ```<<```, but can be specialized to allow more refined display of values. 
 
-In case values are maybe too hard to display, one may eventually use custom message check, which will not report any information regarding its arguments. 
+In case values are too hard to display, one may eventually use custom message check, which will not report any information regarding its arguments. 
 
 @subsection tutorial_checks_options Options
 
@@ -221,7 +221,7 @@ For example, a check can have a hit for the logger to emphase it in report, with
 check_equal(a, 10).important(); //check is market as important.
 ~~~
 
-Because of this option mechanism, Check objects shall NEVER be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page for more information.
+Because of this option mechanism, Check objects shall not be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page for more information.
 
 How checks are displayed depend on the runner chosen, however, it is likely that they will be reported by their index of appearance in the test. For example, 
 
@@ -239,11 +239,11 @@ Detail of options can be displayed using ```-h``` or ```--help``` option.
 @subsection tutorial_cli_runners Runners 
 
 One of the key feature of fatigue is the ability to select different runners with ```-r runnername``` or ```--runner runnername```. Please note that 
-runners are not tied to support all options altering test execution behavior, and thus before using a runner it advised to check its behavior in corresponding documentation.
+runners are not tied to support all options altering test execution behavior. In case an option isn't supported by a runner, test will end prematurely with an error message.
 
 @subsection tutorial_cli_filtering Select which tests to run
 
-One other convenient ability of fatigue is that some runners allow to select which tests shall run or not. It is done with three options : 
+One other convenient ability of fatigue is that some runners allow selecting which tests shall run or not. It is done with three options : 
 
 - ```-s "regex"``` or ```--select "regex"``` option runs only tests whose identifier matches with the regex. 
 - ```-e "regex"``` or ```--exclude "regex"``` option runs only tests whose identifier does not matches with the regex.
@@ -255,7 +255,7 @@ For example, in our previously defined suite for ``avg``` function, test ```One`
 
 @section advanced_testing Advanced testing
 
-fatigue assumes that one is the best knowing what is needed to test one's software. Because of this, it only tries to provide a solid base for building your own testing library, according to your own needs. This section gives few hints on how to use fatigue for specific test cases. 
+fatigue assumes that one is the best knowing what is needed to test one's software. Because of this, it only tries to provide a solid base for building your own testing library, according to your own needs. This section gives few hints on how to use fatigue for specific cases. 
 
 @subsection tutorial_specifications Specification testing
 
@@ -267,7 +267,7 @@ Let's have an example. Imagine we have the following interface :
  
 \include specifications/Concat.hpp
 
-We can see that its specification is fairly hard to express through sole code, and a comment is needed to precise wanted behavior of the interface. We can enforce this behavior in implementing classes through providing specification tests : a test that we can apply to any subclass.
+We can see that its specification is fairly hard to express through sole code, and a comment is needed to specify wanted behavior of the interface. We can enforce this behavior in derived classes through providing specification tests : a test that we can apply to any subclass.
 
 First, we derive ```ftg::Test``` as a template, taking as a parameter a factory of the type we want to test. Let's write two tests like this.
 
@@ -283,7 +283,7 @@ We can now write two implementations of the ```Concat``` interface, one based on
 
 \include specifications/ConcreteConcat.hpp
 
-Finally, we simply need to write a Factory and register one instance of ```SpecsConcat``` in fatigue for each of these two ```Concat``` implementations.
+Finally, we simply need to write a factory and register one instance of ```SpecsConcat``` in fatigue for each of these two ```Concat``` implementations.
 
 \include specifications/main_specs.cpp
 
@@ -299,11 +299,11 @@ However, in case of heavyweight fixtures, one may want to restrain their lifetim
 
 ```load``` and ```unload``` are ```noexcept``` and thus you are responsible for handling cases where something goes wrong. *Note that in a future iteration of fatigue, it should be possible to specify dependencies between tests, which should make loading and unloading of tests much easier.*
 
-Finally, in case of a fixture that has to be shared between a lot of tests, but is extremely costly to create, one can opt for a sharing resources through all tests of a suite.
+Finally, in case of a fixture that has to be shared between a lot of tests, or is extremely costly to create, one can opt for sharing resources through all tests of a suite.
 
 @subsection tutorial_execution Ruling execution order 
 
-**Preview, will only be actual when parallelism is introduced**
+**Preview, will only be possible when parallelism is introduced**
 
 By default, tests can be executed in a completely arbitrary order when parallelism is enabled. However, this can be changed by overriding methods from ```ftg::Test``` or ```ftg::Suite``` classes.
 
@@ -324,9 +324,9 @@ We may want to extend checking capabilities, as for example adding a check to ve
 
 ```ToStringable``` concept ensures that ```T``` is convertible to string using ```ftg::to_string``` template function described earlier in this tutorial.
 
-Our check returns a ```ftg::Check``` object. Checking mechanisms are detailed in @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page. This is not mandatory to understand what is going on there to extend fatigue, even if it can help. We can not create a ```Check``` object directly, and instead we call ```raw_check``` method from ```ftg::Checker```, accessible through inheriting from ```ftg::Test```. 
+Our check returns a ```ftg::Check``` object. Checking mechanisms are detailed in @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page. This is not mandatory to understand what is going on there to extend fatigue, even if it can help. We cannot create a ```Check``` object directly, we instead call ```raw_check``` method from ```ftg::Checker```, accessible through inheriting from ```ftg::Test```. 
 
-```raw_check``` method takes three arguments, which you can consult in detail on ```ftg::Check``` page : 
+```raw_check``` method takes three arguments, which you can observe in detail on ```ftg::Check``` page : 
 
 - name of the check performed
 - list of arguments of the check, their types and their names.
@@ -336,12 +336,12 @@ And we are done, our check is now ready to be used !
 
 @subsection tutorial_extending_runners Creating custom runner
 
-Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier than you think, since fatigue's core isn't thought to be intuitive, but rather flexible and practical to implement.*
+Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier than you think, since fatigue's core design favors flexibility and ease of implementation over intuitiveness.*
 
 General thoughts on runners and loggers are described in @ref architecture_run "Test runners and loggers" section of @ref architecture "Architecture" page. It is recommended for you to read this section to better understand what follows.
 
 As an example, here is the code of an absolutely minimal combined runner and logger, providing no output and exiting straight with an error code in case a test 
-fails. It considers any check not passing as an error.
+fails. It features an option to choose whether or not consider warnings as errors, the ```werror``` or ```w``` option.
 
 \include extending/TrivialRunner.hpp
 
@@ -352,7 +352,6 @@ Now, we want to see how to use our runner. This will be seen in section @ref tut
 As mentionned before, fatigue allows user to alter behavior of the test software through command lines options. Options are parsed using [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts). 
 
 Now, how to add options. In this example, we will add the custom runner we made in section @ref tutorial_extending_runners "Creating custom runner" in the runner pool, as well as an option to select the fastest available runner (that we assume to be our ```TrivialRunner```).
-
 
 First, we write a function taking in a ```cxxopts::Option``` reference.
 
@@ -366,18 +365,8 @@ We can now use ```fatigue_ex``` as a drop-in replacement for  ```fatigue``` :
 
 \include extending/main_ex.cpp
 
-And of course, we can use ```-f``` or ```--fast``` option in the command line. 
+And of course, we can use ```-f``` or ```--fast``` option in the command line, and ```-w```` or ```-werror``` alongside with it. 
 
-Note that if you add commands that are targeted to runner, if they are set through is is better to declare them using ```ftg::Config::setOption``` method, so automatic runner compatibility with CLI options will take them in account.
-
-~~~{.cpp}
-//in body of constructor of ftg::fatigue extension 
-
-if(m_parsedOpts.count("myrunneropt") > 0){
-    int myRunnerOpt = m_parsedOpts["myrunneropt"];
-    m_config.setOption("myrunneropt);
-}
-~~~
 
 
 */

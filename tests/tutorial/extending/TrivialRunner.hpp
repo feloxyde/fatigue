@@ -5,6 +5,7 @@
 #ifndef FATIGUE_TUTORIAL_TRIVIALRUNNER_HPP
 #define FATIGUE_TUTORIAL_TRIVIALRUNNER_HPP
 
+#include "fatigue/Config.hpp"
 #include "fatigue/Runner.hpp"
 #include <fatigue/fatigue.hpp>
 #include <string>
@@ -18,23 +19,41 @@ struct TrivialRunnerFail {
 }; //used for exception
 
 class TrivialRunner : public ftg::Logger, public ftg::Runner {
+private:
+  bool m_werror;
+  bool m_failure;
+
 public:
+  /* creating a constructor, and passing it required configuration : the werror option*/
+  TrivialRunner(bool werror) : m_werror(werror), m_failure(false) {}
+  virtual ~TrivialRunner() {}
+
+
   /* Method from Runner. 
     Implement in order to tell which runner-targeted options are supported by the runner
     Empty in our case, since we don't support any runner-targed option
   */
-  virtual std::unordered_set<std::string> supportedOptions() const { return std::unordered_set<std::string>(); }
+  virtual std::unordered_set<std::string> supportedOptions() const
+  {
+    std::unordered_set<std::string> opts;
+    opts.emplace("werror");
+    return opts;
+  }
 
   /* Method from Logger. 
     Implement in order to receive messages from Checker when running tests
     note that arg names are commented out to prevent compiler unused variable warning,
     but for a more elaborated runner, you may want to use them.
+    The method is noexcept because it is triggered withing destructor of Check class.
   */
-  virtual void report(Logger::Message const& message)
+  virtual void report(Logger::Message const& message) noexcept
   {
-    if (message.result != message.expected) {
-      /* if result is not what we expect, fail */
-      throw TrivialRunnerFail();
+    //if the message is not a warning, or if we fail on warning
+    if (message.mode != ftg::Logger::Message::MESSAGE_WARN || m_werror) {
+      //if result isnt what we expect
+      if (message.result != message.expected) {
+	m_failure = true;
+      }
     }
   }
 
@@ -55,7 +74,10 @@ public:
       /* on unhandled exception exit */
 	    [](){throw TrivialRunnerFail();}
     );
-    // clang-format on
+    // cang-format on
+    if(m_failure){
+      throw TrivialRunnerFail();
+    }
   }
 
   /* helper method, used to run individual tests from TestList */
@@ -77,7 +99,7 @@ public:
   {
     try {
       runTests(tests);
-    } catch (TrivialRunnerFail) {
+    } catch (...) {
       std::cout << "FAIL" << std::endl;
       return 1;
     }

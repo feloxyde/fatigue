@@ -116,11 +116,13 @@ Documentation shall document what is not trivial enough to understand by solely 
 Docs write_documentation(bool sign);
 ~~~
 
-Does not need to precise that the function returning a newly written doc, however, some precisions on how the ```sign``` boolean affects created doc. 
+does not need to precise that the function returning a newly written doc, however, some precisions on how the ```sign``` boolean affects created doc. 
 
 Also, keep in mind that, as fatigue is open source and free software, users do have access to the code. Therefore, trivial-in-code behaviors do not require to be precisely documented. 
 
-Finally, API targetted at end user shall be added to the @ref user_api "user api" group, using identifier ```user_api```. Those API components may eventually accept more documentation.
+API targetted at end user shall be added to the @ref user_api "user api" group, using identifier ```user_api```. Those API components may eventually accept more documentation.
+
+Finally, practical examples used in tutorials shall written as tests residing in ```tests/tutorial``` and then ```include``` into tutorial text.
 
 @section develoment_other Other 
 

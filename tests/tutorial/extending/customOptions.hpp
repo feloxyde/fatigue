@@ -16,6 +16,9 @@ inline void customOptions(cxxopts::Options& opts)
   opts.add_options()("f,fast",
 		     "selects fastest runner available, overrides any runner selected by -r option",
 		     cxxopts::value<bool>()->default_value("false"));
+  opts.add_options()("w,werror",
+		     "if set, warning messages fails the test",
+		     cxxopts::value<bool>()->default_value("false"));
 }
 
 #endif

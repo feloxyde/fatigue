@@ -16,7 +16,7 @@ struct LogItem {
 struct MockLogger : public Logger {
   MockLogger() {}
   virtual ~MockLogger() {}
-  virtual void report(Message const& report) { log.push_back(report); }
+  virtual void report(Message const& report) noexcept { log.push_back(report); }
 
   size_t countCheckPassed()
   {

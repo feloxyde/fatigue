@@ -70,7 +70,7 @@ struct Logger {
   };
 
   virtual ~Logger(){};
-  virtual void report(Message const& message) = 0;
+  virtual void report(Message const& message) noexcept = 0;
 };
 
 } // namespace ftg
