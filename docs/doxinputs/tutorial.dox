@@ -4,7 +4,7 @@
 
 /** @page tutorial Tutorial 
 
-This page presents basic and advanced usage of fatigue framework. 
+This page presents basic and advanced usage of fatigue framework. Note that most examples shown in this tutorial can be found in ```tests/tutorial``` directory.
 
 \tableofcontents{html}
 
@@ -14,7 +14,7 @@ You can either include CMake directly as a submodule of your projects, or instal
 
 If you intend to use fatigue as a submodule, simply skip this section and go straight to @ref quick_example "Quick example". 
 
-The following instructions on building and installing fatigue are targeted at Linux systems, however, they should be possible to adapt to any other system as fatigue does not have heavy dependencies.
+The following instructions to build and install fatigue are targeted at Linux systems, however, they should be possible to adapt to any other system as fatigue does not have heavy dependencies.
 
 Please note that as fatigue uses templates and C++20 features, it is not installed as a binary but as a subproject you can include in your own cmake configs. This way it keeps away binary compatibilities issues. 
 
@@ -32,7 +32,7 @@ Note that fatigue uses [jarro2783's cxxopts](https://github.com/jarro2783/cxxopt
 
 Once dependencies are installed, clone repository. 
 
-~~~
+~~~bash
 git clone https://gitlab.com/feloxyde/fatigue
 ~~~
 
@@ -51,28 +51,24 @@ cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 ~~~
 
-Build target fatigue :
+
+It is recommended, but not mandatory, to build and test fatigue using default and test targets : 
 
 ~~~
 cmake --build . fatigue
-~~~
-
-Optionally, build can be tested by building default target and then run tests : 
-
-~~~
 cmake --build .
 cmake --build . --target test
 ~~~
 
 @subsection installation_install Install
 
-Once fatigue is built using one of the two ways mentionned before, run install target with according permissions.
+Once fatigue is built using one of the two ways mentionned before, run install target with an user having write permissions to the target directory, likely ```/usr/local```.
 
 ~~~
 sudo cmake --build . --target install
 ~~~
 
-Fatigue should now be installed on your computer, under ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory, which is likely ```/usr/local/fatigue``` under Linux systems.
+Fatigue should now be installed on your computer, under ```${CMAKE_INSTALL_PREFIX}/fatigue``` directory, likely ```/usr/local/fatigue``` under Linux systems.
 
 Optionally, install can be tested by changing into ```tests/install``` and running CMake there to build and run tests with installed library. 
 
@@ -93,13 +89,13 @@ To uninstall fatigue, you will have to manually remove ```${CMAKE_INSTALL_PREFIX
 
 @subsection importing_fatigue Importing fatigue in your project 
 
-If you include the project directly as a submodule, what you want probably is in ```fatigue/``` directory, the one directly containing ```fatigue.hpp``` file. This one contains a single target, ```fatigue```, which is the testing library. Assuming you included fatigue as a git submodule, you want to do :
+If you include the project directly as a submodule, you probably want to target ```fatigue/fatigue/``` directory, the one directly containing ```fatigue.hpp``` file. This one contains a single target, ```fatigue```, which is the testing library. Assuming you included fatigue as a git submodule, you want to do :
 
 ```cmake
 add_subdirectory(fatigue/fatigue)
 ```
 
-If you want to import fatigue from a system_wide install, you can simply ```find_package(fatigue)```. 
+If you want to import fatigue from a system wide install, you can simply ```find_package(fatigue)```. 
 
 ```cmake
 #adds fatigue as a subdirectory, making fatigue target available for linkage
@@ -132,7 +128,7 @@ We need to define at least three things for the test :
 
 \include quick_example/TestAvgEmpty.hpp
 
-We use ```check_*``` methods, provided by class ```ftg::Test```, verify results. Checks are counted and reported. We will discuss them a bit later, and they are listed in @ref checks "Checks" page.
+We use ```check_*``` methods, provided by class ```ftg::Test```, to verify results. Checks are counted and reported. We will discuss them a bit later, and they are listed in @ref checks "Checks" page.
 Let's write two more tests, for the two other cases.
 
 \include quick_example/TestAvgOne.hpp
@@ -153,11 +149,11 @@ We implement a suite by publicly deriving from ```ftg::Suite```, and giving it :
 
 You can notice that here, we use suites as a namespace for our tests, calling our test ```Empty``` instead of ```TestAvgEmpty```. 
 This is not mandatory, and if you prefer full explicit names, that is up to you. Keep in mind that most runners will concatenate test name with suite name,
-and thus display the ```Empty``` test from ```Avg``` suite as```Avg//Empty``` or anything close by.
+and thus display the ```Empty``` test from ```Avg``` suite like ```Avg//Empty```.
 
 @subsection writing_test_software Writing test software
 
-Finally, we want to create an executable running our tests. For this, ```fatigue``` class is convenient. We can use it in three steps, preferably inside a ```main``` function.
+Finally, we want to create an executable running our tests. ```fatigue``` class is convenient to do so. We can use it in three steps, preferably inside a ```main``` function.
 
 - Create a ```fatigue``` instance by initializing it with ```main``` invocation args, ```argc``` and ```argv```.
 - Declare a certain number of tests or suites, using ```declare``` method.
@@ -167,7 +163,7 @@ Finally, we want to create an executable running our tests. For this, ```fatigue
 
 ```run``` method returns 0 if all tests passed and a different value if some tests failed. It depends on the runner used, but it will usually be the number of failed tests.
 
-Note that ```declare``` method supports method chaining, allowing more flexibility in declaration of tests. 
+Note that ```declare``` method supports method chaining, allowing shorter constructs. 
 
 \include quick_example/main_avg_chaining.cpp
 
@@ -180,12 +176,16 @@ add_executable(test_tutorial_avg quick_example/main_avg.cpp)
 target_link_libraries(test_fatigue fatigue)
 ~~~
 
+Then, when we run it, default runner will display progression.
+
+\include test_tutorial_avg.expected
+
 @section tutorial_checks Checks
 
 @subsection tutorial_checks_basics Basics
 
 When writing tests, we use *checks* provided by the ```ftg::Test``` class, allowing us to specify conditions for 
-test success and cleaner failure reporting. All checks are listed in the @ref checks "Checks" page. Let's see the overall anatomy and usage of checks. 
+test success and cleaner failure reporting. All checks are listed in the @ref checks "Checks" page.
 All checks methods are of the form :
 
 ~~~{.cpp}
@@ -208,7 +208,27 @@ Will report that *l* (left) argument, *float*, with value *1.0*, was not equal t
 To convert values to strings, checks use ```ftg::to_string(T const& val)``` template function. By default, this function tries to 
 use the ```std::ostream``` shift operator ```<<```, but can be specialized to allow more refined display of values. 
 
+~~~{.cpp}
+
+namespace ftg {
+    to_string(float const& val) {
+        std::stringstream ss;
+        ss << val;
+        ss << f;
+        return ss.str();
+    }
+}
+
+check_equal(1.0f, 2);  
+~~~
+
+
 In case values are too hard to display, one may eventually use custom message check, which will not report any information regarding its arguments. 
+
+~~~{.cpp}
+//displays something like "custom message check failed".
+check_equal(1.0f, 2, "custom message check"); 
+~~~
 
 @subsection tutorial_checks_options Options
 
@@ -218,12 +238,12 @@ This instance allows use, through method chaining, to give more precision about 
 For example, a check can have a hit for the logger to emphase it in report, with 
 
 ~~~{.cpp}
-check_equal(a, 10).important(); //check is market as important.
+check_equal(a, 10).important(); //check is marked as important.
 ~~~
 
 Because of this option mechanism, Check objects shall not be assigned to a variable, in order to use discarded-value-expression mechanism. See @ref architecture_reporting "Reporting mechanisms" section in @ref architecture "Architecture" page for more information.
 
-How checks are displayed depend on the runner chosen, however, it is likely that they will be reported by their index of appearance in the test. For example, 
+How checks are displayed depend on the chosen runner, however, it is likely that they will be reported by their index of appearance in the test. For example, 
 
 ~~~{.cpp}
 check_true(true);
@@ -240,6 +260,8 @@ Detail of options can be displayed using ```-h``` or ```--help``` option.
 
 One of the key feature of fatigue is the ability to select different runners with ```-r runnername``` or ```--runner runnername```. Please note that 
 runners are not tied to support all options altering test execution behavior. In case an option isn't supported by a runner, test will end prematurely with an error message.
+
+For now, there is only available runner, ```default```, which runs tests and reports failures in a sequential and synchronous manner. It is not segfault-proof, but will still display fairly precise informations in case of sefgault crash.
 
 @subsection tutorial_cli_filtering Select which tests to run
 
@@ -303,7 +325,7 @@ Finally, in case of a fixture that has to be shared between a lot of tests, or i
 
 @subsection tutorial_execution Ruling execution order 
 
-**Preview, will only be possible when parallelism is introduced**
+<b>Preview, will only be possible when parallelism is introduced</b>
 
 By default, tests can be executed in a completely arbitrary order when parallelism is enabled. However, this can be changed by overriding methods from ```ftg::Test``` or ```ftg::Suite``` classes.
 
@@ -314,7 +336,7 @@ By default, tests can be executed in a completely arbitrary order when paralleli
 
 @section extending Extending fatigue
 
-As Fatigue is an open source software, you can easily adapt its sources to your needs. *I try to provide sufficient documentation to do so as well*. However, that is in most cases what you want to do, since it can create conflicts with future updates. You probably prefer to *extend* fatigue instead of changing its core behavior. This section constains some tips on how to do that.
+As Fatigue is an open source software, you can easily adapt its sources to your needs. *I try to provide sufficient documentation to do so as well*. However, that is in most cases not what you want to do, since it can create conflicts with future updates. You probably prefer to *extend* fatigue instead of changing its core behavior. This section constains some tips on how to do that.
 
 @subsection tutorial_extending_checks Create custom checks
 
@@ -336,11 +358,11 @@ And we are done, our check is now ready to be used !
 
 @subsection tutorial_extending_runners Creating custom runner
 
-Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier than you think, since fatigue's core design favors flexibility and ease of implementation over intuitiveness.*
+Builtin runners should be sufficient for most use, but in case you want to create your custom runners, it is always possible. *Still, be careful, runners can be trickier to implement than you think, since fatigue's core design favors flexibility and ease of implementation over intuitiveness.*
 
 General thoughts on runners and loggers are described in @ref architecture_run "Test runners and loggers" section of @ref architecture "Architecture" page. It is recommended for you to read this section to better understand what follows.
 
-As an example, here is the code of an absolutely minimal combined runner and logger, providing no output and exiting straight with an error code in case a test 
+As an example, here is the code of an absolutely minimal combined runner and logger, providing no output and exiting straight with an error code in case a check 
 fails. It features an option to choose whether or not consider warnings as errors, the ```werror``` or ```w``` option.
 
 \include extending/TrivialRunner.hpp
