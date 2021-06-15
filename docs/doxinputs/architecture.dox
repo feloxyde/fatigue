@@ -7,12 +7,14 @@
 This page describes elements of fatigue's architecture and their rationales that aren't forcibly easy to get while looking at the code, 
 in order to give a better understanding of how fatigue is built.
 
+Please note that this page assumes you already read the @ref tutorial Tutorial page. 
 
 \tableofcontents{html} 
 
 @section architecture_repository Repository organization
 
-- **cmake_llvm_coverage** Git ubmodule for coverage using LLVM.
+- **.reuse** directory containing infos for the Reuse licensing tool
+- **cmake_llvm_coverage** Git submodule for coverage using LLVM.
 - **cxxopts** Git submodule of [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts), for parsing command lines options.
 - **docs** Files related to doc 
     - **doxinput** Directory containing doxygen pages
@@ -21,13 +23,15 @@ in order to give a better understanding of how fatigue is built.
     - **external** (generated at cmake config time) directory to receive external headers and sources to be shipped with fatigue, as cxxopts.
     - **runners** directory grouping runners 
     - **templates** directory grouping test templates
+- **LICENSES** directory containing licenses, handled by Reuse licensing tool
 - **misc** a directory with various things, as logo 
+- **quality** directory holding config for quality tools
 - **tests** directory holding tests 
     - **install** Custom build to run tests with an installed fatigue version 
     - **system** System tests
     - **tutorial** System tests which are also used as examples in @ref tutorial "Tutorial".
     - **unit** Unit tests, grouped by component.
-    - **utils** scripts and other testing tools.
+    - **utils** scripts and other testing tools, as well as sanity tests.
 
 @section architecture_overview Architecture overview
 
@@ -53,16 +57,16 @@ additional arguments and options, as for example to be able to flag the check as
 Some ways to achieve this are : 
 
 - using different methods, as ```check_equal``` and ```fatal_check_equal```. This is acceptable for one or two options, but it can lead to heavy code duplication when more are added. It also prevents factorization of behavior that are optional on all checks.
-- using additional, default-valued parameters, as ```check_equal(..., bool fatal = false, bool important=false)```. This is problematic, since it does not allow to select only the last defaulted option when calling the check, if there are more than one option : ```check_equal(..., false, true).```
+- using additional, default-valued parameters, as ```check_equal(..., bool fatal = false, bool important = false)```. This is problematic, since it does not allow to select only the last defaulted option when calling the check, if there are more than one option : ```check_equal(..., false, true).```
 - using an string or map with options, as ```check_equal(..., "fatal: true")``` can lead to typos undetected at compile time.
 - using flags as ```check_equal(..., FATAL | IMPORTANT)``` forbids values other than booleans
-- using a data structure may be quite inconvenient to use as well, as it may obfuscate what we are actually checking.
+- using a data structure may be quite inconvenient as well, as it may obfuscate what we are actually checking.
 
 Solution selected for fatigue, to set check options through method chaining as ```check_equal(...).fatal()```.
 
 @subsection architecture_reporting_principle Principle
 
-Checks are using discarded values expression to allow method chaining.
+Checks are using discarded values expression to allow both method chaining and automatic commiting.
 
 A discarded value expression is an expression which value isn't assigned to anything. For example :
 
@@ -121,9 +125,9 @@ Check reporting mechanism in fatigue involve three classes :
 - ```ftg::Logger```, which is an interface receiving reports from ```ftg::Check```. 
 
 
-There is a tiny subtility in there for handling early test termination option, ```fatal()```. In C++, it is bad practice to have a deleter throw, as 
+There is a tiny subtility in there for handling early test termination options, ```ftg::Check::endRunOnFailure()``` and ```ftg::Check::endRunOnSuccess()```. In C++, it is bad practice to have a deleter throw, as 
 exception involves stack unwinding, and thus deleter call. Therefore, in case of fatal check failing, we don't wait for ```Check``` deleter to be called,
-and instead directly report and throw an exception. That's also the reason why ```ftg::Check::fatal()``` methods does not have method chaining. 
+and instead directly report and throw an exception. That's also the reason why ```ftg::Check::endRunOnFailure()``` and ```ftg::Check::endRunOnSuccess()``` methods does not have method chaining. 
 
 Copy constructor of ```ftg::Check``` is deleted and move constructor prevents its input object to report. 
 This allows a ```ftg::Check``` instance to safely travel through multiple function ```return``` without triggering more than one report.
@@ -180,9 +184,9 @@ This code highlights few key points :
 - A test is loaded before running, and if the call returns ```false```, load is considered as failed and test shall not be run nor unloaded. 
 - A test is unloaded after running, no matter the status of the test.
 - Deciding what is an *error* or not is responsibility of the logger and runner, NOT the responsibility of the test itself. 
-- Logger shall register itself to ```ftg::Checker```, from which ```ftg::test``` inherits, before running. 
+- Logger shall register itself to ```ftg::Checker```, from which ```ftg::test``` inherits, before running. That is done automatically by ```ftg::Checker::run```.
 
-A runner's behavior is much simpler. It takes a list of tests and suite, represented as a ```std::variant```, a typical behavior could alike following pseudocode :
+A runner's behavior is much simpler. It takes a list of tests and suite, represented as a ```std::variant```, a typical behavior could be following pseudocode :
 
 ~~~{.cpp}
 
@@ -211,13 +215,21 @@ Note that here, ```Test``` and ```Checker``` instances are represented as two di
 
 Transcript of this sequence is as follows  : 
 
-1. A ```check_*``` method from ```Test``` is called, which :
-    1.1. performs some checkings,
-    1.2. self-calls ```raw_check``` method from ```Checker```, returning a ```Check``` object, ```chk```, to report result.
-    1.3. returns ```chk```.
-2. (Some more methods are eventually called on ```chk``` to set reporting options.)
-3. According to mechanisms seen in section@ref architecture_reporting "Reporting mechanisms", ```chk``` is deleted :
-    1.1 accesses it's creator ```Checker``` object which it has a reference to. 
-    1.2 calls ```report``` method from ```Logger``` of the checker with right informations to report. 
+<ol>
+<li>A ```check_*``` method from ```Test``` is called, which :
+    <ol>
+    <li>performs some checkings,
+    <li>self-calls ```raw_check``` method from ```Checker```, returning a ```Check``` object, ```chk```, to report result.
+    <li>returns ```chk```.
+    </ol>
+</li>
+<li>(Some more methods are eventually called on ```chk``` to set reporting options.)</li>
+<li>According to mechanisms seen in section@ref architecture_reporting "Reporting mechanisms", ```chk``` is deleted :
+    <ol>
+    <li>accesses it's creator ```Checker``` object which it has a reference to. 
+    <li>calls ```report``` method from ```Logger``` of the checker with right informations to report. 
+    </ol>
+</li>
+</ol>
 */
 

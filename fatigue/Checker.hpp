@@ -28,13 +28,13 @@ namespace ftg {
 // exception.
 
 /** @brief Structure used as exception to stop test in case a marked check
- * fails. */
+ fails. */
 struct EndRunOnFailure final {
   EndRunOnFailure();
 };
 
 /** @brief Structure used as exception to stop test in case a marked check
- * succeeds */
+ succeeds */
 struct EndRunOnSuccess final {
   EndRunOnSuccess();
 };

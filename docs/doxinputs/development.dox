@@ -8,6 +8,8 @@ This page is addressed to developers who want to contribute to fatigue, and pres
 
 Following guidelines are meant to be adapted to capacities of contributors. In case you have such a constraint (disability, time limitations, ...) that makes it hard or impossible for you to follow one of the guidelines, and still want to contribute, you are welcome ! Please state you which points you were constrained on in your merge requests, that way we can skip them at review time and let other people handle them once request is validated.
 
+Please note that this page assumes you already read the both @ref tutorial Tutorial and @ref architecture Architecture pages. 
+
 \tableofcontents{html}
 
 @section development_environement Environment 
