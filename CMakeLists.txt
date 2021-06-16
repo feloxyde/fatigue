@@ -90,19 +90,19 @@ add_custom_target(quality_all)
 
 add_custom_target(quality_codechecker_sensitive 
                 COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable sensitive --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/sentitive || true
-                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive ${QUALITY_CODECHECKER_DIR}/sentitive)
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive ${QUALITY_CODECHECKER_DIR}/codechecker_sentitive)
 
 add_custom_target(quality_codechecker_sensitive_ctu
                 COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable sensitive --ctu --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/sentitive_ctu || true
-                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive_ctu ${QUALITY_CODECHECKER_DIR}/sentitive_ctu)
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive_ctu ${QUALITY_CODECHECKER_DIR}/codechecker_sentitive_ctu)
 
 add_custom_target(quality_codechecker_extreme
                 COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable extreme --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/extreme || true
-                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme ${QUALITY_CODECHECKER_DIR}/extreme)
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme ${QUALITY_CODECHECKER_DIR}/codechecker_extreme)
 
 add_custom_target(quality_codechecker_extreme_ctu
                 COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable extreme --ctu --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/extreme_ctu || true
-                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme_ctu ${QUALITY_CODECHECKER_DIR}/extreme_ctu)
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme_ctu ${QUALITY_CODECHECKER_DIR}/codechecker_extreme_ctu)
 
 set(QUALITY_CPPCHECK_DIR ${QUALITY_DIR}/cppcheck)
 file(MAKE_DIRECTORY ${QUALITY_CPPCHECK_DIR})
