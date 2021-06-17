@@ -143,6 +143,8 @@ For now, code quality requirements are decided mostly by human review.  Addition
 
 - Any tool setup for code quality or other means of development shall be free software as well. On your side, you are free to use whatever tools you want if this use is not setup in the project.
 
+- All files shall be licensed with the Reuse tool [https://reuse.software/](https://reuse.software/).
+
 @section development_documentation Documentation 
 
 Code shall be documented. Documentation is meant to be concise, and is **complementary** with code, to help making it easier to use and maintain.

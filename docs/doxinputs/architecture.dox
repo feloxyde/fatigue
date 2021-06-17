@@ -13,7 +13,7 @@ Please note that this page assumes you already read the @ref tutorial Tutorial p
 
 @section architecture_repository Repository organization
 
-- **.reuse** directory containing infos for the Reuse licensing tool
+- **.reuse** directory containing infos for the Reuse licensing tool [https://reuse.software/](https://reuse.software/)
 - **cmake_llvm_coverage** Git submodule for coverage using LLVM.
 - **cxxopts** Git submodule of [jarro2783's cxxopts library](https://github.com/jarro2783/cxxopts), for parsing command lines options.
 - **docs** Files related to doc 
