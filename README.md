@@ -111,7 +111,7 @@ Please see issue list at [https://gitlab.com/feloxyde/fatigue/](https://gitlab.c
 
 # Documentation
 
-Documentation of the project, including API reference, architecture, tutorials and more can be found at **FIXME add here**.
+Documentation of the project, including API reference, architecture, tutorials and more can be found at [https://feloxyde.gitlab.io/fatigue/].
 
 If for some reason you can't access documentation, you can build it with : 
 
@@ -125,5 +125,5 @@ Then, simply run ```doxygen Doxyfile``` at the root of directory and an HTML doc
 
 Contributions are welcome, please read [Contributing.md](Contributing.md). 
 
-This project has currently not received contributions aside from maintainer, Felix Bertoni, [felix.bertoni987@gmail.com)](felix.bertoni987@gmail.com).
+This project has currently not received contributions aside from maintainer, Felix Bertoni, [felix.bertoni987@gmail.com](felix.bertoni987@gmail.com).
 

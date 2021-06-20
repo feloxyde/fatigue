@@ -107,7 +107,7 @@ licenses:
   stage: relcheck
   before_script:
     - sudo pacman -Syu --noconfirm
-    - sudo pacman -S --noconfirm pip
+    - sudo pacman -S --noconfirm python-pip
     - sudo pip3 install fsfe-reuse
   script:
     - 'reuse lint | grep "Congratulations! Your project is compliant with version 3.0 of the REUSE Specification"'
