@@ -103,7 +103,7 @@ doc:
 
 licenses:
   extends:
-    - .rules_stable_only
+    - .rules_all
   stage: relcheck
   before_script:
     - sudo pacman -Syu --noconfirm
