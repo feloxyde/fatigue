@@ -28,6 +28,7 @@ image: carterjones/manjaro
   before_script:
     - sudo pacman --noconfirm -Syu
     - sudo pacman --noconfirm -S doxygen graphviz
+    - git submodule update --init --recursive
 
 ## RULES ##
 

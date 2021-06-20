@@ -95,7 +95,7 @@ Please see documentation for a deeper insight.
 # Planned features
 
 The project is still in progress, and features will be added depending on my time and needs. This is an overview of some planned features, 
-Please see issue list at [https://gitlab.com/feloxyde/fatigue/](https://gitlab.com/feloxyde/fatigue/])for more informations.
+Please see issue list at [https://gitlab.com/feloxyde/fatigue/](https://gitlab.com/feloxyde/fatigue/)for more informations.
 
 ## Guaranteed features
 
@@ -111,7 +111,7 @@ Please see issue list at [https://gitlab.com/feloxyde/fatigue/](https://gitlab.c
 
 # Documentation
 
-Documentation of the project, including API reference, architecture, tutorials and more can be found at [https://feloxyde.gitlab.io/fatigue/].
+Documentation of the project, including API reference, architecture, tutorials and more can be found at [https://feloxyde.gitlab.io/fatigue/html/index.html](https://feloxyde.gitlab.io/fatigue/html/index.html).
 
 If for some reason you can't access documentation, you can build it with : 
 
