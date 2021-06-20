@@ -20,3 +20,7 @@ License: CC-BY-4.0
 Files: *.drawio
 Copyright: 2021 Felix Bertoni
 License: CC-BY-4.0
+
+Files : quality/*.txt
+Copyright: 2021 Felix Bertoni
+License: MIT

@@ -1,3 +1,7 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #ifndef FATIGUE_TESTS_UTILS_COMPARESTRINGS_HPP
 #define FATIGUE_TESTS_UTILS_COMPARESTRINGS_HPP
 

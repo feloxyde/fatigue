@@ -1,3 +1,9 @@
+<!--
+Copyright 2021 Felix Bertoni
+
+SPDX-License-Identifier: MIT
+-->
+
 # Code of conduct
 
 fatigue is a free an opensource library, and contributing to the project will likely lead you
