@@ -1,0 +1,26 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: fatigue
+Upstream-Contact: Felix Bertoni <felix.bertoni987@gmail.com>
+Source: https://gitlab.com/feloxyde/fatigue
+
+# Sample paragraph, commented out:
+#
+# Files: src/*
+# Copyright: $YEAR $NAME <$CONTACT>
+# License: ...
+
+Files: *.expected
+Copyright: 2021 Felix Bertoni 
+License: MIT
+
+Files: *.svg
+Copyright: 2021 Felix Bertoni
+License: CC-BY-4.0
+
+Files: *.drawio
+Copyright: 2021 Felix Bertoni
+License: CC-BY-4.0
+
+Files : quality/*.txt
+Copyright: 2021 Felix Bertoni
+License: MIT

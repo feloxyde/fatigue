@@ -1,0 +1,16 @@
+/*
+ * Copyright 2021 Felix Bertoni
+ *
+ * SPDX-License-Identifier: CC-BY-4.0
+ * SPDX-License-Identifier: MIT
+ */
+
+:root {
+    --primary-color : #ffade7ff;
+    --primary-dark-color : #ff8bddff;
+    --primary-light-color : #ffade7ff;
+    --primary-lighter-color : #ffade7ff;
+    --primary-lightest-color : #ffade7ff;
+
+    --content-maxwidth : auto;
+}

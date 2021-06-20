@@ -1,46 +1,11 @@
-#[[
-Copyright or © or Copr. Félix Bertoni (2020)
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
 
-felix.bertoni987@gmail.com
+cmake_minimum_required(VERSION 3.20.0)
 
-This software is a computer program whose purpose is to provide an easy way 
-to create softwares with a modulare design.
-
-This software is governed by the CeCILL-C license under French law and
-abiding by the rules of distribution of free software.  You can  use, 
-modify and/ or redistribute the software under the terms of the CeCILL-C
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info". 
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability. 
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or 
-data to be ensured and,  more generally, to use and operate it in the 
-same conditions as regards security. 
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL-C license and that you accept its terms.
-]]
-
-
-
-
-cmake_minimum_required(VERSION 3.1.0)
-option(ENABLE_GDB "enable gdb debug (-g) flag")
-
-#project declaration (noodle engine)
-project(fatigue)
+#project declaration
+project(fatigue_toplevel)
 
 
 include(ProcessorCount)
@@ -48,7 +13,6 @@ ProcessorCount(N_PROC)
 if(N_PROC EQUAL 0)
      set(N_PROC 1)
 endif()
-
 
 #testing enabled, comment to disable
 enable_testing()
@@ -58,6 +22,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+#Setting compiler flags and build types
+SET(CMAKE_CXX_FLAGS "-Wall -Wextra")
+SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O2")
+SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g -Werror")
+
 include(${CMAKE_CURRENT_LIST_DIR}/cmake_llvm_coverage/LLVMCoverage.cmake)
 #include(CMakeUtils.cmake)
 
@@ -65,75 +35,96 @@ set(CMAKE_CXX_STANDARD 20)
 
 #to generate with proper flags, please use 
 #cmake .. -DENABLE_LLVM_COVERAGE=ON -DENABLE_GDB=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+
 if(ENABLE_LLVM_COVERAGE)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping -O0 -g")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping -O0 -g")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping -ftest-coverage")
 endif()
 
 #setting the root directory for includes as the root of the project, 
 #so files can be included as <skuldenka/...>
-include_directories(${CMAKE_CURRENT_LIST_DIR})
-
-set(headers 
-    fatigue/Config.hpp
-    fatigue/fatigue.hpp
-    fatigue/OstreamTestRunner.hpp
-    fatigue/Suite.hpp
-    fatigue/Test.hpp
-    fatigue/TestDriver.hpp
-    fatigue/TestRunner.hpp
-    fatigue/utils.hpp
-)
-
-set(sources
-    fatigue/Config.cpp
-    fatigue/fatigue.cpp
-    fatigue/OstreamTestRunner.cpp
-    fatigue/Suite.cpp
-    fatigue/TestDriver.cpp
-)
+include_directories(BEFORE ${CMAKE_CURRENT_LIST_DIR})
 
 
-add_library(fatigue ${sources})
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fatigue/external)
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/cxxopts/include/cxxopts.hpp DESTINATION ${CMAKE_CURRENT_LIST_DIR}/fatigue/external)
+
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/fatigue)
+
+#installing headers
+#set_target_properties(fatigue PROPERTIES PUBLIC_HEADER "${headers}")
+install(DIRECTORY fatigue/ DESTINATION ${CMAKE_INSTALL_PREFIX}/fatigue/fatigue)
+install(FILES fatigue-config.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/fatigue)
+#installing lib
 
 ########################################################### 
 ########## TESTING ########################################
 ###########################################################
 
 
-set(unit_tests
-    tests/unit/test_Config.cpp
-    tests/unit/test_Filter.cpp
-    tests/unit/test_OstreamTestLogger_noparam.cpp 
-    tests/unit/test_OstreamTestRunner_noparam.cpp
-    tests/unit/test_OstreamTestRunner_exception.cpp
-    tests/unit/test_OstreamTestRunner_fatal.cpp
-    tests/unit/test_OstreamTestRunner_load_failure.cpp
-    tests/unit/test_OstreamTestRunner_passing.cpp
-    tests/unit/test_Test_automsg_fail_showtypes.cpp
-    tests/unit/test_Test_automsg_fail_showtypes_shownames.cpp
-    tests/unit/test_Test_automsg_fail.cpp
-    tests/unit/test_Test_automsg_pass.cpp
-    #tests/test_TestDriver.cpp
+add_subdirectory(tests)
+
+get_property(unit_binaries GLOBAL PROPERTY ts_fatigue_unit_BINARIES_LIST)
+
+file(GLOB_RECURSE sources LIST_DIRECTORIES false RELATIVE ${CMAKE_SOURCE_DIR} fatigue/*.[ch]pp )
+list(FILTER sources EXCLUDE REGEX fatigue/external/*)
+
+
+ADD_COVERAGE_REPORT(coverage_all COVERING ${sources} TESTS * BINARIES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${unit_binaries}) 
+
+########################################################### 
+########## QUALITY ########################################
+###########################################################
+
+set(QUALITY_DIR ${CMAKE_BINARY_DIR}/quality)
+set(QUALITY_REPORT_DIR ${QUALITY_DIR}/reports)
+set(COMPILE_COMMANDS ${CMAKE_BINARY_DIR}/compile_commands.json)
+
+file(MAKE_DIRECTORY ${QUALITY_REPORT_DIR})
+
+
+set(QUALITY_CODECHECKER_DIR ${QUALITY_DIR}/codechecker)
+set(QUALITY_CODECHECKER_SKIPFILE ${CMAKE_SOURCE_DIR}/quality/codechecker_skipfile.txt)
+file(MAKE_DIRECTORY ${QUALITY_CODECHECKER_DIR})
+
+add_custom_target(quality_all)
+
+add_custom_target(quality_codechecker_sensitive 
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable sensitive --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/sentitive || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive ${QUALITY_CODECHECKER_DIR}/codechecker_sentitive)
+
+add_custom_target(quality_codechecker_sensitive_ctu
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable sensitive --ctu --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/sentitive_ctu || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_sensitive_ctu ${QUALITY_CODECHECKER_DIR}/codechecker_sentitive_ctu)
+
+add_custom_target(quality_codechecker_extreme
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable extreme --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/extreme || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme ${QUALITY_CODECHECKER_DIR}/codechecker_extreme)
+
+add_custom_target(quality_codechecker_extreme_ctu
+                COMMAND codechecker analyze ${COMPILE_COMMANDS} --enable extreme --ctu --disable google-runtime-references --ignore ${QUALITY_CODECHECKER_SKIPFILE} --output ${QUALITY_CODECHECKER_DIR}/extreme_ctu || true
+                COMMAND codechecker parse --export html --output ${QUALITY_REPORT_DIR}/codechecker_extreme_ctu ${QUALITY_CODECHECKER_DIR}/codechecker_extreme_ctu)
+
+set(QUALITY_CPPCHECK_DIR ${QUALITY_DIR}/cppcheck)
+file(MAKE_DIRECTORY ${QUALITY_CPPCHECK_DIR})
+
+add_custom_target(quality_cppcheck_default
+                COMMAND cppcheck --project=${COMPILE_COMMANDS} --xml --output-file=${QUALITY_CPPCHECK_DIR}/default.xml
+                COMMAND cppcheck-htmlreport --title=DefaultReport --file=${QUALITY_CPPCHECK_DIR}/default.xml --report-dir=${QUALITY_REPORT_DIR}/cppcheck_default)
+
+add_custom_target(quality_cppcheck_all
+                COMMAND cppcheck --project=${COMPILE_COMMANDS} --enable=all --xml --output-file=${QUALITY_CPPCHECK_DIR}/all.xml
+                COMMAND cppcheck-htmlreport --title=AllEnabledReport --file=${QUALITY_CPPCHECK_DIR}/all.xml --report-dir=${QUALITY_REPORT_DIR}/cppcheck_all)
+
+add_custom_target(quality_cppcheck_bug_hunting
+                COMMAND cppcheck --project=${COMPILE_COMMANDS} --bug-hunting --enable=all --inconclusive --xml --output-file=${QUALITY_CPPCHECK_DIR}/bug_hunting.xml
+                COMMAND cppcheck-htmlreport --title=AllEnabledReport --file=${QUALITY_CPPCHECK_DIR}/bug_hunting.xml --report-dir=${QUALITY_REPORT_DIR}/cppcheck_bug_hunting)
+
+add_dependencies(quality_all
+                quality_codechecker_sensitive
+                quality_codechecker_sensitive_ctu
+                quality_codechecker_extreme
+                quality_codechecker_extreme_ctu
+                quality_cppcheck_default
+                quality_cppcheck_all
+                quality_cppcheck_bug_hunting 
 )
-
-ADD_TEST_SUITE(ts_fatigue)
-
-BUILD_TESTS_TO_SUITE(ts_fatigue
-TESTS ${unit_tests}
-SOURCES ""
-LIBS fatigue
-)
-
-add_executable(test_fatigue tests/system/test_fatigue.cpp)
-target_link_libraries(test_fatigue fatigue)
-
-set (comp_py ${CMAKE_CURRENT_LIST_DIR}/tests/system/compare.py)
-set (test_sys_dir ${CMAKE_CURRENT_LIST_DIR}/tests/system)
-
-ADD_COVERED_TEST(test_fatigue_cmdline CMD ${comp_py} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue ${test_sys_dir}/test_fatigue_cmdline.expected)
-ADD_COVERED_TEST(test_exclude_ostream CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --exclude 'suite3//.*|suite2.*//.*:0'" ${test_sys_dir}/test_exclude_ostream.expected)
-ADD_COVERED_TEST(test_select_ostream CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --select 'suite3//.*|suite2.*//.*:0'" ${test_sys_dir}/test_select_ostream.expected)
-ADD_COVERED_TEST(test_select_exclude_ostream CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_fatigue --select 'suite3//.*|suite2.*//.*:0' --exclude '.*2:0.*'" ${test_sys_dir}/test_select_exclude_ostream.expected)
-
-ADD_COVERAGE_REPORT(coverage_all CMD ctest COVERING ${headers} ${sources} TESTS * BIN fatigue)

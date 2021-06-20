@@ -1,3 +1,13 @@
+# Copyright 2021 Felix Bertoni
+#
+# SPDX-License-Identifier: MIT
+
 [submodule "cmake_llvm_coverage"]
 	path = cmake_llvm_coverage
 	url = ../../feloxyde/cmake_llvm_coverage
+[submodule "doxygen-awesome-css"]
+	path = doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "cxxopts"]
+	path = cxxopts
+	url = https://github.com/jarro2783/cxxopts.git

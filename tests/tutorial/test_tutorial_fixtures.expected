@@ -1,0 +1,22 @@
+------ RUNNING TESTS ------
+
+---- SuiteSharedFixture//TestSharedFixture:1
+---- passed : 1 checks, 0 failed.
+
+---- SuiteSharedFixture//TestSharedFixture:2
+---- passed : 1 checks, 0 failed.
+
+---- SuiteSharedFixture//TestSharedFixture:3
+---- passed : 1 checks, 0 failed.
+
+---- SuiteSharedFixture//TestSharedFixture:4
+---- passed : 1 checks, 0 failed.
+
+---- TestMemberFixture
+---- passed : 1 checks, 0 failed.
+
+---- TestLoadedFixture
+---- passed : 1 checks, 0 failed.
+
+---------- PASSED ---------
+ran : 6

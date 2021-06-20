@@ -1,242 +1,129 @@
-# fatigue
+<!--
+Copyright 2021 Felix Bertoni
 
-fatigue (Framework for Advanced Testing Including Grotesque User Experience), a simple and flexible testing framework. Probably not as user friendly as others, but more flexible and still simple
+SPDX-License-Identifier: MIT
+-->
 
-(namespace ftg) NOTE : depends on cxxopts
+# fatigue 
 
-# Problem
+*Framework for Advanced Testing Inducing a Grotestque User Experience.* 
+A simple C++ testing framework, template based and macro free. It is mainly oriented toward unit, integration testing through specification checking.
 
-## Flexibility
+Please see documentation section for more informations. 
 
-I was writing tests for another project, and somehow ended up with a need to test some assing-like methods on different types. Here is a quick example. 
+[[_TOC_]]
+
+# Overview
+
+This section is meant to give you a quick overview of how fatigue works, so you can decide quickly to adpot it or not. Please see documentation section for more informations regarding fatigue.
+
+To create a test, simply derive from the ```Test``` class and define the ```virtual void run()``` method.
+
+```cpp 
+class MyTest : public ftg::Test {
+    MyTest() : Test("MyTest"){}
+
+    virtual void run() {
+        
+    }
+
+};
+```
+Additionally, ```virtual void load() noexcept``` and ```virtual void unload() noexcept``` methods can be defined and will be called respectively just before and just after running the test through method ```run```. They are to be used for difficult or heavy ressource management. 
+
+```Test``` class provides several checks, to call from the ```run``` method body to implement tests.
+
+```cpp 
+virtual void run() {
+    check_equal(10, 20);
+    check_true(false);
+    check_near_equal(9, 9, 0.3, "some custom description");
+    /* and a lot more to discover*/
+}
+```
+
+Tests are to be grouped through test suites, by deriving from ```Suite``` class, and defining the ```virtual TestList tests()``` method.
 
 ```cpp
+class MySuite : public ftg::Suite {
+    MySuite() : Suite("MySuite"){}
 
-struct MyStruct {
-    /*some constructors here */
-    MyStruct(Mystruct const& origin);
-
-    MyStruct(JSON const& json);
-    operator JSON() const;
-
-    MyStruct& operator=(MyStruct const& other);
-
-    /* some more code */
-private:
-    /* some nontrivial copy members here,
-    A, B and C 
-    */
+    virtual ftg::TestList tests(){
+        ftg::TestList tl;
+        tl.push_back(std::make_unique<MyTest>());
+        return tl;
+    }
 };
 ```
 
-Construction and cast to ```JSON``` is meant to be directional, so all three following lines are strictly equivalents in terms of object they produce :
+Finally, in the main of the test software, suites are registered and run according to CLI config.
 
 ```cpp
-Mystruct a(...), b(...);
-MyStruct a(b);
-MyStruct c(b);
-MyStruct d( JSON(b) );
-```
-
-My requirements here for tests are fairly simple : For each operation, I want to write a test suite that takes in an arbitrary number of ```MyStruct``` factories as parameter, and check that their result operation matches the original. It shall be compatible with other types as well. So, roughly, is would perform the same operations as following code.
-
-```cpp
-/* true if fails, false if passes */
-template<typename T>
-RESULT testAssignOperator(std::vector<Factory<T>> variations)
-{
-    for (auto const& v : variations){
-        T origin = v.create();
-        T target(); //default construction or something like that 
-        target = origin;
-        if(!(target == origin)){
-            return FAIL; //of course with more info
-        }
-    }
-    return PASS;
-}
-```
-That's the idea, except that I want to get a more detailed report, and especially, I want to have *one test* for *each* variation. At this point, most, if not all, frameworks are already unable to provide a flexible solution. 
-
-## Dependencies
-
-When writing my tests, I often write them *assuming* some functionality of the subject or other components are passing already. For example, in my previous templated test function example, I assumed that ```bool T::operator==(T const& other) const``` is functional. 
-
-On a quick sidenote, this operator is even more time-consuming to test than assign-like operators and methods, as it requires to check that *two of the same variation are matching* **and** *two elements of different variants are not matching*. For ```n``` variation, it requires performing roughly ```n^2``` assertions.
-
-
-```cpp
-/* true if fails, false if passes */
-template<typename T>
-RESULT testEqualOperator(std::vector<Factory<T>> variations)
-{
-    for(size_t v = 0; v < variations.size(); v++){
-        T target = variations[v].create();
-        for(size_t u = 0; u < variations.size(); u++){
-            T sample = variations[u].create();
-            if(v == u && !(target == sample) ||
-               v != u && target == sample) {
-                   return FAIL;
-            }
-        }
-    }
-    return TRUE;
+int main(int argc, char**argv){
+    return fatigue(argc, argv)
+    .declare(std::make_unique<MySuite>())
+    .run();
 }
 ```
 
-It becomes even more a nightmare to handle with most frameworks if you want precise report. But that's not the point here, let's back on topic.
+The program returns ```0``` if all tests succeeds, something else if some tests fails. 
 
-So, the idea is that I want that in case tests for ```operator=``` and ```operator==``` both fails, I want to be informed that the first depends on the second. This way, I know that it would be wise to first investigate why the second didn't pass. 
-I also, eventually, want a way to tell that no test were run for this particular operator, as *test for MyStruct::operator= depends on MyStruct::operator==, which doesn't appears to have been tested.*
-
-## Learning curve, debug and portability.
-
-Most frameworks able to handle some of previously regarded features are :
-1) Using macros extensively, making it hard to debug certain errors, as well as increasing the difficulty of making hacks.
-2) Are not using C++ 20 concepts, making it hard to debug when they rely on templates.
-3) Are not using std library only, and thus adding even more dependencies to the project. 
-4) Are not header only, which can make them nontrivial to install on unusual systems.  
-5) Most frameworks are unable to display conditional messages to give more info if test fails, which is quite inconvenient. 
-
-
-# Solution : Three class Framework
-
-In order to use the fatigue framework, only two classes and two methods are to be known. It's use is somehow inspired from Pytest framework, where tests are implemented by deriving a test class. 
-
-Especially, this framework is oriented toward ensuring debug of the code is as simple as possible.
-
-## ```Test```
-
-Is the struct holding a test. Tests shall be derived from it. 
-In order to run it, you only need to override four methods, each taking no arguments. Please note ```Test``` takes a mandatory ```std::string``` name parameter.
-
-- ```run```, mandatory, which runs the test
-- ```load```, optional, which creates resources needed for the test.
-- ```unload```, optional, which destroys resources needed for the test.
-- ```depends```, optional, which returns a list of tests identifiers that the test depends on.
-
-```cpp 
-//should Test should be instanciated with final class, in order to auto name ?
-//Test has an additional
-struct MyTest : public ftg::Test {
-    virtual void load();
-    virtual void run();
-    virtual void unload();
-    virtual std::list<TestId> name() const; 
-};
-```
-
-The test class provides utilities to write checks in your tests. 
+Checks can customized to display a special message
 
 ```cpp
-check_equal(a, b); /* ensures that A and B are equal */
-check_close(a, b, tolerance); /* ensures that A and B are near equal */
-/* ... */
-```
-By default, checks are non-fatal, and test will continue. By default, a failing assertion will fail the test. 
-Check can stop test by specifying ```FATAL``` as a template parameter, or by using asserts.
-
-```cpp
-check_equal<FATAL>(a, b);
-assert_equal(a, b); //equivalent to previous line
+//in run method
+check_true(true);
+check_equal(10, 20.0);
+check_true(false, "custom check");
+//end run method
 ```
 
-Check can print a message without stopping the test by specifying ```WARN``` as a template parameter, or using warnings.
+Will produce output as : 
 
-```cpp
-check_equal<WARN>(a, b);
-warn_equal(a, b); //equivalent to previous line
+```
+(2) [ERROR] check_equal( 10, 20 ) -> true : failed.
+(3) [ERROR] custom check -> true : failed.
+```
+Some runners allows to display additional informations through cli switches, as names (```-n```) or types (```-t```) of checks arguments.
+
+```
+(2) [ERROR] expected check_equal( l: 10 [int), r: 20 [double] ) to succeed, but failed.
 ```
 
-Checks can take an optional string message parameter to give precision on what failed. 
+Please see documentation for a deeper insight.
 
-```cpp
-check_equal<WARN>(a, b, "a and b not equal feels strange, please rerun test");
-```
+# Planned features
 
-Finally, the class gives options to display messages. Those messages are displayed *only if the test fails*. By default, they are displayed if either the previous or the next check fails. This behavior can be changed by setting template parameters. 
+The project is still in progress, and features will be added depending on my time and needs. This is an overview of some planned features, 
+Please see issue list at [https://gitlab.com/feloxyde/fatigue/](https://gitlab.com/feloxyde/fatigue/])for more informations.
 
-```cpp 
-assert_equal(a, b); //1
-message("a = " + a); //this will be displayed either assert 1 or 2 fails
-assert_equal(a, c); //2
-```
+## Guaranteed features
 
-```cpp
-assert_equal(a, b); //1
-assert_equal(a, c); //2
-message<PREV, 2>("a = "); //this will be displayed 
-                          //if either assert 1 or 2 fails, but not if 3 fails
-assert_equal(a, c); //3
-```
+- parallel and segfault proof test runners
+- dependencies between tests
+- superfast and lightweight runner
 
-```cpp
-assert_equal(a, b); //1
-message<NEXT, 2>("a = "); //this will be displayed if either assert 
-                          //2 or 3 fails, but not if 1 fails
-assert_equal(a, c); //2
-assert_equal(a, c); //3
-```
+## On the fly features
 
-```cpp
-assert_equal(a, b); //1
-message<ANY, 2>("a = "); //this will be displayed if either 
-                         //assert 1, 2 or 3 fails
-assert_equal(a, c); //2
-assert_equal(a, c); //3
-```
+- More checks than current available ones, especially regarding string and data collections
+- Better display runners
+- Test archetypes, as for example for testing ```==``` operator quickly.
 
-```cpp
-assert_equal(a, b); //1
-message<TEST>("a = "); //this will be displayed if test fails.
-assert_equal(a, c); //2
-assert_equal(a, c); //3
-```
+# Documentation
 
-## ```TestSuite```
+Documentation of the project, including API reference, architecture, tutorials and more can be found at **FIXME add here**.
 
-Test suite provides a way to generate a battery of tests and run them in isolated behavior. **Please note that for now, isolation is only in the same thread, but it could later be in a different process!**. 
+If for some reason you can't access documentation, you can build it with : 
 
-To create your own suite, simply derive from ```TestSuite``` struct, and override the ```testsList tests() const``` method. 
-Please note that ```TestSuite``` constructor takes a ```std::string``` name as mandatory parameter.
+- *Doxygen* and its dependencies, as Python.
+- *dot*, a graphviz tool usually found in the graphviz package of your distribution.
 
-```cpp 
-struct MySuite : public ftg::TestSuite {
-    /* some ctor */
-    virtual void testList tests() const;
-}
-```
+Then, simply run ```doxygen Doxyfile``` at the root of directory and an HTML doc will be generated in 
+```build/docgen``` directory, with ```build/docgen/html/index.html``` as entry point. 
 
-```testList``` is an alias for 
+# Contributions
 
-```cpp
-std::unique_ptr<std::vector<std::unique_ptr<itoofut::Test>>>;
-```
+Contributions are welcome, please read [Contributing.md](Contributing.md). 
 
-With this, we can handle our nasty test cases. 
+This project has currently not received contributions aside from maintainer, Felix Bertoni, [felix.bertoni987@gmail.com)](felix.bertoni987@gmail.com).
 
-## ```TestRunner```
-
-Test runner provides a singleton interface that is able to register suites, as well as a command line parser for filtering tests and choosing which one to run. 
-You can interact with it either with 
-
-Usually, the bottom of the *main* file of your tests will look like that : 
-
-```cpp
-void register_tests(){
-    ::ftg::add(std::make_unique<MySuite>("MySuite"));
-    ::ftg::add(std::make_unique<AnotherSuite>("AnotherSuite"));
-    /* ... */
-}
-
-int main(int argc, char** argv){
-    register_tests();
-    ::ftg::run(argc, argv);
-}
-```
-
-FIXME add syntax for cli here !
-
-## Utilities
-
-A function to convert a type into a string.

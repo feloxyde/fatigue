@@ -1,80 +1,88 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
 #include "Config.hpp"
 
 #include <iostream>
 #include <memory>
-#include <cxxopts.hpp>
 #include <regex>
-#include "OstreamTestRunner.hpp"
 
 namespace ftg {
 
-
-
-Filter::Filter() : select(), exclude(), separator("//"){}
-Filter::~Filter(){}
-
-bool Filter::shouldRun(std::string const& suite, std::string const& test) const
+Filter::Filter() : select(), exclude(), separator("//")
 {
-    std::string fullname=suite + separator + test;
-
-    bool run = true;
-    if(select.has_value()){
-        run = std::regex_match(fullname, select.value());
-    }
-    if(exclude.has_value()){
-        run = ! std::regex_match(fullname, exclude.value());
-    }
-
-    return run;
 }
-
-
-
-Config& config() {
-    return Config::instance();
-}
-//#FIXME note : can use some kind of defer caller to actually force configure/add tests/run in the right order : 
-//ftg::configure(argc, argv).addSuite().addSuite().[...].run();
-
-Config& Config::instance() {
-    if(!instancePtr){
-        instancePtr = std::make_unique<Config>(); 
-    }
-    return *instancePtr;
-}
-
-std::unique_ptr<Config> Config::instancePtr;
-
-Config::Config() : showParamNames(false), showParamTypes(false), runner(std::make_unique<OstreamTestRunner>(std::cout)), filter(){}
-Config::~Config(){}
-
-void Config::loadFromCLI(int argc, char**argv)
+Filter::~Filter()
 {
-    cxxopts::Options opts("Fatigue built test software", "You are supposed to know this btw.");
-    opts.add_options()
-    ("t,showtypes", "show parameter types when displaying checks results", cxxopts::value<bool>()->default_value("false"))
-    ("n,shownames", "show parameter names when displaying checks results", cxxopts::value<bool>()->default_value("false"))
-    ("r,runner", "selects which runner to use to conduct tests", cxxopts::value<std::string>()->default_value("SequentialCout"))
-    ("s,select", "runs tests matching a regular expression", cxxopts::value<std::string>())
-    ("e,exclude", "excludes tests matching a regular expression", cxxopts::value<std::string>());
-
-    auto results = opts.parse(argc, argv);
-
-    showParamNames = results["shownames"].as<bool>();
-    showParamTypes = results["showtypes"].as<bool>();
-    
-    if(results["runner"].as<std::string>() == "SequentialCout"){
-        runner = std::make_unique<OstreamTestRunner>(std::cout);
-    }
-
-    if(results["select"].count()){
-        filter.select = results["select"].as<std::string>();
-    }
-
-    if(results["exclude"].count()){
-        filter.exclude = results["exclude"].as<std::string>();
-    }
-
 }
 
+bool Filter::shouldRun(std::vector<std::string> const& prefixes, std::string const& test) const
+{
+  std::string fullname = "";
+
+  for (auto const& s : prefixes) {
+    fullname += s + separator;
+  }
+
+  fullname += separator + test;
+
+  bool run = true;
+  if (select.has_value()) {
+    run = run && std::regex_match(fullname, select.value());
+  }
+  if (exclude.has_value()) {
+    run = run && !std::regex_match(fullname, exclude.value());
+  }
+  return run;
 }
+
+Config::Config() : showParamNames(false), showParamTypes(false), runner("default"), filter()
+{
+}
+
+Config::~Config()
+{
+}
+
+
+void Config::loadFromOpts(cxxopts::ParseResult const& res)
+{
+
+  showParamNames = res[RunnerOptions::shownames].as<bool>();
+  if (showParamNames) {
+    m_runnerOptions.emplace(RunnerOptions::shownames);
+  }
+
+  showParamTypes = res[RunnerOptions::showtypes].as<bool>();
+  if (showParamTypes) {
+    m_runnerOptions.emplace(RunnerOptions::showtypes);
+  }
+
+  runner = res[RunnerOptions::runner].as<std::string>();
+
+  if (res[RunnerOptions::select].count()) {
+    filter.select = res[RunnerOptions::select].as<std::string>();
+    foundRunnerOption(RunnerOptions::select);
+  }
+
+  if (res[RunnerOptions::exclude].count()) {
+    foundRunnerOption(RunnerOptions::exclude);
+    filter.exclude = res[RunnerOptions::exclude].as<std::string>();
+  }
+
+  //listing runners
+}
+
+std::unordered_set<std::string> const& Config::options() const
+{
+  return m_runnerOptions;
+}
+
+
+void Config::foundRunnerOption(std::string const& option)
+{
+  m_runnerOptions.emplace(option);
+}
+
+} // namespace ftg

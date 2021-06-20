@@ -1,0 +1,16 @@
+------ RUNNING TESTS ------
+
+---- SpecsConcat<factoryListConcat>//Many
+---- passed : 1 checks, 0 failed.
+
+---- SpecsConcat<factoryListConcat>//Empty
+---- passed : 1 checks, 0 failed.
+
+---- SpecsConcat<factoryListConcat>//Many
+---- passed : 1 checks, 0 failed.
+
+---- SpecsConcat<factoryListConcat>//Empty
+---- passed : 1 checks, 0 failed.
+
+---------- PASSED ---------
+ran : 4

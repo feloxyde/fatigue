@@ -1,0 +1,19 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
+/**
+@defgroup user_api User Api
+
+This groups document components that are likely to be used on a regular basis.
+
+- ftg::Test class is the one you derive from when writing tests. 
+
+- ftg::Suite allows grouping a set of tests. 
+
+- ftg::fatigue processes inputs and runs a runner on registered tests.
+
+- ftg::Check is an object returned by ```check_*``` methods of ftg::Test class, allowing further customization of the reporting.  
+
+Additionally, all checks are listed in the @ref checks Checks page.
+*/

@@ -1,0 +1,17 @@
+------ RUNNING TESTS ------
+
+---- Avg//Empty
+---- passed : 1 checks, 0 failed.
+
+---- Avg//One
+---- passed : 1 checks, 0 failed.
+
+---- Avg//Many
+---- passed : 1 checks, 0 failed.
+
+---- EqTen
+(2) [WARN] check_near_equal( 9 ) -> true : failed.
+---- passed : 2 checks, 1 failed.
+
+---------- PASSED ---------
+ran : 4
