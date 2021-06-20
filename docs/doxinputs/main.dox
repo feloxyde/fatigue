@@ -28,6 +28,8 @@ Namespaces, classes and files dropdowns gives you access to api and internal doc
 
 \ref development "Development" provides guidelines regarding development practices of the project, and is aimed to people wanting to contribute to fatigue.
 
+\ref changelog "Changelog" Changelog of the project.
+
 @section main_license License and use
 
 Note that this section has no legal value, it is only a quick -and possibly inaccurate- summary of licensing through .
