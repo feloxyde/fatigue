@@ -14,7 +14,8 @@ public:
 
   virtual void run()
   {
-    check_equals_ten(10); //checking our function
+    check_equals_ten(10);       //checking our function
+    check_equals_ten(9).warn(); //same, but as warning
   }
 };
 

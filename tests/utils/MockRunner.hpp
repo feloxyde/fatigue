@@ -1,3 +1,8 @@
+// Copyright 2021 Felix Bertoni
+//
+// SPDX-License-Identifier: MIT
+
+
 #ifndef FATIGUE_TESTS_UTILS_MOCKRUNNER_HPP
 #define FATIGUE_TESTS_UTILS_MOCKRUNNER_HPP
 
@@ -16,7 +21,7 @@ struct LogItem {
 struct MockLogger : public Logger {
   MockLogger() {}
   virtual ~MockLogger() {}
-  virtual void report(Message const& report) { log.push_back(report); }
+  virtual void report(Message const& report) noexcept { log.push_back(report); }
 
   size_t countCheckPassed()
   {

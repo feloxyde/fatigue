@@ -115,6 +115,7 @@ protected:
 
   /**
   \defgroup checks Checks
+  This group lists all checks provided by ftg::Test class for quick access.
   @{
   */
 

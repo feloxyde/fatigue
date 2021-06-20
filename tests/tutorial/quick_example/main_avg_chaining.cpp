@@ -8,8 +8,9 @@
 
 int main(int argc, char** argv)
 {
-
-  auto f = ftg::fatigue(argc, argv);
-  f.declare(std::make_unique<Avg>());
-  return f.run();
+  // clang-format off
+  return ftg::fatigue(argc, argv)
+        .declare(std::make_unique<Avg>())
+        .run();
+  // clang-format on
 }

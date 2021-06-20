@@ -10,11 +10,11 @@
 
 Hello there ! Welcome in the documentation of the *fatigue* testing framework. fatigue stands for Framework for Advanced Testing Inducing a Grotesque User Experience. Grotesque, because unlike most testing frameworks, it sacrifices a bit of simplicity to for flexibility and extensibility, having user handle test registration manually. Therefore, you probably want to use it only for what it is used for : extensive unit and integration testing, including component specification testing. 
 
-In summary, fatigue is a testing framework not frame user too much.
+In summary, fatigue is a testing framework not framing too much.
 
 \tableofcontents{html}
 
-@section main_contents Contents
+@section main_contents In this documentation
 
 \ref tutorial "Tutorial" is an introduction on how to use fatigue. If you are new, you should probably start reading here.
 

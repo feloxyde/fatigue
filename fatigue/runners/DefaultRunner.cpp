@@ -60,7 +60,7 @@ unsigned DefaultRunner::run(TestList const& tests)
 }
 
 
-void DefaultRunner::report(Logger::Message const& message)
+void DefaultRunner::report(Logger::Message const& message) noexcept
 {
   if (message.expected == message.result) {
     m_currentRun.checkPassed++;

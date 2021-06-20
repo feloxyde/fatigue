@@ -30,7 +30,7 @@ public:
   virtual std::unordered_set<std::string> supportedOptions() const;
   virtual unsigned run(TestList const& tests);
 
-  virtual void report(Logger::Message const& message);
+  virtual void report(Logger::Message const& message) noexcept;
 
 protected:
   /** @brief Selects whether to run suite or test for each element of testlist. */

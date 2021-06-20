@@ -16,7 +16,7 @@ public:
     return std::unordered_set<std::string>({"select"});
   }
 
-  virtual void report(Logger::Message const&) {}
+  virtual void report(Logger::Message const&) noexcept {}
 
   virtual unsigned run(ftg::TestList const&) { return 1; }
 };

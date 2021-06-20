@@ -55,3 +55,11 @@ ADD_COVERED_TEST(test_ex_fast
     CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_tutorial_ex -f" ${test_tutorial_dir}/test_tutorial_ex_fast.expected
     SUITE ts_fatigue_tutorial)
 
+
+ADD_COVERED_TEST(test_ex_werror_default
+    CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_tutorial_ex -w" ${test_tutorial_dir}/test_tutorial_ex_werror_default.expected
+    SUITE ts_fatigue_tutorial)
+
+ADD_COVERED_TEST(test_ex_werror_fast
+    CMD ${comp_py} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_tutorial_ex -f -w" ${test_tutorial_dir}/test_tutorial_ex_werror_fast.expected
+    SUITE ts_fatigue_tutorial)

@@ -70,7 +70,13 @@ struct Logger {
   };
 
   virtual ~Logger(){};
-  virtual void report(Message const& message) = 0;
+
+  /** @brief Receive a message from ftg::Check objects to report test execution
+
+    Please note that this method has to be noexcept since it will likely be called 
+    in the destructor of ftg::Check objects.
+  */
+  virtual void report(Message const& message) noexcept = 0;
 };
 
 } // namespace ftg
